@@ -10,7 +10,5 @@ public class FieldDefinition {
     private String strategy;
     private String identifyBy;
     private ItemMergeDefinition itemMergeDefinition;
-    private Integer DB;
-    private Integer GUI;
     private Object defaultValue;
 }

@@ -80,7 +80,7 @@ class AverageValueStrategyTest {
             Object result = strategy.merge(sources, fieldDef, fieldName);
 
             // Assert
-            assertEquals(4.0, result); // (4.5 + 3.5) / 2 = 4.0
+            assertEquals(4, result); // (4.5 + 3.5) / 2 = 4.0, returned as int
         }
     }
 

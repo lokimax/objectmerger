@@ -33,7 +33,10 @@ public class AverageValueStrategy implements MergeStrategy<Object> {
 
         double average = sum / count;
         
-        // Return as Integer if all values were integers
-        return (average == Math.floor(average)) ? (int) average : average;
+        // Return as Integer if result is a whole number, otherwise as Double
+        if (average == Math.floor(average) && average <= Integer.MAX_VALUE && average >= Integer.MIN_VALUE) {
+            return (int) average;
+        }
+        return average;
     }
 }
