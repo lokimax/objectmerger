@@ -15,7 +15,12 @@ public class MinimumValueStrategy implements MergeStrategy<Object> {
         return sources.stream()
                 .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
                 .filter(Objects::nonNull)
-                .min(Comparator.comparingInt(value -> (Integer) value))
+                .min(Comparator.comparingDouble(value -> {
+                    if (value instanceof Number) {
+                        return ((Number) value).doubleValue();
+                    }
+                    throw new IllegalArgumentException("Field " + fieldName + " must be a number for minimum strategy, but was: " + value.getClass().getSimpleName());
+                }))
                 .orElse(fieldDef.getDefaultValue());
     }
 }

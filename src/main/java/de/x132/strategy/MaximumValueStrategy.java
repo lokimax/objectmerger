@@ -15,7 +15,12 @@ public class MaximumValueStrategy implements MergeStrategy<Object> {
         return sources.stream()
                 .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
                 .filter(Objects::nonNull)
-                .max(Comparator.comparingInt(value -> (Integer) value))
+                .max(Comparator.comparingDouble(value -> {
+                    if (value instanceof Number) {
+                        return ((Number) value).doubleValue();
+                    }
+                    throw new IllegalArgumentException("Field " + fieldName + " must be a number for maximum strategy, but was: " + value.getClass().getSimpleName());
+                }))
                 .orElse(fieldDef.getDefaultValue());
     }
 }
