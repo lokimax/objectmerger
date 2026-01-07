@@ -307,3 +307,44 @@ src/
 Im `src/test/resources/` Verzeichnis finden Sie Beispiel-JSON-Dateien:
 - `person/` - Beispiele für einfaches Merge-Szenario (3 Quellen: analytics, crm, database)
 - `family/` - Beispiele für Listen-Merge-Szenario
+
+## CLI-Beispielanwendung
+
+Eine kleine Kommandozeilen-App befindet sich unter `examples/objectmerger-cli`. Sie bezieht die Library über Maven und erlaubt das Mergen von JSON-Dateien anhand einer Merge-Definition.
+
+### Build
+
+```bash
+# Library ins lokale Maven-Repo installieren
+mvn -q clean install
+
+# CLI-Jar bauen (fat jar)
+mvn -q -f examples/objectmerger-cli/pom.xml clean package
+```
+
+### Nutzung
+
+```bash
+# Beispiel: Person aus drei Quellen mergen und Ergebnis ausgeben
+java -jar examples/objectmerger-cli/target/objectmerger-cli-0.1.0-SNAPSHOT.jar \
+  --target-class de.x132.cli.Person \
+  --definition examples/objectmerger-cli/src/main/resources/person/person-merge-definition.json \
+  --source database=examples/objectmerger-cli/src/main/resources/person/db-person.json \
+  --source crm=examples/objectmerger-cli/src/main/resources/person/crm-person.json \
+  --source analytics=examples/objectmerger-cli/src/main/resources/person/analytics-person.json
+
+# Optional: Ergebnis in Datei schreiben
+java -jar examples/objectmerger-cli/target/objectmerger-cli-0.1.0-SNAPSHOT.jar \
+  -t de.x132.cli.Person \
+  -d examples/objectmerger-cli/src/main/resources/person/person-merge-definition.json \
+  -s database=examples/objectmerger-cli/src/main/resources/person/db-person.json \
+  -s crm=examples/objectmerger-cli/src/main/resources/person/crm-person.json \
+  -s analytics=examples/objectmerger-cli/src/main/resources/person/analytics-person.json \
+  -o merged-person.json
+```
+
+Parameter:
+- `--target-class` (`-t`): Vollqualifizierter Klassenname des Ziel-Objekts
+- `--definition` (`-d`): Pfad zur Merge-Definitions-JSON
+- `--source` (`-s`): Mehrfach wiederholbar; Format `label=pfad/zur.json`
+- `--output` (`-o`): Optionaler Pfad für die Ausgabedatei (ansonsten stdout)
