@@ -2,6 +2,11 @@
 
 Eine Java-Library zum intelligenten Zusammenführen von Objektdaten aus mehreren Quellen (z.B. verschiedene Datenbanken, APIs, externe Services). Mit konfigurierbaren Merge-Strategien können Sie festlegen, welche Datenquelle Vorrang hat oder wie Daten kombiniert werden.
 
+**Multi-Module Maven Projekt mit:**
+- **objectmerger**: Kern-Library mit Merge-Logik und 8 Strategien
+- **objectmerger-cli**: Kommandozeilen-Tool für JSON-Merging
+- **objectmerger-spring-boot**: REST API mit Swagger/OpenAPI-Dokumentation
+
 ## Anwendungsbeispiele
 
 - **Datenverschmelzung**: Konsolidierung von Kundendaten aus CRM, Datenbank und Analytics
@@ -127,16 +132,28 @@ Fügen Sie folgende Dependency zu Ihrem `pom.xml` hinzu:
 
 ## Build & Test
 
+Das Projekt ist als Multi-Module Maven Projekt strukturiert:
+
 ```bash
-# Projekt bauen und Tests ausführen
-mvn clean test
+# Gesamtes Projekt bauen (alle Module)
+mvn clean install
 
-# Nur JAR-Datei erstellen
-mvn clean package
-
-# Tests kompilieren und ausführen
+# Nur Tests ausführen
 mvn test
+
+# Build ohne Tests
+mvn clean install -DskipTests
+
+# Einzelnes Modul bauen
+mvn -pl objectmerger clean install
+mvn -pl objectmerger-cli clean package
+mvn -pl objectmerger-spring-boot clean package
 ```
+
+Build-Reihenfolge:
+1. `objectmerger` - Core Library
+2. `objectmerger-cli` - CLI Tool (hängt von objectmerger ab)
+3. `objectmerger-spring-boot` - REST API (hängt von objectmerger ab)
 
 ## Schnelstart
 
@@ -196,40 +213,47 @@ System.out.println("Tags: " + merged.getTags());
 ## Projektstruktur
 
 ```
-src/
-├── main/java/de/x132/
-│   ├── ObjectMerger.java                    # Hauptklasse - Merging-Logik
-│   ├── MergeDefinition.java                 # Container für Feld-Definitionen
-│   ├── FieldDefinition.java                 # Definition für einzelne Felder
-│   ├── ItemMergeDefinition.java             # Definition für Listen-Items
-│   ├── LabeledSource.java                   # Quelle mit Label (z.B. "database", "api")
-│   └── strategy/
-│       ├── MergeStrategy.java               # Interface für alle Strategien
-│       ├── PriorityMergeStrategy.java       # Prioritätsbasierte Auswahl (Standard)
-│       ├── MinimumValueStrategy.java        # Findet Minimum-Wert
-│       ├── MaximumValueStrategy.java        # Findet Maximum-Wert
-│       ├── AverageValueStrategy.java        # Berechnet Durchschnittswert
-│       ├── SumValueStrategy.java            # Berechnet Summe
-│       ├── ConcatenateStrategy.java         # Vereinigt Strings mit Priorität
-│       ├── ListMergeStrategy.java           # Mergt Listen von Objekten
-│       └── MapMergeStrategy.java            # Mergt Map-Objekte nach Key
-└── test/java/
-    ├── person/
-    │   ├── Person.java                      # Test-Modell
-    │   └── MultiSourceMergeTest.java        # Integration-Test
-    ├── family/
-    │   ├── Family.java                      # Test-Modell für Listen-Merging
-    │   ├── FamilyMember.java
-    │   └── ListMergeTest.java               # Listen-Merge-Test
-    └── strategy/
-        ├── PriorityMergeStrategyTest.java
-        ├── MinimumValueStrategyTest.java
-        ├── MaximumValueStrategyTest.java
-        ├── AverageValueStrategyTest.java
-        ├── SumValueStrategyTest.java
-        ├── ConcatenateStrategyTest.java
-        ├── ListMergeStrategyTest.java
-        └── MapMergeStrategyTest.java
+objectmerger/                              # Parent POM - Multi-Module Projekt
+├── pom.xml                               # Parent POM mit Dependency Management
+├── objectmerger/                         # Core Library Modul
+│   ├── pom.xml                          # Core Library POM
+│   └── src/
+│       ├── main/java/de/x132/
+│       │   ├── ObjectMerger.java        # Hauptklasse - Merging-Logik
+│       │   ├── MergeDefinition.java     # Container für Feld-Definitionen
+│       │   ├── FieldDefinition.java     # Definition für einzelne Felder
+│       │   ├── ItemMergeDefinition.java # Definition für Listen-Items
+│       │   ├── LabeledSource.java       # Quelle mit Label
+│       │   └── strategy/
+│       │       ├── MergeStrategy.java
+│       │       ├── PriorityMergeStrategy.java
+│       │       ├── MinimumValueStrategy.java
+│       │       ├── MaximumValueStrategy.java
+│       │       ├── AverageValueStrategy.java
+│       │       ├── SumValueStrategy.java
+│       │       ├── ConcatenateStrategy.java
+│       │       ├── ListMergeStrategy.java
+│       │       └── MapMergeStrategy.java
+│       └── test/java/                   # 62 Unit Tests
+├── objectmerger-cli/                     # CLI Tool Modul
+│   ├── pom.xml                          # CLI POM mit Picocli
+│   ├── README.md                        # CLI-spezifische Dokumentation
+│   └── src/
+│       └── main/java/de/x132/cli/
+│           ├── ObjectMergerCli.java     # Picocli Command
+│           └── Person.java              # Demo-Model
+└── objectmerger-spring-boot/            # REST API Modul
+    ├── pom.xml                          # Spring Boot POM
+    ├── README.md                        # REST API Dokumentation
+    └── src/
+        ├── main/java/de/x132/objectmerger/
+        │   ├── ObjectMergerApplication.java
+        │   ├── controller/MergeController.java
+        │   ├── service/ObjectMergerService.java
+        │   ├── dto/                     # Request/Response DTOs
+        │   ├── model/Person.java
+        │   └── util/MergeDefinitionConverter.java
+        └── test/java/                   # 21 Integration Tests
 ```
 
 ## Erweiterte Konfiguration
@@ -300,74 +324,106 @@ src/
 
 - **Aktuell**: 0.1.0-SNAPSHOT
 - **Java**: 21 LTS
+- **Maven**: 3.8+
 - **License**: MIT
+
+## Module
+
+| Modul | Beschreibung | Artifact |
+|-------|-------------|----------|
+| `objectmerger` | Core Library mit Merge-Logik | `de.x132:objectmerger:0.1.0-SNAPSHOT` |
+| `objectmerger-cli` | Kommandozeilen-Tool (Picocli) | `de.x132:objectmerger-cli:0.1.0-SNAPSHOT` |
+| `objectmerger-spring-boot` | REST API mit Swagger UI | `de.x132:objectmerger-spring-boot:0.1.0-SNAPSHOT` |
+
+## Test-Abdeckung
+
+- **objectmerger**: 62 Unit Tests (alle Strategien)
+- **objectmerger-spring-boot**: 21 Integration Tests (Controller, Service, Converter)
+- **Gesamt**: 83 Tests
 
 ## Beispiel-Daten
 
-Im `src/test/resources/` Verzeichnis finden Sie Beispiel-JSON-Dateien:
+Im `objectmerger/src/test/resources/` Verzeichnis finden Sie Beispiel-JSON-Dateien:
 - `person/` - Beispiele für einfaches Merge-Szenario (3 Quellen: analytics, crm, database)
 - `family/` - Beispiele für Listen-Merge-Szenario
+- `sales/` - Beispiele für Sum-Strategie (4 Quellen: amazon, ebay, shopify, woocommerce)
 
-## CLI-Beispielanwendung
+---
 
-Eine kleine Kommandozeilen-App befindet sich unter `examples/objectmerger-cli`. Sie bezieht die Library über Maven und erlaubt das Mergen von JSON-Dateien anhand einer Merge-Definition.
+## CLI-Modul: objectmerger-cli
+
+Eine Kommandozeilen-Anwendung zum Mergen von JSON-Dateien.
 
 ### Build
 
 ```bash
-# Library ins lokale Maven-Repo installieren
-mvn -q clean install
+# Gesamtes Projekt bauen (baut automatisch CLI mit)
+mvn clean install
 
-# CLI-Jar bauen (fat jar)
-mvn -q -f examples/objectmerger-cli/pom.xml clean package
+# Nur CLI-Modul bauen (setzt voraus, dass objectmerger installiert ist)
+mvn -pl objectmerger-cli clean package
 ```
+
+Das erzeugte JAR ist ein fat JAR (~732 KB) mit allen Dependencies: `objectmerger-cli/target/objectmerger-cli-0.1.0-SNAPSHOT.jar`
 
 ### Nutzung
 
 ```bash
-# Beispiel: Person aus drei Quellen mergen und Ergebnis ausgeben
-java -jar examples/objectmerger-cli/target/objectmerger-cli-0.1.0-SNAPSHOT.jar \
+# Beispiel: Person aus drei Quellen mergen
+java -jar objectmerger-cli/target/objectmerger-cli-0.1.0-SNAPSHOT.jar \
   --target-class de.x132.cli.Person \
-  --definition examples/objectmerger-cli/src/main/resources/person/person-merge-definition.json \
-  --source database=examples/objectmerger-cli/src/main/resources/person/db-person.json \
-  --source crm=examples/objectmerger-cli/src/main/resources/person/crm-person.json \
-  --source analytics=examples/objectmerger-cli/src/main/resources/person/analytics-person.json
+  --definition objectmerger-cli/src/main/resources/person/person-merge-definition.json \
+  --source database=objectmerger-cli/src/main/resources/person/db-person.json \
+  --source crm=objectmerger-cli/src/main/resources/person/crm-person.json \
+  --source analytics=objectmerger-cli/src/main/resources/person/analytics-person.json
 
-# Optional: Ergebnis in Datei schreiben
-java -jar examples/objectmerger-cli/target/objectmerger-cli-0.1.0-SNAPSHOT.jar \
+# Mit Ausgabe in Datei
+java -jar objectmerger-cli/target/objectmerger-cli-0.1.0-SNAPSHOT.jar \
   -t de.x132.cli.Person \
-  -d examples/objectmerger-cli/src/main/resources/person/person-merge-definition.json \
-  -s database=examples/objectmerger-cli/src/main/resources/person/db-person.json \
-  -s crm=examples/objectmerger-cli/src/main/resources/person/crm-person.json \
-  -s analytics=examples/objectmerger-cli/src/main/resources/person/analytics-person.json \
+  -d objectmerger-cli/src/main/resources/person/person-merge-definition.json \
+  -s database=objectmerger-cli/src/main/resources/person/db-person.json \
+  -s crm=objectmerger-cli/src/main/resources/person/crm-person.json \
+  -s analytics=objectmerger-cli/src/main/resources/person/analytics-person.json \
   -o merged-person.json
 ```
 
-Parameter:
+**Parameter:**
 - `--target-class` (`-t`): Vollqualifizierter Klassenname des Ziel-Objekts
 - `--definition` (`-d`): Pfad zur Merge-Definitions-JSON
 - `--source` (`-s`): Mehrfach wiederholbar; Format `label=pfad/zur.json`
 - `--output` (`-o`): Optionaler Pfad für die Ausgabedatei (ansonsten stdout)
 
-## Spring Boot REST API Beispiel
+Weitere Details im [CLI README](objectmerger-cli/README.md).
 
-Eine Spring Boot REST API befindet sich unter `examples/objectmerger-spring-boot`. Sie bietet einen interaktiven HTTP-Endpunkt zum Mergen mit vollständiger Swagger/OpenAPI-Dokumentation.
+---
+
+## Spring Boot Modul: objectmerger-spring-boot
+
+Eine REST API mit vollständiger Swagger/OpenAPI-Dokumentation zum interaktiven Mergen über HTTP.
 
 ### Build
 
 ```bash
-# Library und Spring Boot App bauen
-mvn -q clean install
-mvn -q -f examples/objectmerger-spring-boot/pom.xml clean package
+# Gesamtes Projekt bauen (baut automatisch Spring Boot App mit)
+mvn clean install
+
+# Nur Spring Boot Modul bauen
+mvn -pl objectmerger-spring-boot clean package
 ```
+
+Das erzeugte JAR ist ein executable Spring Boot JAR (~25 MB) mit embedded Tomcat: `objectmerger-spring-boot/target/objectmerger-spring-boot-0.1.0-SNAPSHOT.jar`
 
 ### Start
 
 ```bash
-java -jar examples/objectmerger-spring-boot/target/objectmerger-spring-boot-0.1.0-SNAPSHOT.jar
+# Direkt aus dem JAR starten
+java -jar objectmerger-spring-boot/target/objectmerger-spring-boot-0.1.0-SNAPSHOT.jar
+
+# Oder mit Maven
+mvn -pl objectmerger-spring-boot spring-boot:run
 ```
 
-App startet auf `http://localhost:8080`
+App startet auf **http://localhost:8080**
 
 ### Swagger UI
 
@@ -428,23 +484,30 @@ Merged automatisch drei Person-Objekte (database, crm, analytics) nach den Regel
 ### Spring Boot Module-Struktur
 
 ```
-examples/objectmerger-spring-boot/
-├── pom.xml                          # Spring Boot 3.2 + Springdoc + ObjectMerger Dependency
-├── src/main/java/de/x132/objectmerger/
-│   ├── ObjectMergerApplication.java # Spring Boot App Entry Point
-│   ├── controller/
-│   │   └── MergeController.java      # REST-Controller mit /api/v1/merge Endpoints
-│   ├── service/
-│   │   └── ObjectMergerService.java  # Wrapper um ObjectMerger.merge()
-│   ├── model/
-│   │   └── Person.java              # Example Domain Model
-│   ├── dto/
-│   │   ├── MergeRequest.java        # API Request Schema
-│   │   └── LabeledSourceDTO.java    # Source DTO
-│   └── util/
-│       └── MergeDefinitionConverter.java # Gson-basierte Typ-Konvertierung
-└── src/main/resources/
-    └── application.properties        # Spring Boot Config (Port 8080, Swagger paths)
+objectmerger-spring-boot/
+├── pom.xml                              # Spring Boot 3.2.1 + Springdoc OpenAPI 2.1.0
+├── README.md                            # Detaillierte API-Dokumentation
+└── src/
+    ├── main/
+    │   ├── java/de/x132/objectmerger/
+    │   │   ├── ObjectMergerApplication.java    # Spring Boot Entry Point
+    │   │   ├── controller/
+    │   │   │   └── MergeController.java        # REST-Controller (/api/v1/merge)
+    │   │   ├── service/
+    │   │   │   └── ObjectMergerService.java    # Wrapper um ObjectMerger
+    │   │   ├── model/
+    │   │   │   └── Person.java                 # Demo Model
+    │   │   ├── dto/
+    │   │   │   ├── MergeRequest.java           # API Request Schema
+    │   │   │   └── LabeledSourceDTO.java       # Source DTO
+    │   │   └── util/
+    │   │       └── MergeDefinitionConverter.java  # Map→MergeDefinition
+    │   └── resources/
+    │       └── application.properties          # Port 8080, Swagger Config
+    └── test/java/                              # 21 Integration Tests
+        ├── controller/MergeControllerIntegrationTest.java  # 10 Tests
+        ├── service/ObjectMergerServiceIntegrationTest.java # 4 Tests
+        └── util/MergeDefinitionConverterTest.java          # 7 Tests
 ```
 
 ### Swagger Annotations
@@ -456,3 +519,5 @@ Die API ist vollständig mit OpenAPI 3.0 Annotations dokumentiert:
 - `@Schema` für DTO-Felder
 
 Dies generiert automatisch die Swagger UI und OpenAPI JSON unter `/api-docs`.
+
+Weitere Details im [Spring Boot README](objectmerger-spring-boot/README.md).
