@@ -6,6 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class LabeledSource<T> {
-    private String label;
-    private T source;
+  private String label;
+  private T source;
 }

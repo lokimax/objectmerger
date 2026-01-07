@@ -1,240 +1,271 @@
 package de.x132.strategy;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
+
 import de.x132.FieldDefinition;
 import de.x132.LabeledSource;
 import de.x132.ObjectMerger;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.mockito.MockedStatic;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 @DisplayName("PriorityMergeStrategy Tests")
 class PriorityMergeStrategyTest {
 
-    private PriorityMergeStrategy strategy;
-    private FieldDefinition fieldDef;
+  private PriorityMergeStrategy strategy;
+  private FieldDefinition fieldDef;
 
-    @BeforeEach
-    void setUp() {
-        strategy = new PriorityMergeStrategy();
-        fieldDef = mock(FieldDefinition.class);
+  @BeforeEach
+  void setUp() {
+    strategy = new PriorityMergeStrategy();
+    fieldDef = mock(FieldDefinition.class);
+  }
+
+  @Test
+  @DisplayName("Should return first non-null value when priority is null")
+  void testMergeWithNoPriority() {
+    // Arrange
+    String fieldName = "name";
+    Object source1 = new Object();
+    Object source2 = new Object();
+    Object source3 = new Object();
+
+    List<LabeledSource<?>> sources =
+        Arrays.asList(
+            new LabeledSource<>("source1", source1),
+            new LabeledSource<>("source2", source2),
+            new LabeledSource<>("source3", source3));
+
+    when(fieldDef.getPriority()).thenReturn(null);
+    when(fieldDef.getDefaultValue()).thenReturn(null);
+
+    try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
+      mockedObjectMerger
+          .when(() -> ObjectMerger.getFieldValue(source1, fieldName))
+          .thenReturn(null);
+      mockedObjectMerger
+          .when(() -> ObjectMerger.getFieldValue(source2, fieldName))
+          .thenReturn("John");
+      mockedObjectMerger
+          .when(() -> ObjectMerger.getFieldValue(source3, fieldName))
+          .thenReturn("Jane");
+
+      // Act
+      Object result = strategy.merge(sources, fieldDef, fieldName);
+
+      // Assert
+      assertEquals("John", result);
+      mockedObjectMerger.verify(() -> ObjectMerger.getFieldValue(source1, fieldName));
+      mockedObjectMerger.verify(() -> ObjectMerger.getFieldValue(source2, fieldName));
     }
+  }
 
-    @Test
-    @DisplayName("Should return first non-null value when priority is null")
-    void testMergeWithNoPriority() {
-        // Arrange
-        String fieldName = "name";
-        Object source1 = new Object();
-        Object source2 = new Object();
-        Object source3 = new Object();
-        
-        List<LabeledSource<?>> sources = Arrays.asList(
-                new LabeledSource<>("source1", source1),
-                new LabeledSource<>("source2", source2),
-                new LabeledSource<>("source3", source3)
-        );
+  @Test
+  @DisplayName("Should return value from source with lowest priority number")
+  void testMergeWithPriority() {
+    // Arrange
+    String fieldName = "email";
+    Object source1 = new Object();
+    Object source2 = new Object();
+    Object source3 = new Object();
 
-        when(fieldDef.getPriority()).thenReturn(null);
-        when(fieldDef.getDefaultValue()).thenReturn(null);
+    Map<String, Integer> priority = new HashMap<>();
+    priority.put("source1", 3);
+    priority.put("source2", 1);
+    priority.put("source3", 2);
 
-        try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
-            mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source1, fieldName)).thenReturn(null);
-            mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source2, fieldName)).thenReturn("John");
-            mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source3, fieldName)).thenReturn("Jane");
+    List<LabeledSource<?>> sources =
+        Arrays.asList(
+            new LabeledSource<>("source1", source1),
+            new LabeledSource<>("source2", source2),
+            new LabeledSource<>("source3", source3));
 
-            // Act
-            Object result = strategy.merge(sources, fieldDef, fieldName);
+    when(fieldDef.getPriority()).thenReturn(priority);
+    when(fieldDef.getDefaultValue()).thenReturn(null);
 
-            // Assert
-            assertEquals("John", result);
-            mockedObjectMerger.verify(() -> ObjectMerger.getFieldValue(source1, fieldName));
-            mockedObjectMerger.verify(() -> ObjectMerger.getFieldValue(source2, fieldName));
-        }
+    try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
+      mockedObjectMerger
+          .when(() -> ObjectMerger.getFieldValue(source1, fieldName))
+          .thenReturn("crm@example.com");
+      mockedObjectMerger
+          .when(() -> ObjectMerger.getFieldValue(source2, fieldName))
+          .thenReturn("db@example.com");
+      mockedObjectMerger
+          .when(() -> ObjectMerger.getFieldValue(source3, fieldName))
+          .thenReturn("api@example.com");
+
+      // Act
+      Object result = strategy.merge(sources, fieldDef, fieldName);
+
+      // Assert
+      assertEquals("db@example.com", result); // source2 has priority 1 (lowest)
     }
+  }
 
-    @Test
-    @DisplayName("Should return value from source with lowest priority number")
-    void testMergeWithPriority() {
-        // Arrange
-        String fieldName = "email";
-        Object source1 = new Object();
-        Object source2 = new Object();
-        Object source3 = new Object();
-        
-        Map<String, Integer> priority = new HashMap<>();
-        priority.put("source1", 3);
-        priority.put("source2", 1);
-        priority.put("source3", 2);
-        
-        List<LabeledSource<?>> sources = Arrays.asList(
-                new LabeledSource<>("source1", source1),
-                new LabeledSource<>("source2", source2),
-                new LabeledSource<>("source3", source3)
-        );
+  @Test
+  @DisplayName("Should skip sources with null values when priority is set")
+  void testMergeWithPrioritySkipsNullValues() {
+    // Arrange
+    String fieldName = "phone";
+    Object source1 = new Object();
+    Object source2 = new Object();
+    Object source3 = new Object();
 
-        when(fieldDef.getPriority()).thenReturn(priority);
-        when(fieldDef.getDefaultValue()).thenReturn(null);
+    Map<String, Integer> priority = new HashMap<>();
+    priority.put("source1", 1);
+    priority.put("source2", 2);
+    priority.put("source3", 3);
 
-        try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
-            mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source1, fieldName)).thenReturn("crm@example.com");
-            mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source2, fieldName)).thenReturn("db@example.com");
-            mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source3, fieldName)).thenReturn("api@example.com");
+    List<LabeledSource<?>> sources =
+        Arrays.asList(
+            new LabeledSource<>("source1", source1),
+            new LabeledSource<>("source2", source2),
+            new LabeledSource<>("source3", source3));
 
-            // Act
-            Object result = strategy.merge(sources, fieldDef, fieldName);
+    when(fieldDef.getPriority()).thenReturn(priority);
+    when(fieldDef.getDefaultValue()).thenReturn(null);
 
-            // Assert
-            assertEquals("db@example.com", result); // source2 has priority 1 (lowest)
-        }
+    try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
+      mockedObjectMerger
+          .when(() -> ObjectMerger.getFieldValue(source1, fieldName))
+          .thenReturn(null);
+      mockedObjectMerger
+          .when(() -> ObjectMerger.getFieldValue(source2, fieldName))
+          .thenReturn("123-456");
+      mockedObjectMerger
+          .when(() -> ObjectMerger.getFieldValue(source3, fieldName))
+          .thenReturn("789-000");
+
+      // Act
+      Object result = strategy.merge(sources, fieldDef, fieldName);
+
+      // Assert
+      assertEquals("123-456", result); // source2 is used (source1 is null, source2 has priority)
     }
+  }
 
-    @Test
-    @DisplayName("Should skip sources with null values when priority is set")
-    void testMergeWithPrioritySkipsNullValues() {
-        // Arrange
-        String fieldName = "phone";
-        Object source1 = new Object();
-        Object source2 = new Object();
-        Object source3 = new Object();
-        
-        Map<String, Integer> priority = new HashMap<>();
-        priority.put("source1", 1);
-        priority.put("source2", 2);
-        priority.put("source3", 3);
-        
-        List<LabeledSource<?>> sources = Arrays.asList(
-                new LabeledSource<>("source1", source1),
-                new LabeledSource<>("source2", source2),
-                new LabeledSource<>("source3", source3)
-        );
+  @Test
+  @DisplayName("Should return default value when all sources have null values")
+  void testMergeReturnsDefaultValueWhenAllNull() {
+    // Arrange
+    String fieldName = "age";
+    Object source1 = new Object();
+    Object source2 = new Object();
 
-        when(fieldDef.getPriority()).thenReturn(priority);
-        when(fieldDef.getDefaultValue()).thenReturn(null);
+    Map<String, Integer> priority = new HashMap<>();
+    priority.put("source1", 1);
+    priority.put("source2", 2);
 
-        try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
-            mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source1, fieldName)).thenReturn(null);
-            mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source2, fieldName)).thenReturn("123-456");
-            mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source3, fieldName)).thenReturn("789-000");
+    List<LabeledSource<?>> sources =
+        Arrays.asList(
+            new LabeledSource<>("source1", source1), new LabeledSource<>("source2", source2));
 
-            // Act
-            Object result = strategy.merge(sources, fieldDef, fieldName);
+    Integer defaultValue = 0;
+    when(fieldDef.getPriority()).thenReturn(priority);
+    when(fieldDef.getDefaultValue()).thenReturn(defaultValue);
 
-            // Assert
-            assertEquals("123-456", result); // source2 is used (source1 is null, source2 has priority)
-        }
+    try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
+      mockedObjectMerger
+          .when(() -> ObjectMerger.getFieldValue(source1, fieldName))
+          .thenReturn(null);
+      mockedObjectMerger
+          .when(() -> ObjectMerger.getFieldValue(source2, fieldName))
+          .thenReturn(null);
+
+      // Act
+      Object result = strategy.merge(sources, fieldDef, fieldName);
+
+      // Assert
+      assertEquals(0, result);
     }
+  }
 
-    @Test
-    @DisplayName("Should return default value when all sources have null values")
-    void testMergeReturnsDefaultValueWhenAllNull() {
-        // Arrange
-        String fieldName = "age";
-        Object source1 = new Object();
-        Object source2 = new Object();
-        
-        Map<String, Integer> priority = new HashMap<>();
-        priority.put("source1", 1);
-        priority.put("source2", 2);
-        
-        List<LabeledSource<?>> sources = Arrays.asList(
-                new LabeledSource<>("source1", source1),
-                new LabeledSource<>("source2", source2)
-        );
+  @Test
+  @DisplayName("Should handle unknown source labels with MAX_VALUE priority")
+  void testMergeWithUnknownSourceLabel() {
+    // Arrange
+    String fieldName = "status";
+    Object source1 = new Object();
+    Object source2 = new Object();
+    Object source3 = new Object();
 
-        Integer defaultValue = 0;
-        when(fieldDef.getPriority()).thenReturn(priority);
-        when(fieldDef.getDefaultValue()).thenReturn(defaultValue);
+    Map<String, Integer> priority = new HashMap<>();
+    priority.put("source1", 1);
+    // source2 and source3 are not in the priority map
 
-        try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
-            mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source1, fieldName)).thenReturn(null);
-            mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source2, fieldName)).thenReturn(null);
+    List<LabeledSource<?>> sources =
+        Arrays.asList(
+            new LabeledSource<>("source1", source1),
+            new LabeledSource<>("source2", source2),
+            new LabeledSource<>("source3", source3));
 
-            // Act
-            Object result = strategy.merge(sources, fieldDef, fieldName);
+    when(fieldDef.getPriority()).thenReturn(priority);
+    when(fieldDef.getDefaultValue()).thenReturn(null);
 
-            // Assert
-            assertEquals(0, result);
-        }
+    try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
+      mockedObjectMerger
+          .when(() -> ObjectMerger.getFieldValue(source1, fieldName))
+          .thenReturn("active");
+      mockedObjectMerger
+          .when(() -> ObjectMerger.getFieldValue(source2, fieldName))
+          .thenReturn("inactive");
+      mockedObjectMerger
+          .when(() -> ObjectMerger.getFieldValue(source3, fieldName))
+          .thenReturn("pending");
+
+      // Act
+      Object result = strategy.merge(sources, fieldDef, fieldName);
+
+      // Assert
+      assertEquals("active", result); // source1 has priority 1 (other sources get MAX_VALUE)
     }
+  }
 
-    @Test
-    @DisplayName("Should handle unknown source labels with MAX_VALUE priority")
-    void testMergeWithUnknownSourceLabel() {
-        // Arrange
-        String fieldName = "status";
-        Object source1 = new Object();
-        Object source2 = new Object();
-        Object source3 = new Object();
-        
-        Map<String, Integer> priority = new HashMap<>();
-        priority.put("source1", 1);
-        // source2 and source3 are not in the priority map
-        
-        List<LabeledSource<?>> sources = Arrays.asList(
-                new LabeledSource<>("source1", source1),
-                new LabeledSource<>("source2", source2),
-                new LabeledSource<>("source3", source3)
-        );
+  @Test
+  @DisplayName("Should implement MergeStrategy interface correctly")
+  void testMergeStrategyInterface() {
+    // Arrange & Act & Assert
+    assertTrue(strategy instanceof MergeStrategy);
+  }
 
-        when(fieldDef.getPriority()).thenReturn(priority);
-        when(fieldDef.getDefaultValue()).thenReturn(null);
+  @Test
+  @DisplayName("Should handle empty priority map like null priority")
+  void testMergeWithEmptyPriority() {
+    // Arrange
+    String fieldName = "city";
+    Object source1 = new Object();
+    Object source2 = new Object();
 
-        try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
-            mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source1, fieldName)).thenReturn("active");
-            mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source2, fieldName)).thenReturn("inactive");
-            mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source3, fieldName)).thenReturn("pending");
+    List<LabeledSource<?>> sources =
+        Arrays.asList(
+            new LabeledSource<>("source1", source1), new LabeledSource<>("source2", source2));
 
-            // Act
-            Object result = strategy.merge(sources, fieldDef, fieldName);
+    Map<String, Integer> emptyPriority = new HashMap<>();
+    when(fieldDef.getPriority()).thenReturn(emptyPriority);
+    when(fieldDef.getDefaultValue()).thenReturn(null);
 
-            // Assert
-            assertEquals("active", result); // source1 has priority 1 (other sources get MAX_VALUE)
-        }
+    try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
+      mockedObjectMerger
+          .when(() -> ObjectMerger.getFieldValue(source1, fieldName))
+          .thenReturn("Berlin");
+      mockedObjectMerger
+          .when(() -> ObjectMerger.getFieldValue(source2, fieldName))
+          .thenReturn("Munich");
+
+      // Act
+      Object result = strategy.merge(sources, fieldDef, fieldName);
+
+      // Assert
+      assertEquals("Berlin", result); // Empty priority behaves like no priority
     }
-
-    @Test
-    @DisplayName("Should implement MergeStrategy interface correctly")
-    void testMergeStrategyInterface() {
-        // Arrange & Act & Assert
-        assertTrue(strategy instanceof MergeStrategy);
-    }
-
-    @Test
-    @DisplayName("Should handle empty priority map like null priority")
-    void testMergeWithEmptyPriority() {
-        // Arrange
-        String fieldName = "city";
-        Object source1 = new Object();
-        Object source2 = new Object();
-        
-        List<LabeledSource<?>> sources = Arrays.asList(
-                new LabeledSource<>("source1", source1),
-                new LabeledSource<>("source2", source2)
-        );
-
-        Map<String, Integer> emptyPriority = new HashMap<>();
-        when(fieldDef.getPriority()).thenReturn(emptyPriority);
-        when(fieldDef.getDefaultValue()).thenReturn(null);
-
-        try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
-            mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source1, fieldName)).thenReturn("Berlin");
-            mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source2, fieldName)).thenReturn("Munich");
-
-            // Act
-            Object result = strategy.merge(sources, fieldDef, fieldName);
-
-            // Assert
-            assertEquals("Berlin", result); // Empty priority behaves like no priority
-        }
-    }
+  }
 }

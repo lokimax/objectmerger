@@ -1,0 +1,22 @@
+# EditorConfig helps maintain consistent coding styles for multiple developers
+# working on the same project across various editors and IDEs.
+# editorconfig.org
+
+root = true
+
+# All files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Java files
+[*.java]
+indent_style = space
+indent_size = 4
+
+# Disable wildcard imports
+[*.java]
+# This setting tells IDEs to avoid wildcard imports
+ij_java_imports_layout = *,|,java.util.*
