@@ -2,19 +2,20 @@ package de.x132;
 
 import de.x132.strategy.ListMergeStrategy;
 import de.x132.strategy.MaximumValueStrategy;
+import de.x132.strategy.PriorityMergeStrategy;
 import de.x132.strategy.MergeStrategy;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Comparator;
 
 public class ObjectMerger {
 
     private static final Map<String, MergeStrategy<?>> STRATEGIES = Map.of(
             "mergeList", new ListMergeStrategy(),
-            "maximum", new MaximumValueStrategy()
+            "maximum", new MaximumValueStrategy(),
+            "priority", new PriorityMergeStrategy()
     );
 
     @SafeVarargs
@@ -30,16 +31,11 @@ public class ObjectMerger {
                 Field field = targetClass.getDeclaredField(fieldName);
                 field.setAccessible(true);
                 
-                if (fieldDef.getStrategy() != null) {
-                    MergeStrategy<?> strategy = STRATEGIES.get(fieldDef.getStrategy());
-                    if (strategy != null) {
-                        field.set(result, strategy.merge((List) sourceList, fieldDef, fieldName));
-                    }
-                } else {
-                    LabeledSource<T> bestSource = findBestSource(sourceList, fieldDef.getPriority(), fieldName);
-                    if (bestSource != null) {
-                        field.set(result, getFieldValue(bestSource.getSource(), fieldName));
-                    }
+                MergeStrategy<?> strategy = STRATEGIES.get(
+                        fieldDef.getStrategy() != null ? fieldDef.getStrategy() : "priority"
+                );
+                if (strategy != null) {
+                    field.set(result, strategy.merge((List) sourceList, fieldDef, fieldName));
                 }
             }
             return result;
@@ -48,19 +44,6 @@ public class ObjectMerger {
         }
     }
     
-    private static <T> LabeledSource<T> findBestSource(List<LabeledSource<T>> sources, Map<String, Integer> priority, String fieldName) {
-        if (priority == null) {
-            return sources.stream()
-                    .filter(s -> getFieldValue(s.getSource(), fieldName) != null)
-                    .findFirst()
-                    .orElse(null);
-        }
-        return sources.stream()
-                .filter(s -> getFieldValue(s.getSource(), fieldName) != null)
-                .min(Comparator.comparingInt(s -> priority.getOrDefault(s.getLabel(), Integer.MAX_VALUE)))
-                .orElse(null);
-    }
-
     public static Object getFieldValue(Object obj, String fieldName) {
         if (obj == null) return null;
         try {
