@@ -16,10 +16,10 @@ public class MultiSourceMergeTest {
 
     @Test
     void testMergePersonData() throws Exception {
-        Person analyticsPerson = gson.fromJson(new FileReader("src/test/resources/analytics-person.json"), Person.class);
-        Person crmPerson = gson.fromJson(new FileReader("src/test/resources/crm-person.json"), Person.class);
-        Person dbPerson = gson.fromJson(new FileReader("src/test/resources/db-person.json"), Person.class);
-        MergeDefinition mergeDefinition = gson.fromJson(new FileReader("src/test/resources/person-merge-definition.json"), MergeDefinition.class);
+        Person analyticsPerson = gson.fromJson(new FileReader("src/test/resources/person/analytics-person.json"), Person.class);
+        Person crmPerson = gson.fromJson(new FileReader("src/test/resources/person/crm-person.json"), Person.class);
+        Person dbPerson = gson.fromJson(new FileReader("src/test/resources/person/db-person.json"), Person.class);
+        MergeDefinition mergeDefinition = gson.fromJson(new FileReader("src/test/resources/person/person-merge-definition.json"), MergeDefinition.class);
 
         Person mergedPerson = ObjectMerger.merge(
                 Person.class,
