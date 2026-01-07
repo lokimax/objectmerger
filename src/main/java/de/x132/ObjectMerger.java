@@ -1,4 +1,4 @@
-package com.example.objectmerger;
+package de.x132;
 
 public class ObjectMerger {
     /**
