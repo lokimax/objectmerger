@@ -1,12 +1,11 @@
 package de.x132.objectmerger.util;
 
+import java.util.Map;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import de.x132.FieldDefinition;
-import de.x132.MergeDefinition;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import de.x132.MergeDefinition;
 
 /**
  * Converts JSON/Map-based merge definitions to proper MergeDefinition objects

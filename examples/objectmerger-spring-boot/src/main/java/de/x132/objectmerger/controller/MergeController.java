@@ -30,10 +30,7 @@ public class MergeController {
     }
 
     @PostMapping
-    @Operation(
-            summary = "Merge multiple sources",
-            description = "Merge multiple labeled sources into a single object using the provided merge definition"
-    )
+    @Operation(summary = "Merge multiple sources", description = "Merge multiple labeled sources into a single object using the provided merge definition")
     @ApiResponse(responseCode = "200", description = "Merge successful")
     @ApiResponse(responseCode = "400", description = "Invalid request or merge failed")
     public ResponseEntity<?> merge(@RequestBody MergeRequest request) {
@@ -67,10 +64,7 @@ public class MergeController {
     }
 
     @PostMapping("/example")
-    @Operation(
-            summary = "Merge Person example",
-            description = "Example merge of a Person object from three sources (database, crm, analytics)"
-    )
+    @Operation(summary = "Merge Person example", description = "Example merge of a Person object from three sources (database, crm, analytics)")
     public ResponseEntity<?> mergePersonExample() {
         try {
             // Create merge definition using converter
@@ -121,7 +115,8 @@ public class MergeController {
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest().body(Map.of("error", "Example merge failed: " + e.getMessage(), "type", e.getClass().getSimpleName()));
+            return ResponseEntity.badRequest().body(
+                    Map.of("error", "Example merge failed: " + e.getMessage(), "type", e.getClass().getSimpleName()));
         }
     }
 }
