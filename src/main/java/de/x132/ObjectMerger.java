@@ -2,6 +2,8 @@ package de.x132;
 
 import de.x132.strategy.ListMergeStrategy;
 import de.x132.strategy.MaximumValueStrategy;
+import de.x132.strategy.MinimumValueStrategy;
+import de.x132.strategy.AverageValueStrategy;
 import de.x132.strategy.PriorityMergeStrategy;
 import de.x132.strategy.MergeStrategy;
 
@@ -15,6 +17,8 @@ public class ObjectMerger {
     private static final Map<String, MergeStrategy<?>> STRATEGIES = Map.of(
             "mergeList", new ListMergeStrategy(),
             "maximum", new MaximumValueStrategy(),
+            "minimum", new MinimumValueStrategy(),
+            "average", new AverageValueStrategy(),
             "priority", new PriorityMergeStrategy()
     );
 

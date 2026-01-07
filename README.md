@@ -1,6 +1,6 @@
 # ObjectMerger
 
-Eine Java-Library zum intelligenten Zusammenführen von Objektdaten aus mehreren Quellen (z.B. verschiedene Datenbanken, APIs, externe Services). Mit konfigurierbare Merge-Strategien können Sie festlegen, welche Datenquelle Vorrang hat oder wie Daten kombiniert werden.
+Eine Java-Library zum intelligenten Zusammenführen von Objektdaten aus mehreren Quellen (z.B. verschiedene Datenbanken, APIs, externe Services). Mit konfigurierbaren Merge-Strategien können Sie festlegen, welche Datenquelle Vorrang hat oder wie Daten kombiniert werden.
 
 ## Anwendungsbeispiele
 
@@ -25,18 +25,40 @@ Wählt den Wert aus der Quelle mit höchster Priorität:
 }
 ```
 
-### 2. Maximum-Wert-Strategie
+### 2. Minimum-Wert-Strategie
+Nutzt den kleinsten numerischen Wert aus allen Quellen:
+```json
+{
+  "minimumPrice": {
+    "strategy": "minimum",
+    "defaultValue": 0
+  }
+}
+```
+
+### 3. Maximum-Wert-Strategie
 Nutzt den höchsten numerischen Wert aus allen Quellen:
 ```json
 {
-  "age": {
+  "maximumAge": {
     "strategy": "maximum",
     "defaultValue": 0
   }
 }
 ```
 
-### 3. Listen-Merge-Strategie
+### 4. Durchschnittswert-Strategie
+Berechnet den Durchschnitt aus allen numerischen Werten:
+```json
+{
+  "averageRating": {
+    "strategy": "average",
+    "defaultValue": 0
+  }
+}
+```
+
+### 5. Listen-Merge-Strategie
 Kombiniert Listen aus mehreren Quellen basierend auf Identifikationsmerkmale:
 ```json
 {
@@ -90,14 +112,14 @@ mvn test
         "crm": 2
       }
     },
-    "email": {
-      "priority": {
-        "crm": 1,
-        "database": 2
-      }
+    "minPrice": {
+      "strategy": "minimum"
     },
-    "age": {
+    "maxPrice": {
       "strategy": "maximum"
+    },
+    "avgRating": {
+      "strategy": "average"
     }
   }
 }
@@ -107,24 +129,25 @@ mvn test
 
 ```java
 // Quellen laden
-Person dbPerson = loadFromDatabase();
-Person crmPerson = loadFromCRM();
+Product product1 = loadFromDatabase();
+Product product2 = loadFromAPI();
 
 // Merge-Definition aus JSON laden
 MergeDefinition definition = loadMergeDefinition();
 
 // Objekte mergen
-Person mergedPerson = ObjectMerger.merge(
-    Person.class,
+Product merged = ObjectMerger.merge(
+    Product.class,
     definition,
-    new LabeledSource<>("database", dbPerson),
-    new LabeledSource<>("crm", crmPerson)
+    new LabeledSource<>("database", product1),
+    new LabeledSource<>("api", product2)
 );
 
 // Ergebnis nutzen
-System.out.println("Name: " + mergedPerson.getName());
-System.out.println("Email: " + mergedPerson.getEmail());
-System.out.println("Age: " + mergedPerson.getAge());
+System.out.println("Name: " + merged.getName());
+System.out.println("Min Price: " + merged.getMinPrice());
+System.out.println("Max Price: " + merged.getMaxPrice());
+System.out.println("Avg Rating: " + merged.getAvgRating());
 ```
 
 ## Projektstruktur
@@ -136,11 +159,13 @@ src/
 │   ├── MergeDefinition.java                 # Container für Feld-Definitionen
 │   ├── FieldDefinition.java                 # Definition für einzelne Felder
 │   ├── ItemMergeDefinition.java             # Definition für Listen-Items
-│   ├── LabeledSource.java                   # Quelle mit Label (z.B. "database", "crm")
+│   ├── LabeledSource.java                   # Quelle mit Label (z.B. "database", "api")
 │   └── strategy/
 │       ├── MergeStrategy.java               # Interface für alle Strategien
 │       ├── PriorityMergeStrategy.java       # Prioritätsbasierte Auswahl (Standard)
+│       ├── MinimumValueStrategy.java        # Findet Minimum-Wert
 │       ├── MaximumValueStrategy.java        # Findet Maximum-Wert
+│       ├── AverageValueStrategy.java        # Berechnet Durchschnittswert
 │       └── ListMergeStrategy.java           # Mergt Listen von Objekten
 └── test/java/
     ├── person/
@@ -152,7 +177,9 @@ src/
     │   └── ListMergeTest.java               # Listen-Merge-Test
     └── strategy/
         ├── PriorityMergeStrategyTest.java
+        ├── MinimumValueStrategyTest.java
         ├── MaximumValueStrategyTest.java
+        ├── AverageValueStrategyTest.java
         └── ListMergeStrategyTest.java
 ```
 
@@ -183,6 +210,16 @@ src/
   }
 }
 ```
+
+## Merge-Strategien im Detail
+
+| Strategie | Nutzung | Beispiel |
+|-----------|---------|---------|
+| `priority` (Standard) | Wählt Wert aus Quelle mit höchster Priorität | Name: Database (1) > CRM (2) > Analytics (3) |
+| `minimum` | Verwendet kleinsten numerischen Wert | Price: Min aus [100, 50, 75] = 50 |
+| `maximum` | Verwendet größten numerischen Wert | Age: Max aus [25, 35, 30] = 35 |
+| `average` | Berechnet Durchschnitt numerischer Werte | Rating: Average aus [4.5, 3.5, 4.0] = 4.0 |
+| `mergeList` | Kombiniert Listen basierend auf ID | Merge [Item1, Item2] + [Item1, Item3] |
 
 ## Version
 
