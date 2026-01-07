@@ -1,121 +1,80 @@
 package de.x132;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import de.x132.strategy.ListMergeStrategy;
+import de.x132.strategy.MaximumValueStrategy;
+import de.x132.strategy.MergeStrategy;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
+import java.util.Comparator;
 
 public class ObjectMerger {
 
-    private static final Gson gson = new Gson();
+    private static final Map<String, MergeStrategy<?>> STRATEGIES = Map.of(
+            "mergeList", new ListMergeStrategy(),
+            "maximum", new MaximumValueStrategy()
+    );
 
-    public static <T> T merge(T obj1, String label1, T obj2, String label2, String mergeDefinition, Class<T> targetClass) {
-        JsonElement node1 = gson.toJsonTree(obj1);
-        JsonElement node2 = gson.toJsonTree(obj2);
-        JsonElement definition = JsonParser.parseString(mergeDefinition);
+    @SafeVarargs
+    public static <T> T merge(Class<T> targetClass, MergeDefinition mergeDefinition, LabeledSource<T>... sources) {
+        try {
+            T result = targetClass.getDeclaredConstructor().newInstance();
+            Map<String, FieldDefinition> definitions = mergeDefinition.getDefinitions();
+            List<LabeledSource<T>> sourceList = Arrays.asList(sources);
 
-        JsonElement resultNode = mergeNodes(node1.getAsJsonObject(), label1, node2.getAsJsonObject(), label2, definition.getAsJsonObject().get("definitions").getAsJsonObject());
-        return gson.fromJson(resultNode, targetClass);
-    }
-
-    private static JsonObject mergeNodes(JsonObject node1, String label1, JsonObject node2, String label2, JsonObject definition) {
-        JsonObject resultNode = new JsonObject();
-        
-        for (Entry<String, JsonElement> entry : definition.entrySet()) {
-            String fieldName = entry.getKey();
-            JsonObject fieldDefinition = entry.getValue().getAsJsonObject();
-
-            if (fieldDefinition.has("strategy")) {
-                String strategy = fieldDefinition.get("strategy").getAsString();
-                if ("mergeList".equals(strategy)) {
-                    resultNode.add(fieldName, mergeList(
-                            node1.getAsJsonArray(fieldName), label1,
-                            node2.getAsJsonArray(fieldName), label2,
-                            fieldDefinition
-                    ));
-                } else if ("maximum".equals(strategy)) {
-                    JsonObject priority = fieldDefinition.get("priority").getAsJsonObject();
-                    String preferredLabel = getPreferredLabel(label1, label2, priority);
-                    JsonElement value1 = node1.get(fieldName);
-                    JsonElement value2 = node2.get(fieldName);
-
-                    if(value1 == null || value1.isJsonNull()) {
-                        resultNode.add(fieldName, value2);
-                    } else if (value2 == null || value2.isJsonNull()) {
-                        resultNode.add(fieldName, value1);
+            for (Map.Entry<String, FieldDefinition> entry : definitions.entrySet()) {
+                String fieldName = entry.getKey();
+                FieldDefinition fieldDef = entry.getValue();
+                Field field = targetClass.getDeclaredField(fieldName);
+                field.setAccessible(true);
+                
+                if (fieldDef.getStrategy() != null) {
+                    MergeStrategy<?> strategy = STRATEGIES.get(fieldDef.getStrategy());
+                    if (strategy != null) {
+                        field.set(result, strategy.merge((List) sourceList, fieldDef, fieldName));
                     }
-                    else if(value1.getAsDouble() > value2.getAsDouble()) {
-                        resultNode.add(fieldName, value1);
-                    }
-                    else {
-                        resultNode.add(fieldName, value2);
+                } else {
+                    LabeledSource<T> bestSource = findBestSource(sourceList, fieldDef.getPriority(), fieldName);
+                    if (bestSource != null) {
+                        field.set(result, getFieldValue(bestSource.getSource(), fieldName));
                     }
                 }
-            } else {
-                String preferredLabel = getPreferredLabel(label1, label2, fieldDefinition);
-                if (preferredLabel.equals(label1) && node1.has(fieldName)) {
-                    resultNode.add(fieldName, node1.get(fieldName));
-                } else if (node2.has(fieldName)) {
-                    resultNode.add(fieldName, node2.get(fieldName));
-                }
             }
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to merge objects", e);
         }
-        return resultNode;
+    }
+    
+    private static <T> LabeledSource<T> findBestSource(List<LabeledSource<T>> sources, Map<String, Integer> priority, String fieldName) {
+        if (priority == null) {
+            return sources.stream()
+                    .filter(s -> getFieldValue(s.getSource(), fieldName) != null)
+                    .findFirst()
+                    .orElse(null);
+        }
+        return sources.stream()
+                .filter(s -> getFieldValue(s.getSource(), fieldName) != null)
+                .min(Comparator.comparingInt(s -> priority.getOrDefault(s.getLabel(), Integer.MAX_VALUE)))
+                .orElse(null);
     }
 
-    private static String getPreferredLabel(String label1, String label2, JsonObject priorityDefinition) {
-        int priority1 = priorityDefinition.has(label1) ? priorityDefinition.get(label1).getAsInt() : Integer.MAX_VALUE;
-        int priority2 = priorityDefinition.has(label2) ? priorityDefinition.get(label2).getAsInt() : Integer.MAX_VALUE;
-        return priority1 <= priority2 ? label1 : label2;
+    public static Object getFieldValue(Object obj, String fieldName) {
+        if (obj == null) return null;
+        try {
+            Field field = obj.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            return field.get(obj);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException("Failed to get field value: " + fieldName, e);
+        }
     }
 
-    private static JsonArray mergeList(JsonArray list1, String label1, JsonArray list2, String label2, JsonObject definition) {
-        JsonArray mergedList = new JsonArray();
-        String identifyBy = definition.get("identifyBy").getAsString();
-
-        Map<String, JsonElement> map1 = new HashMap<>();
-        if (list1 != null) {
-            for (JsonElement item : list1) {
-                map1.put(item.getAsJsonObject().get(identifyBy).getAsString(), item);
-            }
-        }
-
-        Map<String, JsonElement> map2 = new HashMap<>();
-        if (list2 != null) {
-            for (JsonElement item : list2) {
-                map2.put(item.getAsJsonObject().get(identifyBy).getAsString(), item);
-            }
-        }
-
-        Set<String> allKeys = new HashSet<>(map1.keySet());
-        allKeys.addAll(map2.keySet());
-
-        String preferredLabel = getPreferredLabel(label1, label2, definition.get("priority").getAsJsonObject());
-
-        for (String key : allKeys) {
-            JsonElement item1 = map1.get(key);
-            JsonElement item2 = map2.get(key);
-            JsonObject itemDefinition = definition.get("itemMergeDefinition").getAsJsonObject();
-            
-            if (item1 != null && item2 != null) {
-                mergedList.add(mergeNodes(item1.getAsJsonObject(), label1, item2.getAsJsonObject(), label2, itemDefinition.get("definitions").getAsJsonObject()));
-            } else if (item1 != null) {
-                 if (preferredLabel.equals(label1)) {
-                    mergedList.add(item1);
-                 }
-            } else if (item2 != null) {
-                if (preferredLabel.equals(label2)) {
-                    mergedList.add(item2);
-                }
-            }
-        }
-        return mergedList;
+    public static MergeDefinition toMergeDefinition(ItemMergeDefinition itemMergeDefinition) {
+        MergeDefinition mergeDefinition = new MergeDefinition();
+        mergeDefinition.setDefinitions(itemMergeDefinition.getDefinitions());
+        return mergeDefinition;
     }
 }

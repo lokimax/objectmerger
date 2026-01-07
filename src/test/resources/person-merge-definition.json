@@ -1,0 +1,34 @@
+{
+  "definitions": {
+    "name": {
+      "priority": {
+        "database": 1,
+        "crm": 2,
+        "analytics": 3
+      }
+    },
+    "age": {
+      "priority": {
+        "crm": 1,
+        "database": 2,
+        "analytics": 3
+      },
+      "strategy": "maximum",
+      "defaultValue": 0
+    },
+    "email": {
+      "priority": {
+        "database": 1,
+        "crm": 2,
+        "analytics": 3
+      }
+    },
+    "phone": {
+      "priority": {
+        "analytics": 1,
+        "crm": 2,
+        "database": 3
+      }
+    }
+  }
+}
