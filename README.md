@@ -393,8 +393,6 @@ java -jar objectmerger-cli/target/objectmerger-cli-0.1.0-SNAPSHOT.jar \
 - `--source` (`-s`): Mehrfach wiederholbar; Format `label=pfad/zur.json`
 - `--output` (`-o`): Optionaler Pfad für die Ausgabedatei (ansonsten stdout)
 
-Weitere Details im [CLI README](objectmerger-cli/README.md).
-
 ---
 
 ## Spring Boot Modul: objectmerger-spring-boot
@@ -519,5 +517,3 @@ Die API ist vollständig mit OpenAPI 3.0 Annotations dokumentiert:
 - `@Schema` für DTO-Felder
 
 Dies generiert automatisch die Swagger UI und OpenAPI JSON unter `/api-docs`.
-
-Weitere Details im [Spring Boot README](objectmerger-spring-boot/README.md).
