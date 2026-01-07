@@ -440,7 +440,9 @@ GET http://localhost:8080/api/v1/merge/health
 ```
 Response: `{"status":"UP"}`
 
-#### 2. Merge mit Custom Quellen
+#### 2. Merge mit Custom Quellen (JSON)
+
+**Endpoint:** `POST /api/v1/merge`
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/merge \
@@ -471,6 +473,77 @@ Response:
 }
 ```
 
+#### 2b. Merge mit Custom Quellen (YAML)
+
+**Endpoint:** `POST /api/v1/merge/yaml`
+
+Die REST API unterstützt YAML zusätzlich zu JSON. YAML ist besser lesbar für komplexe Merge-Definitionen und unterstützt Kommentare.
+
+```bash
+curl -X POST http://localhost:8080/api/v1/merge/yaml \
+  -H "Content-Type: application/x-yaml" \
+  -H "Accept: application/x-yaml" \
+  --data-binary @example-merge-request.yaml
+```
+
+**Beispiel YAML-Datei** (`example-merge-request.yaml`):
+```yaml
+targetClass: "de.x132.objectmerger.model.Person"
+definition:
+  name:
+    priority:
+      database: 1
+      crm: 2
+      analytics: 3
+  age:
+    strategy: "maximum"
+    defaultValue: 0
+  email:
+    priority:
+      database: 1
+      crm: 2
+      analytics: 3
+  phone:
+    priority:
+      analytics: 1
+      crm: 2
+      database: 3
+sources:
+  - label: "database"
+    data:
+      name: "Max Müller"
+      age: 30
+      email: "max@example.com"
+      phone: null
+  - label: "crm"
+    data:
+      name: "Maximilian Müller"
+      age: 25
+      email: null
+      phone: "030-123456"
+  - label: "analytics"
+    data:
+      name: null
+      age: 35
+      email: "max.mueller@example.de"
+      phone: "030-654321"
+```
+
+Response (YAML):
+```yaml
+---
+name: "Max Müller"
+age: 35
+email: "max@example.com"
+phone: "030-654321"
+```
+
+**YAML-Vorteile:**
+- Menschenlesbareres Format für komplexe Merge-Definitionen
+- Besser geeignet für Konfigurationsdateien
+- Unterstützt Kommentare (im Gegensatz zu JSON)
+- Einfachere Wartung großer Merge-Konfigurationen
+
 #### 3. Person-Beispiel (vordefiniert)
 
 ```bash
@@ -483,16 +556,18 @@ Merged automatisch drei Person-Objekte (database, crm, analytics) nach den Regel
 
 ```
 objectmerger-spring-boot/
-├── pom.xml                              # Spring Boot 3.2.1 + Springdoc OpenAPI 2.1.0
+├── pom.xml                              # Spring Boot 3.2.1 + Springdoc OpenAPI 2.1.0 + Jackson YAML
 ├── README.md                            # Detaillierte API-Dokumentation
 └── src/
     ├── main/
     │   ├── java/de/x132/objectmerger/
     │   │   ├── ObjectMergerApplication.java    # Spring Boot Entry Point
     │   │   ├── controller/
-    │   │   │   └── MergeController.java        # REST-Controller (/api/v1/merge)
+    │   │   │   └── MergeController.java        # REST-Controller (/api/v1/merge + /yaml)
     │   │   ├── service/
     │   │   │   └── ObjectMergerService.java    # Wrapper um ObjectMerger
+    │   │   ├── config/
+    │   │   │   └── YamlConfiguration.java      # YAML Message Converter
     │   │   ├── model/
     │   │   │   └── Person.java                 # Demo Model
     │   │   ├── dto/
