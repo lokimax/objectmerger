@@ -59,7 +59,18 @@ Berechnet den Durchschnitt aus allen numerischen Werten:
 }
 ```
 
-### 5. Concatenate-Strategie
+### 5. Summen-Strategie
+Addiert alle numerischen Werte aus allen Quellen:
+```json
+{
+  "totalRevenue": {
+    "strategy": "sum",
+    "defaultValue": 0
+  }
+}
+```
+
+### 6. Concatenate-Strategie
 Vereinigt mehrere String-Werte zu einem (respektiert Priorität und ignoriert null-Werte):
 ```json
 {
@@ -75,7 +86,7 @@ Vereinigt mehrere String-Werte zu einem (respektiert Priorität und ignoriert nu
 }
 ```
 
-### 6. Listen-Merge-Strategie
+### 7. Listen-Merge-Strategie
 Kombiniert Listen aus mehreren Quellen basierend auf Identifikationsmerkmale:
 ```json
 {
@@ -87,7 +98,7 @@ Kombiniert Listen aus mehreren Quellen basierend auf Identifikationsmerkmale:
 }
 ```
 
-### 7. Map-Merge-Strategie
+### 8. Map-Merge-Strategie
 Vereinigt Map-Objekte aus mehreren Quellen, gruppiert nach Key:
 ```json
 {
@@ -198,6 +209,7 @@ src/
 │       ├── MinimumValueStrategy.java        # Findet Minimum-Wert
 │       ├── MaximumValueStrategy.java        # Findet Maximum-Wert
 │       ├── AverageValueStrategy.java        # Berechnet Durchschnittswert
+│       ├── SumValueStrategy.java            # Berechnet Summe
 │       ├── ConcatenateStrategy.java         # Vereinigt Strings mit Priorität
 │       ├── ListMergeStrategy.java           # Mergt Listen von Objekten
 │       └── MapMergeStrategy.java            # Mergt Map-Objekte nach Key
@@ -214,6 +226,7 @@ src/
         ├── MinimumValueStrategyTest.java
         ├── MaximumValueStrategyTest.java
         ├── AverageValueStrategyTest.java
+        ├── SumValueStrategyTest.java
         ├── ConcatenateStrategyTest.java
         ├── ListMergeStrategyTest.java
         └── MapMergeStrategyTest.java
@@ -268,6 +281,7 @@ src/
 | `minimum` | Verwendet kleinsten numerischen Wert | Number | Price: Min aus [100, 50, 75] = 50 |
 | `maximum` | Verwendet größten numerischen Wert | Number | Age: Max aus [25, 35, 30] = 35 |
 | `average` | Berechnet Durchschnitt numerischer Werte | Number | Rating: Average aus [4.5, 3.5, 4.0] = 4.0 |
+| `sum` | Addiert alle numerischen Werte | Number | Sales: Sum aus [1500, 2300, 800] = 4600 |
 | `concatenate` | Vereinigt Strings mit Prioritätsreihenfolge | String | Tags: "java,spring,boot" |
 | `mergeList` | Kombiniert Listen basierend auf ID | List | Merge Items basierend auf ID |
 | `mergeMap` | Vereinigt Maps nach Key-Gruppierung | Map | Settings: Key-basiertes Merging |
@@ -277,6 +291,7 @@ src/
 - **Priority**: Beliebige Typen
 - **Minimum/Maximum**: Numeric Typen (Integer, Long, Double, Float, BigDecimal)
 - **Average**: Numeric Typen
+- **Sum**: Numeric Typen
 - **Concatenate**: String nur
 - **MergeList**: List Typ mit Items
 - **MergeMap**: Map Typ mit beliebigen Key-Value-Typen

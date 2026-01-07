@@ -8,6 +8,7 @@ import de.x132.strategy.MaximumValueStrategy;
 import de.x132.strategy.MergeStrategy;
 import de.x132.strategy.MinimumValueStrategy;
 import de.x132.strategy.PriorityMergeStrategy;
+import de.x132.strategy.SumValueStrategy;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +23,7 @@ public class ObjectMerger {
           "maximum", new MaximumValueStrategy(),
           "minimum", new MinimumValueStrategy(),
           "average", new AverageValueStrategy(),
+          "sum", new SumValueStrategy(),
           "concatenate", new ConcatenateStrategy(),
           "priority", new PriorityMergeStrategy());
 
