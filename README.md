@@ -87,6 +87,17 @@ Kombiniert Listen aus mehreren Quellen basierend auf Identifikationsmerkmale:
 }
 ```
 
+### 7. Map-Merge-Strategie
+Vereinigt Map-Objekte aus mehreren Quellen, gruppiert nach Key:
+```json
+{
+  "settings": {
+    "strategy": "mergeMap",
+    "itemMergeDefinition": { ... }
+  }
+}
+```
+
 ## Anforderungen
 
 - **Java**: 21 (LTS)
@@ -188,7 +199,8 @@ src/
 │       ├── MaximumValueStrategy.java        # Findet Maximum-Wert
 │       ├── AverageValueStrategy.java        # Berechnet Durchschnittswert
 │       ├── ConcatenateStrategy.java         # Vereinigt Strings mit Priorität
-│       └── ListMergeStrategy.java           # Mergt Listen von Objekten
+│       ├── ListMergeStrategy.java           # Mergt Listen von Objekten
+│       └── MapMergeStrategy.java            # Mergt Map-Objekte nach Key
 └── test/java/
     ├── person/
     │   ├── Person.java                      # Test-Modell
@@ -203,7 +215,8 @@ src/
         ├── MaximumValueStrategyTest.java
         ├── AverageValueStrategyTest.java
         ├── ConcatenateStrategyTest.java
-        └── ListMergeStrategyTest.java
+        ├── ListMergeStrategyTest.java
+        └── MapMergeStrategyTest.java
 ```
 
 ## Erweiterte Konfiguration
@@ -257,6 +270,7 @@ src/
 | `average` | Berechnet Durchschnitt numerischer Werte | Number | Rating: Average aus [4.5, 3.5, 4.0] = 4.0 |
 | `concatenate` | Vereinigt Strings mit Prioritätsreihenfolge | String | Tags: "java,spring,boot" |
 | `mergeList` | Kombiniert Listen basierend auf ID | List | Merge Items basierend auf ID |
+| `mergeMap` | Vereinigt Maps nach Key-Gruppierung | Map | Settings: Key-basiertes Merging |
 
 ## Strategie-Anforderungen
 
@@ -265,6 +279,7 @@ src/
 - **Average**: Numeric Typen
 - **Concatenate**: String nur
 - **MergeList**: List Typ mit Items
+- **MergeMap**: Map Typ mit beliebigen Key-Value-Typen
 
 ## Version
 
