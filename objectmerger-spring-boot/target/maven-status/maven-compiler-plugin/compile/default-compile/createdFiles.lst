@@ -1,7 +1,0 @@
-de/x132/objectmerger/dto/LabeledSourceDTO.class
-de/x132/objectmerger/service/ObjectMergerService.class
-de/x132/objectmerger/util/MergeDefinitionConverter.class
-de/x132/objectmerger/controller/MergeController.class
-de/x132/objectmerger/dto/MergeRequest.class
-de/x132/objectmerger/model/Person.class
-de/x132/objectmerger/ObjectMergerApplication.class

@@ -1,7 +1,0 @@
-{
-  "definitions": {
-    "totalSales": {
-      "strategy": "sum"
-    }
-  }
-}

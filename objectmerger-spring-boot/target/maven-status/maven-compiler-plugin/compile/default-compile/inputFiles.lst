@@ -1,7 +1,0 @@
-/home/max/Dokumente/Projects/09_ObjectMerger/objectmerger-spring-boot/src/main/java/de/x132/objectmerger/ObjectMergerApplication.java
-/home/max/Dokumente/Projects/09_ObjectMerger/objectmerger-spring-boot/src/main/java/de/x132/objectmerger/controller/MergeController.java
-/home/max/Dokumente/Projects/09_ObjectMerger/objectmerger-spring-boot/src/main/java/de/x132/objectmerger/dto/LabeledSourceDTO.java
-/home/max/Dokumente/Projects/09_ObjectMerger/objectmerger-spring-boot/src/main/java/de/x132/objectmerger/util/MergeDefinitionConverter.java
-/home/max/Dokumente/Projects/09_ObjectMerger/objectmerger-spring-boot/src/main/java/de/x132/objectmerger/service/ObjectMergerService.java
-/home/max/Dokumente/Projects/09_ObjectMerger/objectmerger-spring-boot/src/main/java/de/x132/objectmerger/model/Person.java
-/home/max/Dokumente/Projects/09_ObjectMerger/objectmerger-spring-boot/src/main/java/de/x132/objectmerger/dto/MergeRequest.java
