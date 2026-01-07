@@ -348,3 +348,111 @@ Parameter:
 - `--definition` (`-d`): Pfad zur Merge-Definitions-JSON
 - `--source` (`-s`): Mehrfach wiederholbar; Format `label=pfad/zur.json`
 - `--output` (`-o`): Optionaler Pfad für die Ausgabedatei (ansonsten stdout)
+
+## Spring Boot REST API Beispiel
+
+Eine Spring Boot REST API befindet sich unter `examples/objectmerger-spring-boot`. Sie bietet einen interaktiven HTTP-Endpunkt zum Mergen mit vollständiger Swagger/OpenAPI-Dokumentation.
+
+### Build
+
+```bash
+# Library und Spring Boot App bauen
+mvn -q clean install
+mvn -q -f examples/objectmerger-spring-boot/pom.xml clean package
+```
+
+### Start
+
+```bash
+java -jar examples/objectmerger-spring-boot/target/objectmerger-spring-boot-0.1.0-SNAPSHOT.jar
+```
+
+App startet auf `http://localhost:8080`
+
+### Swagger UI
+
+Öffne im Browser: **http://localhost:8080/swagger-ui.html**
+
+Dort kannst du:
+- Alle Endpoints und ihre Schema anschauen
+- Requests direkt aus der UI senden (Try it out)
+- Response-Beispiele sehen
+
+### REST-Endpoints
+
+#### 1. Health Check
+```bash
+GET http://localhost:8080/api/v1/merge/health
+```
+Response: `{"status":"UP"}`
+
+#### 2. Merge mit Custom Quellen
+
+```bash
+curl -X POST http://localhost:8080/api/v1/merge \
+  -H "Content-Type: application/json" \
+  -d '{
+    "targetClass": "de.x132.objectmerger.model.Person",
+    "definition": {
+      "name": {"priority": {"database": 1, "crm": 2, "analytics": 3}},
+      "age": {"strategy": "maximum", "defaultValue": 0},
+      "email": {"priority": {"database": 1, "crm": 2, "analytics": 3}},
+      "phone": {"priority": {"analytics": 1, "crm": 2, "database": 3}}
+    },
+    "sources": [
+      {"label": "database", "data": {"name": "Max Müller", "age": 30, "email": "max@example.com", "phone": null}},
+      {"label": "crm", "data": {"name": "Maximilian Müller", "age": 25, "email": null, "phone": "030-123456"}},
+      {"label": "analytics", "data": {"name": null, "age": 35, "email": "max.mueller@example.de", "phone": "030-654321"}}
+    ]
+  }'
+```
+
+Response:
+```json
+{
+  "name": "Max Müller",
+  "age": 35,
+  "email": "max@example.com",
+  "phone": "030-654321"
+}
+```
+
+#### 3. Person-Beispiel (vordefiniert)
+
+```bash
+curl -X POST http://localhost:8080/api/v1/merge/example
+```
+
+Merged automatisch drei Person-Objekte (database, crm, analytics) nach den Regeln in der Merge-Definition.
+
+### Spring Boot Module-Struktur
+
+```
+examples/objectmerger-spring-boot/
+├── pom.xml                          # Spring Boot 3.2 + Springdoc + ObjectMerger Dependency
+├── src/main/java/de/x132/objectmerger/
+│   ├── ObjectMergerApplication.java # Spring Boot App Entry Point
+│   ├── controller/
+│   │   └── MergeController.java      # REST-Controller mit /api/v1/merge Endpoints
+│   ├── service/
+│   │   └── ObjectMergerService.java  # Wrapper um ObjectMerger.merge()
+│   ├── model/
+│   │   └── Person.java              # Example Domain Model
+│   ├── dto/
+│   │   ├── MergeRequest.java        # API Request Schema
+│   │   └── LabeledSourceDTO.java    # Source DTO
+│   └── util/
+│       └── MergeDefinitionConverter.java # Gson-basierte Typ-Konvertierung
+└── src/main/resources/
+    └── application.properties        # Spring Boot Config (Port 8080, Swagger paths)
+```
+
+### Swagger Annotations
+
+Die API ist vollständig mit OpenAPI 3.0 Annotations dokumentiert:
+- `@Tag` für API-Gruppen
+- `@Operation` für Endpoint-Beschreibungen
+- `@ApiResponse` für Response-Codes
+- `@Schema` für DTO-Felder
+
+Dies generiert automatisch die Swagger UI und OpenAPI JSON unter `/api-docs`.
