@@ -1,14 +1,13 @@
 package de.x132.strategy;
 
+import de.x132.FieldDefinition;
+import de.x132.LabeledSource;
+import de.x132.ObjectMerger;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
-import de.x132.FieldDefinition;
-import de.x132.LabeledSource;
-import de.x132.ObjectMerger;
 
 public class ConcatenateStrategy implements MergeStrategy<Object> {
 
