@@ -10,8 +10,8 @@
         <version>0.1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>objectmerger-core</artifactId>
-    <name>ObjectMerger Core</name>
+    <artifactId>objectmerger</artifactId>
+    <name>ObjectMerger</name>
     <description>Core library for merging/coalescing objects</description>
 
     <dependencies>

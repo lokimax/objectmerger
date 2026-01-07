@@ -13,7 +13,7 @@
     <description>Parent POM for ObjectMerger multi-module project</description>
 
     <modules>
-        <module>objectmerger-core</module>
+        <module>objectmerger</module>
         <module>objectmerger-cli</module>
         <module>objectmerger-spring-boot</module>
     </modules>
@@ -36,7 +36,7 @@
             <!-- Internal modules -->
             <dependency>
                 <groupId>de.x132</groupId>
-                <artifactId>objectmerger-core</artifactId>
+                <artifactId>objectmerger</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
