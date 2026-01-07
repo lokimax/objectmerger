@@ -3,6 +3,8 @@ package de.x132.strategy;
 import de.x132.FieldDefinition;
 import de.x132.ItemMergeDefinition;
 import de.x132.LabeledSource;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -110,33 +112,16 @@ class ListMergeStrategyTest {
     /**
      * Test helper classes
      */
+    @Data
+    @AllArgsConstructor
     private static class TestItem {
-        private final String id;
-        private final String name;
-
-        TestItem(String id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public String getName() {
-            return name;
-        }
+        private String id;
+        private String name;
     }
 
+    @Data
+    @AllArgsConstructor
     private static class TestContainer {
-        private final List<?> members;
-
-        TestContainer(List<?> members) {
-            this.members = members;
-        }
-
-        public List<?> getMembers() {
-            return members;
-        }
+        private List<?> members;
     }
 }
