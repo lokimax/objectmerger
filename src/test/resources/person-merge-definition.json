@@ -8,11 +8,6 @@
       }
     },
     "age": {
-      "priority": {
-        "crm": 1,
-        "database": 2,
-        "analytics": 3
-      },
       "strategy": "maximum",
       "defaultValue": 0
     },

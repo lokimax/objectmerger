@@ -23,10 +23,6 @@
             "GUI": 2
           },
           "age": {
-            "priority": {
-              "DB": 1,
-              "GUI": 2
-            },
             "strategy": "maximum"
           }
         }
