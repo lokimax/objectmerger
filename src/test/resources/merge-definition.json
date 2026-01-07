@@ -1,0 +1,36 @@
+{
+  "definitions": {
+    "familyName": {
+      "DB": 1,
+      "GUI": 2
+    },
+    "members": {
+      "priority": {
+        "GUI": 1,
+        "DB": 2
+      },
+      "strategy": "mergeList",
+      "identifyBy": "firstName",
+      "itemMergeDefinition": {
+        "targetClass": "de.x132.FamilyMember",
+        "definitions": {
+          "firstName": {
+            "GUI": 1,
+            "DB": 2
+          },
+          "lastName": {
+            "DB": 1,
+            "GUI": 2
+          },
+          "age": {
+            "priority": {
+              "DB": 1,
+              "GUI": 2
+            },
+            "strategy": "maximum"
+          }
+        }
+      }
+    }
+  }
+}
