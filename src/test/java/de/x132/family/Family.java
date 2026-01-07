@@ -1,4 +1,4 @@
-package de.x132;
+package de.x132.family;
 
 import java.util.List;
 

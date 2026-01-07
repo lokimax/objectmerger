@@ -16,13 +16,13 @@ public class ObjectMerger {
 
     private static final Gson gson = new Gson();
 
-    public static String merge(String json1, String label1, String json2, String label2, String mergeDefinition) {
-        JsonElement node1 = JsonParser.parseString(json1);
-        JsonElement node2 = JsonParser.parseString(json2);
+    public static <T> T merge(T obj1, String label1, T obj2, String label2, String mergeDefinition, Class<T> targetClass) {
+        JsonElement node1 = gson.toJsonTree(obj1);
+        JsonElement node2 = gson.toJsonTree(obj2);
         JsonElement definition = JsonParser.parseString(mergeDefinition);
 
         JsonElement resultNode = mergeNodes(node1.getAsJsonObject(), label1, node2.getAsJsonObject(), label2, definition.getAsJsonObject().get("definitions").getAsJsonObject());
-        return gson.toJson(resultNode);
+        return gson.fromJson(resultNode, targetClass);
     }
 
     private static JsonObject mergeNodes(JsonObject node1, String label1, JsonObject node2, String label2, JsonObject definition) {
