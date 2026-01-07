@@ -1,0 +1,39 @@
+targetClass: "de.x132.objectmerger.model.Person"
+definition:
+  name:
+    priority:
+      database: 1
+      crm: 2
+      analytics: 3
+  age:
+    strategy: "maximum"
+    defaultValue: 0
+  email:
+    priority:
+      database: 1
+      crm: 2
+      analytics: 3
+  phone:
+    priority:
+      analytics: 1
+      crm: 2
+      database: 3
+sources:
+  - label: "database"
+    data:
+      name: "Max Müller"
+      age: 30
+      email: "max@example.com"
+      phone: null
+  - label: "crm"
+    data:
+      name: "Maximilian Müller"
+      age: 25
+      email: null
+      phone: "030-123456"
+  - label: "analytics"
+    data:
+      name: null
+      age: 35
+      email: "max.mueller@example.de"
+      phone: "030-654321"

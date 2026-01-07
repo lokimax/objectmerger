@@ -1,22 +1,24 @@
 package de.x132.objectmerger.controller;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import de.x132.LabeledSource;
 import de.x132.MergeDefinition;
-import de.x132.objectmerger.dto.LabeledSourceDTO;
 import de.x132.objectmerger.dto.MergeRequest;
 import de.x132.objectmerger.service.ObjectMergerService;
 import de.x132.objectmerger.util.MergeDefinitionConverter;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/merge")
@@ -29,11 +31,39 @@ public class MergeController {
         this.mergerService = mergerService;
     }
 
-    @PostMapping
-    @Operation(summary = "Merge multiple sources", description = "Merge multiple labeled sources into a single object using the provided merge definition")
+    @PostMapping(consumes = "application/json", produces = "application/json")
+    @Operation(summary = "Merge multiple sources (JSON)", description = "Merge multiple labeled sources into a single object using the provided merge definition (JSON format)")
     @ApiResponse(responseCode = "200", description = "Merge successful")
     @ApiResponse(responseCode = "400", description = "Invalid request or merge failed")
     public ResponseEntity<?> merge(@RequestBody MergeRequest request) {
+        try {
+            // Convert definition map to MergeDefinition using Gson
+            MergeDefinition definition = MergeDefinitionConverter.fromMap(request.getDefinition());
+
+            // Convert DTOs to LabeledSources
+            @SuppressWarnings("unchecked")
+            List<LabeledSource<?>> sources = (List) request.getSources().stream()
+                    .map(dto -> new LabeledSource<>(dto.getLabel(), dto.getData()))
+                    .toList();
+
+            // Perform merge
+            Object result = mergerService.merge(request.getTargetClass(), definition, sources);
+
+            return ResponseEntity.ok(result);
+        } catch (ClassNotFoundException e) {
+            return ResponseEntity.badRequest().body(
+                    Map.of("error", "Target class not found: " + request.getTargetClass()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(
+                    Map.of("error", "Merge failed: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping(value = "/yaml", consumes = "application/x-yaml", produces = "application/x-yaml")
+    @Operation(summary = "Merge multiple sources (YAML)", description = "Merge multiple labeled sources into a single object using the provided merge definition (YAML format)")
+    @ApiResponse(responseCode = "200", description = "Merge successful")
+    @ApiResponse(responseCode = "400", description = "Invalid request or merge failed")
+    public ResponseEntity<?> mergeYaml(@RequestBody MergeRequest request) {
         try {
             // Convert definition map to MergeDefinition using Gson
             MergeDefinition definition = MergeDefinitionConverter.fromMap(request.getDefinition());
