@@ -483,11 +483,7 @@ Die REST API unterstützt YAML zusätzlich zu JSON. YAML ist besser lesbar für 
 curl -X POST http://localhost:8080/api/v1/merge/yaml \
   -H "Content-Type: application/x-yaml" \
   -H "Accept: application/x-yaml" \
-  --data-binary @example-merge-request.yaml
-```
-
-**Beispiel YAML-Datei** (`example-merge-request.yaml`):
-```yaml
+  --data-binary @- <<'YAML'
 targetClass: "de.x132.objectmerger.model.Person"
 definition:
   name:
@@ -527,6 +523,7 @@ sources:
       age: 35
       email: "max.mueller@example.de"
       phone: "030-654321"
+YAML
 ```
 
 Response (YAML):
