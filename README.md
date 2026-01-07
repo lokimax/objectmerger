@@ -8,6 +8,7 @@ Eine Java-Library zum intelligenten Zusammenführen von Objektdaten aus mehreren
 - **Multi-Source-Integration**: Zusammenführung von Informationen aus mehreren APIs oder Services
 - **Konfliktauflösung**: Bestimmung, welche Quelle bei abweichenden Daten verwendet wird
 - **Datenlisten-Merging**: Kombination von Listen aus verschiedenen Quellen
+- **String-Konkatenation**: Zusammenfügen von Text-Werten mit Prioritätsreihenfolge
 
 ## Features
 
@@ -58,7 +59,23 @@ Berechnet den Durchschnitt aus allen numerischen Werten:
 }
 ```
 
-### 5. Listen-Merge-Strategie
+### 5. Concatenate-Strategie
+Vereinigt mehrere String-Werte zu einem (respektiert Priorität und ignoriert null-Werte):
+```json
+{
+  "tags": {
+    "strategy": "concatenate",
+    "priority": {
+      "primary": 1,
+      "secondary": 2,
+      "tertiary": 3
+    },
+    "defaultValue": ""
+  }
+}
+```
+
+### 6. Listen-Merge-Strategie
 Kombiniert Listen aus mehreren Quellen basierend auf Identifikationsmerkmale:
 ```json
 {
@@ -120,6 +137,9 @@ mvn test
     },
     "avgRating": {
       "strategy": "average"
+    },
+    "tags": {
+      "strategy": "concatenate"
     }
   }
 }
@@ -148,6 +168,7 @@ System.out.println("Name: " + merged.getName());
 System.out.println("Min Price: " + merged.getMinPrice());
 System.out.println("Max Price: " + merged.getMaxPrice());
 System.out.println("Avg Rating: " + merged.getAvgRating());
+System.out.println("Tags: " + merged.getTags());
 ```
 
 ## Projektstruktur
@@ -166,6 +187,7 @@ src/
 │       ├── MinimumValueStrategy.java        # Findet Minimum-Wert
 │       ├── MaximumValueStrategy.java        # Findet Maximum-Wert
 │       ├── AverageValueStrategy.java        # Berechnet Durchschnittswert
+│       ├── ConcatenateStrategy.java         # Vereinigt Strings mit Priorität
 │       └── ListMergeStrategy.java           # Mergt Listen von Objekten
 └── test/java/
     ├── person/
@@ -180,6 +202,7 @@ src/
         ├── MinimumValueStrategyTest.java
         ├── MaximumValueStrategyTest.java
         ├── AverageValueStrategyTest.java
+        ├── ConcatenateStrategyTest.java
         └── ListMergeStrategyTest.java
 ```
 
@@ -211,21 +234,43 @@ src/
 }
 ```
 
+### Strings mit Priorität concatenaten
+```json
+{
+  "description": {
+    "strategy": "concatenate",
+    "priority": {
+      "primary_source": 1,
+      "secondary_source": 2
+    }
+  }
+}
+```
+
 ## Merge-Strategien im Detail
 
-| Strategie | Nutzung | Beispiel |
-|-----------|---------|---------|
-| `priority` (Standard) | Wählt Wert aus Quelle mit höchster Priorität | Name: Database (1) > CRM (2) > Analytics (3) |
-| `minimum` | Verwendet kleinsten numerischen Wert | Price: Min aus [100, 50, 75] = 50 |
-| `maximum` | Verwendet größten numerischen Wert | Age: Max aus [25, 35, 30] = 35 |
-| `average` | Berechnet Durchschnitt numerischer Werte | Rating: Average aus [4.5, 3.5, 4.0] = 4.0 |
-| `mergeList` | Kombiniert Listen basierend auf ID | Merge [Item1, Item2] + [Item1, Item3] |
+| Strategie | Nutzung | Typ | Beispiel |
+|-----------|---------|-----|---------|
+| `priority` (Standard) | Wählt Wert aus Quelle mit höchster Priorität | Beliebig | Name: Database (1) > CRM (2) |
+| `minimum` | Verwendet kleinsten numerischen Wert | Number | Price: Min aus [100, 50, 75] = 50 |
+| `maximum` | Verwendet größten numerischen Wert | Number | Age: Max aus [25, 35, 30] = 35 |
+| `average` | Berechnet Durchschnitt numerischer Werte | Number | Rating: Average aus [4.5, 3.5, 4.0] = 4.0 |
+| `concatenate` | Vereinigt Strings mit Prioritätsreihenfolge | String | Tags: "java,spring,boot" |
+| `mergeList` | Kombiniert Listen basierend auf ID | List | Merge Items basierend auf ID |
+
+## Strategie-Anforderungen
+
+- **Priority**: Beliebige Typen
+- **Minimum/Maximum**: Numeric Typen (Integer, Long, Double, Float, BigDecimal)
+- **Average**: Numeric Typen
+- **Concatenate**: String nur
+- **MergeList**: List Typ mit Items
 
 ## Version
 
 - **Aktuell**: 0.1.0-SNAPSHOT
 - **Java**: 21 LTS
-- **License**: Siehe LICENSE (falls vorhanden)
+- **License**: MIT
 
 ## Beispiel-Daten
 

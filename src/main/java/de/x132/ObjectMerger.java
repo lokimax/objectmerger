@@ -4,6 +4,7 @@ import de.x132.strategy.ListMergeStrategy;
 import de.x132.strategy.MaximumValueStrategy;
 import de.x132.strategy.MinimumValueStrategy;
 import de.x132.strategy.AverageValueStrategy;
+import de.x132.strategy.ConcatenateStrategy;
 import de.x132.strategy.PriorityMergeStrategy;
 import de.x132.strategy.MergeStrategy;
 
@@ -19,6 +20,7 @@ public class ObjectMerger {
             "maximum", new MaximumValueStrategy(),
             "minimum", new MinimumValueStrategy(),
             "average", new AverageValueStrategy(),
+            "concatenate", new ConcatenateStrategy(),
             "priority", new PriorityMergeStrategy()
     );
 
