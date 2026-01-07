@@ -1,0 +1,14 @@
+de/x132/strategy/ListMergeStrategy.class
+de/x132/strategy/MinimumValueStrategy.class
+de/x132/FieldDefinition.class
+de/x132/ItemMergeDefinition.class
+de/x132/strategy/MaximumValueStrategy.class
+de/x132/MergeDefinition.class
+de/x132/LabeledSource.class
+de/x132/strategy/MapMergeStrategy.class
+de/x132/strategy/MergeStrategy.class
+de/x132/strategy/SumValueStrategy.class
+de/x132/strategy/ConcatenateStrategy.class
+de/x132/strategy/PriorityMergeStrategy.class
+de/x132/ObjectMerger.class
+de/x132/strategy/AverageValueStrategy.class

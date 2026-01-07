@@ -1,0 +1,20 @@
+{
+  "familyName": "Miller Family",
+  "members": [
+    {
+      "firstName": "John",
+      "lastName": "Miller",
+      "age": 46
+    },
+    {
+      "firstName": "Jane",
+      "lastName": "Miller",
+      "age": null
+    },
+    {
+      "firstName": "Anna",
+      "lastName": "Miller",
+      "age": 8
+    }
+  ]
+}

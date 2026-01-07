@@ -1,0 +1,13 @@
+/home/max/Dokumente/Projects/09_ObjectMerger/objectmerger-core/src/test/java/de/x132/strategy/SumValueStrategyTest.java
+/home/max/Dokumente/Projects/09_ObjectMerger/objectmerger-core/src/test/java/de/x132/person/Person.java
+/home/max/Dokumente/Projects/09_ObjectMerger/objectmerger-core/src/test/java/de/x132/family/Family.java
+/home/max/Dokumente/Projects/09_ObjectMerger/objectmerger-core/src/test/java/de/x132/strategy/PriorityMergeStrategyTest.java
+/home/max/Dokumente/Projects/09_ObjectMerger/objectmerger-core/src/test/java/de/x132/strategy/MinimumValueStrategyTest.java
+/home/max/Dokumente/Projects/09_ObjectMerger/objectmerger-core/src/test/java/de/x132/strategy/ConcatenateStrategyTest.java
+/home/max/Dokumente/Projects/09_ObjectMerger/objectmerger-core/src/test/java/de/x132/strategy/MapMergeStrategyTest.java
+/home/max/Dokumente/Projects/09_ObjectMerger/objectmerger-core/src/test/java/de/x132/family/ListMergeTest.java
+/home/max/Dokumente/Projects/09_ObjectMerger/objectmerger-core/src/test/java/de/x132/strategy/ListMergeStrategyTest.java
+/home/max/Dokumente/Projects/09_ObjectMerger/objectmerger-core/src/test/java/de/x132/person/MultiSourceMergeTest.java
+/home/max/Dokumente/Projects/09_ObjectMerger/objectmerger-core/src/test/java/de/x132/strategy/AverageValueStrategyTest.java
+/home/max/Dokumente/Projects/09_ObjectMerger/objectmerger-core/src/test/java/de/x132/family/FamilyMember.java
+/home/max/Dokumente/Projects/09_ObjectMerger/objectmerger-core/src/test/java/de/x132/strategy/MaximumValueStrategyTest.java
