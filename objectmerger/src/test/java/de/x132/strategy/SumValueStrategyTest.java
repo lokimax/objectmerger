@@ -51,13 +51,8 @@ class SumValueStrategyTest {
     @Test
     @DisplayName("Should handle mixed numeric types")
     void testSumMixedTypes() {
-        Integer val1 = 100;
-        Long val2 = 200L;
-        Double val3 = 150.5;
-        Float val4 = 50.0f;
-
         SalesData data1 = new SalesData(100, "source1");
-        data1.totalSales = val1;
+        data1.totalSales = 100;
 
         List<LabeledSource<?>> sources = List.of(
                 new LabeledSource<>("s1", data1),

@@ -105,6 +105,27 @@
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>3.4.1</version>
+                    <executions>
+                        <execution>
+                            <id>enforce-jdk-21</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <requireJavaVersion>
+                                        <version>[21,)</version>
+                                        <message>Java 21 or higher is required to build this project</message>
+                                    </requireJavaVersion>
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.11.0</version>
                 </plugin>

@@ -23,10 +23,12 @@ public class PriorityMergeStrategy implements MergeStrategy<Object> {
           .orElse(fieldDef.getDefaultValue());
     }
 
-    // If priority is defined, return value from source with lowest priority number
+    // If priority is defined, consider ONLY sources explicitly listed in the priority map.
+    // This enforces "one source per property" semantics: unspecified sources are ignored.
     return sources.stream()
+        .filter(s -> priority.containsKey(s.getLabel()))
         .filter(s -> ObjectMerger.getFieldValue(s.getSource(), fieldName) != null)
-        .min(Comparator.comparingInt(s -> priority.getOrDefault(s.getLabel(), Integer.MAX_VALUE)))
+        .min(Comparator.comparingInt(s -> priority.get(s.getLabel())))
         .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
         .orElse(fieldDef.getDefaultValue());
   }

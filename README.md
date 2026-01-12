@@ -31,6 +31,22 @@ Wählt den Wert aus der Quelle mit höchster Priorität:
 }
 ```
 
+Hinweis zur Semantik der Priorität:
+- Es werden nur die Quellen berücksichtigt, die explizit im `priority`-Block genannt sind.
+- Nicht genannte Quellen werden für das jeweilige Feld ignoriert.
+- Ist der Wert der ausgewählten Quelle `null` oder die Quelle fehlt, gilt `defaultValue` (falls gesetzt), sonst `null`.
+
+Beispiel (nur CRM für `phone`):
+```json
+{
+  "phone": {
+    "priority": { "crm": 1 },
+    "defaultValue": null
+  }
+}
+```
+Ergebnis: Nur `crm.phone` entscheidet. Ist `crm.phone` gesetzt, wird dieser Wert verwendet; ist er `null` oder es gibt keine CRM-Quelle, wird das Ergebnis `null` (oder der angegebene `defaultValue`).
+
 ### 2. Minimum-Wert-Strategie
 Nutzt den kleinsten numerischen Wert aus allen Quellen:
 ```json

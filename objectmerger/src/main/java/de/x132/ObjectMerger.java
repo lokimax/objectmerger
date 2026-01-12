@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 import de.x132.strategy.AverageValueStrategy;
 import de.x132.strategy.ConcatenateStrategy;
 import de.x132.strategy.ListMergeStrategy;
@@ -15,6 +17,16 @@ import de.x132.strategy.MinimumValueStrategy;
 import de.x132.strategy.PriorityMergeStrategy;
 import de.x132.strategy.SumValueStrategy;
 
+/**
+ * Utility class for merging objects based on a definition and strategies.
+ * <p>
+ * This class uses reflection to iterate over fields and apply specific merge
+ * strategies.
+ * It supports different strategies for resolving conflicts or combining values
+ * from multiple sources.
+ * </p>
+ */
+@Slf4j
 public class ObjectMerger {
 
     private static final Map<String, MergeStrategy<?>> STRATEGIES = Map.of(
@@ -27,6 +39,18 @@ public class ObjectMerger {
             "concatenate", new ConcatenateStrategy(),
             "priority", new PriorityMergeStrategy());
 
+    /**
+     * Merges multiple sources into a target object based on the provided
+     * definition.
+     *
+     * @param targetClass     The class of the result object.
+     * @param mergeDefinition The definition of how fields should be merged.
+     * @param sources         The sources to merge.
+     * @param <T>             The type of the result object.
+     * @return A new instance of T with merged values.
+     * @throws RuntimeException If merging fails (e.g. instantiation or field access
+     *                          errors).
+     */
     @SafeVarargs
     public static <T> T merge(
             Class<T> targetClass, MergeDefinition mergeDefinition, LabeledSource<T>... sources) {
@@ -34,24 +58,48 @@ public class ObjectMerger {
             T result = targetClass.getDeclaredConstructor().newInstance();
             Map<String, FieldDefinition> definitions = mergeDefinition.getDefinitions();
             List<LabeledSource<T>> sourceList = Arrays.asList(sources);
+            MergeContext<T> context = new MergeContext<>(targetClass, result, sourceList);
 
             for (Map.Entry<String, FieldDefinition> entry : definitions.entrySet()) {
-                String fieldName = entry.getKey();
-                FieldDefinition fieldDef = entry.getValue();
-                Field field = targetClass.getDeclaredField(fieldName);
-                field.setAccessible(true);
-
-                MergeStrategy<?> strategy = STRATEGIES
-                        .get(fieldDef.getStrategy() != null ? fieldDef.getStrategy() : "priority");
-                if (strategy != null) {
-                    field.set(
-                            result, strategy.merge(new java.util.ArrayList<>(sourceList), fieldDef, fieldName));
-                }
+                processField(context, entry.getKey(), entry.getValue());
             }
             return result;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to merge objects", e);
+            log.error("Failed to merge objects of type {}", targetClass.getName(), e);
+            throw new RuntimeException("Failed to merge objects of type " + targetClass.getName(), e);
         }
+    }
+
+    private static <T> void processField(
+            MergeContext<T> context,
+            String fieldName,
+            FieldDefinition fieldDef) {
+        try {
+            Field field = context.targetClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+
+            MergeStrategy<?> strategy = resolveStrategy(fieldDef);
+            if (strategy != null) {
+                Object mergedValue = strategy.merge(new java.util.ArrayList<>(context.sources()), fieldDef, fieldName);
+                field.set(context.result(), mergedValue);
+            }
+        } catch (NoSuchFieldException e) {
+            log.warn("Field '{}' defined in mapping but missing in class '{}'", fieldName,
+                    context.targetClass().getName());
+        } catch (IllegalAccessException e) {
+            log.error("Access denied for field '{}'", fieldName, e);
+            throw new RuntimeException("Access denied for field: " + fieldName, e);
+        }
+    }
+
+    private static MergeStrategy<?> resolveStrategy(FieldDefinition fieldDef) {
+        String strategyName = fieldDef.getStrategy() != null ? fieldDef.getStrategy() : "priority";
+        MergeStrategy<?> strategy = STRATEGIES.get(strategyName);
+        if (strategy == null) {
+            log.warn("Unknown strategy '{}' for field. Using default (priority).", strategyName);
+            return STRATEGIES.get("priority");
+        }
+        return strategy;
     }
 
     public static Object getFieldValue(Object obj, String fieldName) {
@@ -62,7 +110,9 @@ public class ObjectMerger {
             field.setAccessible(true);
             return field.get(obj);
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException("Failed to get field value: " + fieldName, e);
+            log.debug("Failed to get field value '{}' from object of type '{}'", fieldName, obj.getClass().getName());
+            throw new RuntimeException(
+                    "Failed to get field value: " + fieldName + " from object of type " + obj.getClass().getName(), e);
         }
     }
 
@@ -71,4 +121,5 @@ public class ObjectMerger {
         mergeDefinition.setDefinitions(itemMergeDefinition.getDefinitions());
         return mergeDefinition;
     }
+
 }
