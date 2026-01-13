@@ -16,8 +16,7 @@ public class MapMergeStrategy implements MergeStrategy<Object> {
 
     for (LabeledSource<?> source : sources) {
       @SuppressWarnings("unchecked")
-      Map<Object, Object> sourceMap =
-          (Map<Object, Object>) ObjectMerger.getFieldValue(source.getSource(), fieldName);
+      Map<Object, Object> sourceMap = (Map<Object, Object>) ObjectMerger.getFieldValue(source.getSource(), fieldName);
 
       if (sourceMap != null) {
         for (Map.Entry<Object, Object> entry : sourceMap.entrySet()) {
@@ -62,12 +61,16 @@ public class MapMergeStrategy implements MergeStrategy<Object> {
   @SuppressWarnings("unchecked")
   private <T> T doMerge(
       Class<T> valueClass, FieldDefinition fieldDef, List<LabeledSource<?>> values) {
-    LabeledSource<T>[] sources =
-        values.stream()
-            .map(item -> new LabeledSource<T>(item.getLabel(), (T) item.getSource()))
-            .toArray(LabeledSource[]::new);
+    LabeledSource<T>[] sources = values.stream()
+        .map(item -> new LabeledSource<T>(item.getLabel(), (T) item.getSource()))
+        .toArray(LabeledSource[]::new);
 
     return ObjectMerger.merge(
         valueClass, ObjectMerger.toMergeDefinition(fieldDef.getItemMergeDefinition()), sources);
+  }
+
+  @Override
+  public String getName() {
+    return "mergeMap";
   }
 }

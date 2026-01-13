@@ -20,4 +20,12 @@ public interface MergeStrategy<T> {
    * @return The merged value.
    */
   T merge(List<LabeledSource<?>> sources, FieldDefinition fieldDef, String fieldName);
+
+  /**
+   * Returns the unique name of this strategy.
+   * This name is used in the configuration to refer to this strategy.
+   *
+   * @return The unique name of the strategy (e.g. "priority").
+   */
+  String getName();
 }

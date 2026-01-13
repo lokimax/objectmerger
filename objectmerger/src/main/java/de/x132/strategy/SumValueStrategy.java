@@ -66,4 +66,9 @@ public class SumValueStrategy implements MergeStrategy<Number> {
         }
         return null;
     }
+
+    @Override
+    public String getName() {
+        return "sum";
+    }
 }

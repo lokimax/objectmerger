@@ -5,17 +5,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import java.util.ServiceLoader;
+
 import lombok.extern.slf4j.Slf4j;
 
-import de.x132.strategy.AverageValueStrategy;
-import de.x132.strategy.ConcatenateStrategy;
-import de.x132.strategy.ListMergeStrategy;
-import de.x132.strategy.MapMergeStrategy;
-import de.x132.strategy.MaximumValueStrategy;
 import de.x132.strategy.MergeStrategy;
-import de.x132.strategy.MinimumValueStrategy;
-import de.x132.strategy.PriorityMergeStrategy;
-import de.x132.strategy.SumValueStrategy;
 
 /**
  * Utility class for merging objects based on a definition and strategies.
@@ -24,20 +18,22 @@ import de.x132.strategy.SumValueStrategy;
  * strategies.
  * It supports different strategies for resolving conflicts or combining values
  * from multiple sources.
+ * Strategies are loaded via Java SPI (Service Provider Interface).
  * </p>
  */
 @Slf4j
 public class ObjectMerger {
 
-    private static final Map<String, MergeStrategy<?>> STRATEGIES = Map.of(
-            "mergeList", new ListMergeStrategy(),
-            "mergeMap", new MapMergeStrategy(),
-            "maximum", new MaximumValueStrategy(),
-            "minimum", new MinimumValueStrategy(),
-            "average", new AverageValueStrategy(),
-            "sum", new SumValueStrategy(),
-            "concatenate", new ConcatenateStrategy(),
-            "priority", new PriorityMergeStrategy());
+    private static final Map<String, MergeStrategy<?>> STRATEGIES;
+
+    static {
+        STRATEGIES = new java.util.HashMap<>();
+        // ServiceLoader.load(Class<S>) returns ServiceLoader<S>
+        ServiceLoader<MergeStrategy> loader = ServiceLoader.load(MergeStrategy.class);
+        for (MergeStrategy<?> strategy : loader) {
+            STRATEGIES.put(strategy.getName(), strategy);
+        }
+    }
 
     /**
      * Merges multiple sources into a target object based on the provided

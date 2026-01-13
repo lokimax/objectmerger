@@ -28,4 +28,9 @@ public class MinimumValueStrategy implements MergeStrategy<Object> {
                 }))
         .orElse(fieldDef.getDefaultValue());
   }
+
+  @Override
+  public String getName() {
+    return "minimum";
+  }
 }
