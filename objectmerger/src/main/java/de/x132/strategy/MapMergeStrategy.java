@@ -11,32 +11,36 @@ public class MapMergeStrategy implements MergeStrategy<Object> {
 
   @Override
   public Object merge(List<LabeledSource<?>> sources, FieldDefinition fieldDef, String fieldName) {
-    // Group all map entries by key across all sources
-    Map<Object, List<LabeledSource<?>>> groupedByKey = new HashMap<>();
-
-    for (LabeledSource<?> source : sources) {
-      @SuppressWarnings("unchecked")
-      Map<Object, Object> sourceMap = (Map<Object, Object>) ObjectMerger.getFieldValue(source.getSource(), fieldName);
-
-      if (sourceMap != null) {
-        for (Map.Entry<Object, Object> entry : sourceMap.entrySet()) {
-          Object key = entry.getKey();
-          Object value = entry.getValue();
-
-          // Create a labeled source for each value with its key
-          LabeledSource<Object> labeledValue = new LabeledSource<>(source.getLabel(), value);
-
-          groupedByKey.computeIfAbsent(key, k -> new java.util.ArrayList<>()).add(labeledValue);
-        }
-      }
+    if (sources.isEmpty()) {
+      return new HashMap<>();
     }
 
-    // Merge values for each key if itemMergeDefinition is provided
+    // The first source acts as the template (master) for keys
+    LabeledSource<?> templateSource = sources.get(0);
+    @SuppressWarnings("unchecked")
+    Map<Object, Object> templateMap = (Map<Object, Object>) ObjectMerger.getFieldValue(templateSource.getSource(),
+        fieldName);
+
+    if (templateMap == null) {
+      return new HashMap<>();
+    }
+
     Map<Object, Object> mergedMap = new HashMap<>();
 
-    for (Map.Entry<Object, List<LabeledSource<?>>> entry : groupedByKey.entrySet()) {
-      Object key = entry.getKey();
-      List<LabeledSource<?>> valuesForKey = entry.getValue();
+    // Iterate ONLY over the keys of the template map
+    for (Object key : templateMap.keySet()) {
+      java.util.List<LabeledSource<?>> valuesForKey = new java.util.ArrayList<>();
+
+      // Collect values for this key from ALL sources
+      for (LabeledSource<?> source : sources) {
+        @SuppressWarnings("unchecked")
+        Map<Object, Object> sourceMap = (Map<Object, Object>) ObjectMerger.getFieldValue(source.getSource(), fieldName);
+
+        if (sourceMap != null && sourceMap.containsKey(key)) {
+          Object value = sourceMap.get(key);
+          valuesForKey.add(new LabeledSource<>(source.getLabel(), value));
+        }
+      }
 
       if (fieldDef != null && fieldDef.getItemMergeDefinition() != null) {
         // Merge the values using itemMergeDefinition
