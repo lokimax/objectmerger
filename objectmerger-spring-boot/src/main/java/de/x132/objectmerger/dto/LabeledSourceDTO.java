@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @Schema(description = "A labeled source for merging")
 public class LabeledSourceDTO {
 
-    @Schema(description = "Label/identifier for the source", example = "database")
-    private String label;
+  @Schema(description = "Label/identifier for the source", example = "database")
+  private String label;
 
-    @Schema(description = "The source object data")
-    private Object data;
+  @Schema(description = "The source object data")
+  private Object data;
 }

@@ -13,27 +13,31 @@ public class ListMergeStrategy implements MergeStrategy<Object> {
 
   @Override
   public Object merge(List<LabeledSource<?>> sources, FieldDefinition fieldDef, String fieldName) {
-    Map<Object, List<LabeledSource<?>>> groupedBy = sources.stream()
-        .flatMap(
-            source -> {
-              Collection<?> collection = (Collection<?>) ObjectMerger.getFieldValue(source.getSource(), fieldName);
-              if (collection == null) {
-                return Stream.empty();
-              }
-              return collection.stream()
-                  .map(item -> new LabeledSource<>(source.getLabel(), item));
-            })
-        .collect(
-            Collectors.groupingBy(
-                labeledSource -> ObjectMerger.getFieldValue(
-                    labeledSource.getSource(), fieldDef.getIdentifyBy()),
-                Collectors.toList()));
+    Map<Object, List<LabeledSource<?>>> groupedBy =
+        sources.stream()
+            .flatMap(
+                source -> {
+                  Collection<?> collection =
+                      (Collection<?>) ObjectMerger.getFieldValue(source.getSource(), fieldName);
+                  if (collection == null) {
+                    return Stream.empty();
+                  }
+                  return collection.stream()
+                      .map(item -> new LabeledSource<>(source.getLabel(), item));
+                })
+            .collect(
+                Collectors.groupingBy(
+                    labeledSource ->
+                        ObjectMerger.getFieldValue(
+                            labeledSource.getSource(), fieldDef.getIdentifyBy()),
+                    Collectors.toList()));
 
     return groupedBy.values().stream()
         .map(
             items -> {
               try {
-                Class<?> itemClass = Class.forName(fieldDef.getItemMergeDefinition().getTargetClass());
+                Class<?> itemClass =
+                    Class.forName(fieldDef.getItemMergeDefinition().getTargetClass());
                 return doMerge(itemClass, fieldDef, items);
               } catch (ClassNotFoundException e) {
                 throw new RuntimeException("Failed to merge list items", e);
@@ -45,9 +49,10 @@ public class ListMergeStrategy implements MergeStrategy<Object> {
   @SuppressWarnings("unchecked")
   private <T> T doMerge(
       Class<T> itemClass, FieldDefinition fieldDef, List<LabeledSource<?>> items) {
-    LabeledSource<T>[] sources = items.stream()
-        .map(item -> new LabeledSource<T>(item.getLabel(), (T) item.getSource()))
-        .toArray(LabeledSource[]::new);
+    LabeledSource<T>[] sources =
+        items.stream()
+            .map(item -> new LabeledSource<T>(item.getLabel(), (T) item.getSource()))
+            .toArray(LabeledSource[]::new);
     return ObjectMerger.merge(
         itemClass, ObjectMerger.toMergeDefinition(fieldDef.getItemMergeDefinition()), sources);
   }

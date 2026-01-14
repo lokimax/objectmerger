@@ -18,12 +18,13 @@ public class ConcatenateStrategy implements MergeStrategy<Object> {
     String delimiter = getDelimiter(fieldDef);
     Map<String, Integer> priority = fieldDef.getPriority();
 
-    List<String> values = sources.stream()
-        .sorted(getComparator(priority))
-        .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
-        .filter(Objects::nonNull)
-        .map(this::validateAndConvertToString)
-        .collect(Collectors.toList());
+    List<String> values =
+        sources.stream()
+            .sorted(getComparator(priority))
+            .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
+            .filter(Objects::nonNull)
+            .map(this::validateAndConvertToString)
+            .collect(Collectors.toList());
 
     if (values.isEmpty()) {
       return fieldDef.getDefaultValue();

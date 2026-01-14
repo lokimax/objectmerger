@@ -18,8 +18,8 @@ public class MapMergeStrategy implements MergeStrategy<Object> {
     // The first source acts as the template (master) for keys
     LabeledSource<?> templateSource = sources.get(0);
     @SuppressWarnings("unchecked")
-    Map<Object, Object> templateMap = (Map<Object, Object>) ObjectMerger.getFieldValue(templateSource.getSource(),
-        fieldName);
+    Map<Object, Object> templateMap =
+        (Map<Object, Object>) ObjectMerger.getFieldValue(templateSource.getSource(), fieldName);
 
     if (templateMap == null) {
       return new HashMap<>();
@@ -34,7 +34,8 @@ public class MapMergeStrategy implements MergeStrategy<Object> {
       // Collect values for this key from ALL sources
       for (LabeledSource<?> source : sources) {
         @SuppressWarnings("unchecked")
-        Map<Object, Object> sourceMap = (Map<Object, Object>) ObjectMerger.getFieldValue(source.getSource(), fieldName);
+        Map<Object, Object> sourceMap =
+            (Map<Object, Object>) ObjectMerger.getFieldValue(source.getSource(), fieldName);
 
         if (sourceMap != null && sourceMap.containsKey(key)) {
           Object value = sourceMap.get(key);
@@ -65,9 +66,10 @@ public class MapMergeStrategy implements MergeStrategy<Object> {
   @SuppressWarnings("unchecked")
   private <T> T doMerge(
       Class<T> valueClass, FieldDefinition fieldDef, List<LabeledSource<?>> values) {
-    LabeledSource<T>[] sources = values.stream()
-        .map(item -> new LabeledSource<T>(item.getLabel(), (T) item.getSource()))
-        .toArray(LabeledSource[]::new);
+    LabeledSource<T>[] sources =
+        values.stream()
+            .map(item -> new LabeledSource<T>(item.getLabel(), (T) item.getSource()))
+            .toArray(LabeledSource[]::new);
 
     return ObjectMerger.merge(
         valueClass, ObjectMerger.toMergeDefinition(fieldDef.getItemMergeDefinition()), sources);
