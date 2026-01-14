@@ -23,6 +23,14 @@ class SumValueStrategyTest {
         }
     }
 
+    static class TestData {
+        public Number value;
+
+        TestData(Number value) {
+            this.value = value;
+        }
+    }
+
     @Test
     @DisplayName("Should instantiate strategy")
     void testInstantiation() {
@@ -51,34 +59,28 @@ class SumValueStrategyTest {
     @Test
     @DisplayName("Should handle mixed numeric types")
     void testSumMixedTypes() {
-        SalesData data1 = new SalesData(100, "source1");
-        data1.totalSales = 100;
-
         List<LabeledSource<?>> sources = List.of(
-                new LabeledSource<>("s1", data1),
-                new LabeledSource<>("s2", new SalesData(200, "s2")),
-                new LabeledSource<>("s3", new SalesData(150, "s3")),
-                new LabeledSource<>("s4", new SalesData(50, "s4")));
+                new LabeledSource<>("s1", new TestData(100)), // Integer
+                new LabeledSource<>("s2", new TestData(200.5)), // Double
+                new LabeledSource<>("s3", new TestData(150L)), // Long
+                new LabeledSource<>("s4", new TestData(50.0f))); // Float
 
-        Object result = strategy.merge(sources, null, "totalSales");
+        Object result = strategy.merge(sources, null, "value");
         assertNotNull(result);
-        assertEquals(500, ((Number) result).intValue());
+        // 100 + 200.5 + 150 + 50.0 = 500.5
+        assertEquals(500.5, ((Number) result).doubleValue(), 0.001);
     }
 
     @Test
     @DisplayName("Should handle null values in sources")
     void testSumWithNullValues() {
-        SalesData dataWithValue = new SalesData(1000, "valid");
-        SalesData dataWithNull = new SalesData(0, "source");
-        dataWithNull.totalSales = 0;
-
         List<LabeledSource<?>> sources = List.of(
-                new LabeledSource<>("s1", dataWithValue),
-                new LabeledSource<>("s2", dataWithNull),
-                new LabeledSource<>("s3", new SalesData(2000, "s3")),
-                new LabeledSource<>("s4", new SalesData(500, "s4")));
+                new LabeledSource<>("s1", new TestData(1000)),
+                new LabeledSource<>("s2", new TestData(null)),
+                new LabeledSource<>("s3", new TestData(2000)),
+                new LabeledSource<>("s4", new TestData(500)));
 
-        Object result = strategy.merge(sources, null, "totalSales");
+        Object result = strategy.merge(sources, null, "value");
         assertNotNull(result);
         assertEquals(3500, ((Number) result).intValue());
     }
@@ -103,18 +105,16 @@ class SumValueStrategyTest {
     @DisplayName("Should return zero for empty or no values")
     void testSumEmpty() {
         List<LabeledSource<?>> sources = List.of(
-                new LabeledSource<>("s1", new SalesData(0, "s1")),
-                new LabeledSource<>("s2", new SalesData(0, "s2")),
-                new LabeledSource<>("s3", new SalesData(0, "s3")),
-                new LabeledSource<>("s4", new SalesData(0, "s4")));
+                new LabeledSource<>("s1", new TestData(null)),
+                new LabeledSource<>("s2", new TestData(null)));
 
-        Object result = strategy.merge(sources, null, "totalSales");
+        Object result = strategy.merge(sources, null, "value");
         assertNotNull(result);
         assertEquals(0, ((Number) result).intValue());
     }
 
     @Test
-    @DisplayName("Should sum all four sources from merge definition")
+    @DisplayName("Should sum all four sources with passed definition")
     void testSumWithMergeDefinition() {
         SalesData amazon = new SalesData(1500, "amazon");
         SalesData shopify = new SalesData(2300, "shopify");
@@ -127,10 +127,13 @@ class SumValueStrategyTest {
                 new LabeledSource<>("ebay", ebay),
                 new LabeledSource<>("woocommerce", woocommerce));
 
-        Object result = strategy.merge(sources, null, "totalSales");
+        de.x132.FieldDefinition def = new de.x132.FieldDefinition();
+        def.setStrategy("sum");
+
+        Object result = strategy.merge(sources, def, "totalSales");
         assertNotNull(result);
 
         int sum = ((Number) result).intValue();
-        assertEquals(1500 + 2300 + 800 + 1200, sum);
+        assertEquals(5800, sum);
     }
 }
