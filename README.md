@@ -120,7 +120,7 @@ Kombiniert Listen aus mehreren Quellen basierend auf Identifikationsmerkmale:
 ```
 
 ### 8. Map-Merge-Strategie
-Vereinigt Map-Objekte aus mehreren Quellen, gruppiert nach Key:
+Vereinigt Map-Objekte aus mehreren Quellen, wobei die erste Quelle (Template) die Keys bestimmt. Keys, die in der ersten Quelle fehlen, werden ignoriert:
 ```json
 {
   "settings": {
@@ -324,7 +324,7 @@ objectmerger/                              # Parent POM - Multi-Module Projekt
 | `sum` | Addiert alle numerischen Werte | Number | Sales: Sum aus [1500, 2300, 800] = 4600 |
 | `concatenate` | Vereinigt Strings mit Prioritätsreihenfolge | String | Tags: "java,spring,boot" |
 | `mergeList` | Kombiniert Listen basierend auf ID | List | Merge Items basierend auf ID |
-| `mergeMap` | Vereinigt Maps nach Key-Gruppierung | Map | Settings: Key-basiertes Merging |
+| `mergeMap` | Vereinigt Maps (Erste Quelle ist Key-Template) | Map | Settings: Controllierte Merges |
 
 ## Strategie-Anforderungen
 
