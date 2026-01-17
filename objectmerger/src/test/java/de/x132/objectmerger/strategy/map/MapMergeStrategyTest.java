@@ -1,11 +1,13 @@
-package de.x132.objectmerger.strategy;
+package de.x132.objectmerger.strategy.map;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.x132.objectmerger.FieldDefinition;
+import de.x132.objectmerger.strategy.map.MapFieldDefinition;
 import de.x132.objectmerger.LabeledSource;
+import de.x132.objectmerger.strategy.MergeStrategy;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,8 +44,7 @@ class MapMergeStrategyTest {
     TestObject obj1 = new TestObject(map1);
     TestObject obj2 = new TestObject(map2);
 
-    List<LabeledSource<?>> sources =
-        List.of(new LabeledSource<>("db", obj1), new LabeledSource<>("api", obj2));
+    List<LabeledSource<?>> sources = List.of(new LabeledSource<>("db", obj1), new LabeledSource<>("api", obj2));
 
     @SuppressWarnings("unchecked")
     Map<Object, Object> result = (Map<Object, Object>) strategy.merge(sources, null, "mapField");
@@ -96,8 +97,7 @@ class MapMergeStrategyTest {
     TestObject obj1 = new TestObject(map1);
     TestObject obj2 = new TestObject(map2);
 
-    List<LabeledSource<?>> sources =
-        List.of(new LabeledSource<>("db", obj1), new LabeledSource<>("api", obj2));
+    List<LabeledSource<?>> sources = List.of(new LabeledSource<>("db", obj1), new LabeledSource<>("api", obj2));
 
     @SuppressWarnings("unchecked")
     Map<Object, Object> result = (Map<Object, Object>) strategy.merge(sources, null, "mapField");
@@ -121,11 +121,11 @@ class MapMergeStrategyTest {
     TestObject obj1 = new TestObject(leaderMap);
     TestObject obj2 = new TestObject(followerMap);
 
-    List<LabeledSource<?>> sources =
-        List.of(new LabeledSource<>("leader", obj1), new LabeledSource<>("follower", obj2));
+    List<LabeledSource<?>> sources = List.of(new LabeledSource<>("leader", obj1),
+        new LabeledSource<>("follower", obj2));
 
     // Configure strictly using "leader" as template
-    FieldDefinition def = new FieldDefinition();
+    MapFieldDefinition def = new MapFieldDefinition();
     def.setKeyTemplateSources(List.of("leader"));
 
     @SuppressWarnings("unchecked")
@@ -153,8 +153,7 @@ class MapMergeStrategyTest {
     TestObject obj1 = new TestObject(map1);
     TestObject obj2 = new TestObject(map2);
 
-    List<LabeledSource<?>> sources =
-        List.of(new LabeledSource<>("db", obj1), new LabeledSource<>("api", obj2));
+    List<LabeledSource<?>> sources = List.of(new LabeledSource<>("db", obj1), new LabeledSource<>("api", obj2));
 
     @SuppressWarnings("unchecked")
     Map<Object, Object> result = (Map<Object, Object>) strategy.merge(sources, null, "mapField");

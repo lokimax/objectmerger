@@ -1,10 +1,12 @@
-package de.x132.objectmerger.strategy;
+package de.x132.objectmerger.strategy.sum;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import de.x132.objectmerger.FieldDefinition;
+import de.x132.objectmerger.StandardFieldDefinition;
 import de.x132.objectmerger.LabeledSource;
+import de.x132.objectmerger.strategy.MergeStrategy;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,12 +48,11 @@ class SumValueStrategyTest {
     SalesData ebay = new SalesData(800, "ebay");
     SalesData woocommerce = new SalesData(1200, "woocommerce");
 
-    List<LabeledSource<?>> sources =
-        List.of(
-            new LabeledSource<>("amazon", amazon),
-            new LabeledSource<>("shopify", shopify),
-            new LabeledSource<>("ebay", ebay),
-            new LabeledSource<>("woocommerce", woocommerce));
+    List<LabeledSource<?>> sources = List.of(
+        new LabeledSource<>("amazon", amazon),
+        new LabeledSource<>("shopify", shopify),
+        new LabeledSource<>("ebay", ebay),
+        new LabeledSource<>("woocommerce", woocommerce));
 
     Object result = strategy.merge(sources, null, "totalSales");
     assertNotNull(result);
@@ -61,12 +62,11 @@ class SumValueStrategyTest {
   @Test
   @DisplayName("Should handle mixed numeric types")
   void testSumMixedTypes() {
-    List<LabeledSource<?>> sources =
-        List.of(
-            new LabeledSource<>("s1", new TestData(100)), // Integer
-            new LabeledSource<>("s2", new TestData(200.5)), // Double
-            new LabeledSource<>("s3", new TestData(150L)), // Long
-            new LabeledSource<>("s4", new TestData(50.0f))); // Float
+    List<LabeledSource<?>> sources = List.of(
+        new LabeledSource<>("s1", new TestData(100)), // Integer
+        new LabeledSource<>("s2", new TestData(200.5)), // Double
+        new LabeledSource<>("s3", new TestData(150L)), // Long
+        new LabeledSource<>("s4", new TestData(50.0f))); // Float
 
     Object result = strategy.merge(sources, null, "value");
     assertNotNull(result);
@@ -77,12 +77,11 @@ class SumValueStrategyTest {
   @Test
   @DisplayName("Should handle null values in sources")
   void testSumWithNullValues() {
-    List<LabeledSource<?>> sources =
-        List.of(
-            new LabeledSource<>("s1", new TestData(1000)),
-            new LabeledSource<>("s2", new TestData(null)),
-            new LabeledSource<>("s3", new TestData(2000)),
-            new LabeledSource<>("s4", new TestData(500)));
+    List<LabeledSource<?>> sources = List.of(
+        new LabeledSource<>("s1", new TestData(1000)),
+        new LabeledSource<>("s2", new TestData(null)),
+        new LabeledSource<>("s3", new TestData(2000)),
+        new LabeledSource<>("s4", new TestData(500)));
 
     Object result = strategy.merge(sources, null, "value");
     assertNotNull(result);
@@ -94,12 +93,11 @@ class SumValueStrategyTest {
   void testSumSingleSource() {
     SalesData data = new SalesData(1000, "amazon");
 
-    List<LabeledSource<?>> sources =
-        List.of(
-            new LabeledSource<>("amazon", data),
-            new LabeledSource<>("shopify", new SalesData(0, "shopify")),
-            new LabeledSource<>("ebay", new SalesData(0, "ebay")),
-            new LabeledSource<>("woocommerce", new SalesData(0, "woocommerce")));
+    List<LabeledSource<?>> sources = List.of(
+        new LabeledSource<>("amazon", data),
+        new LabeledSource<>("shopify", new SalesData(0, "shopify")),
+        new LabeledSource<>("ebay", new SalesData(0, "ebay")),
+        new LabeledSource<>("woocommerce", new SalesData(0, "woocommerce")));
 
     Object result = strategy.merge(sources, null, "totalSales");
     assertNotNull(result);
@@ -109,10 +107,9 @@ class SumValueStrategyTest {
   @Test
   @DisplayName("Should return zero for empty or no values")
   void testSumEmpty() {
-    List<LabeledSource<?>> sources =
-        List.of(
-            new LabeledSource<>("s1", new TestData(null)),
-            new LabeledSource<>("s2", new TestData(null)));
+    List<LabeledSource<?>> sources = List.of(
+        new LabeledSource<>("s1", new TestData(null)),
+        new LabeledSource<>("s2", new TestData(null)));
 
     Object result = strategy.merge(sources, null, "value");
     assertNotNull(result);
@@ -127,14 +124,13 @@ class SumValueStrategyTest {
     SalesData ebay = new SalesData(800, "ebay");
     SalesData woocommerce = new SalesData(1200, "woocommerce");
 
-    List<LabeledSource<?>> sources =
-        List.of(
-            new LabeledSource<>("amazon", amazon),
-            new LabeledSource<>("shopify", shopify),
-            new LabeledSource<>("ebay", ebay),
-            new LabeledSource<>("woocommerce", woocommerce));
+    List<LabeledSource<?>> sources = List.of(
+        new LabeledSource<>("amazon", amazon),
+        new LabeledSource<>("shopify", shopify),
+        new LabeledSource<>("ebay", ebay),
+        new LabeledSource<>("woocommerce", woocommerce));
 
-    FieldDefinition def = new FieldDefinition();
+    StandardFieldDefinition def = new StandardFieldDefinition();
     def.setStrategy("sum");
 
     Object result = strategy.merge(sources, def, "totalSales");

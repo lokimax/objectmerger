@@ -1,4 +1,4 @@
-package de.x132.objectmerger.strategy;
+package de.x132.objectmerger.strategy.list;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -7,8 +7,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.x132.objectmerger.FieldDefinition;
+import de.x132.objectmerger.strategy.list.ListFieldDefinition;
 import de.x132.objectmerger.ItemMergeDefinition;
 import de.x132.objectmerger.LabeledSource;
+import de.x132.objectmerger.strategy.MergeStrategy;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -21,13 +23,13 @@ import org.junit.jupiter.api.Test;
 class ListMergeStrategyTest {
 
   private ListMergeStrategy strategy;
-  private FieldDefinition fieldDef;
+  private ListFieldDefinition fieldDef;
   private ItemMergeDefinition itemMergeDefinition;
 
   @BeforeEach
   void setUp() {
     strategy = new ListMergeStrategy();
-    fieldDef = mock(FieldDefinition.class);
+    fieldDef = mock(ListFieldDefinition.class);
     itemMergeDefinition = mock(ItemMergeDefinition.class);
     when(fieldDef.getItemMergeDefinition()).thenReturn(itemMergeDefinition);
   }

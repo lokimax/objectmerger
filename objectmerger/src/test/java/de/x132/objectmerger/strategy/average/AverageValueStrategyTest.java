@@ -1,4 +1,4 @@
-package de.x132.objectmerger.strategy;
+package de.x132.objectmerger.strategy.average;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import de.x132.objectmerger.FieldDefinition;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.ObjectMerger;
+import de.x132.objectmerger.strategy.MergeStrategy;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,11 +39,10 @@ class AverageValueStrategyTest {
     Object source2 = new Object();
     Object source3 = new Object();
 
-    List<LabeledSource<?>> sources =
-        Arrays.asList(
-            new LabeledSource<>("source1", source1),
-            new LabeledSource<>("source2", source2),
-            new LabeledSource<>("source3", source3));
+    List<LabeledSource<?>> sources = Arrays.asList(
+        new LabeledSource<>("source1", source1),
+        new LabeledSource<>("source2", source2),
+        new LabeledSource<>("source3", source3));
 
     when(fieldDef.getDefaultValue()).thenReturn(null);
 
@@ -67,9 +67,8 @@ class AverageValueStrategyTest {
     Object source1 = new Object();
     Object source2 = new Object();
 
-    List<LabeledSource<?>> sources =
-        Arrays.asList(
-            new LabeledSource<>("source1", source1), new LabeledSource<>("source2", source2));
+    List<LabeledSource<?>> sources = Arrays.asList(
+        new LabeledSource<>("source1", source1), new LabeledSource<>("source2", source2));
 
     when(fieldDef.getDefaultValue()).thenReturn(null);
 
@@ -94,11 +93,10 @@ class AverageValueStrategyTest {
     Object source2 = new Object();
     Object source3 = new Object();
 
-    List<LabeledSource<?>> sources =
-        Arrays.asList(
-            new LabeledSource<>("source1", source1),
-            new LabeledSource<>("source2", source2),
-            new LabeledSource<>("source3", source3));
+    List<LabeledSource<?>> sources = Arrays.asList(
+        new LabeledSource<>("source1", source1),
+        new LabeledSource<>("source2", source2),
+        new LabeledSource<>("source3", source3));
 
     when(fieldDef.getDefaultValue()).thenReturn(null);
 
@@ -125,9 +123,8 @@ class AverageValueStrategyTest {
     Object source1 = new Object();
     Object source2 = new Object();
 
-    List<LabeledSource<?>> sources =
-        Arrays.asList(
-            new LabeledSource<>("source1", source1), new LabeledSource<>("source2", source2));
+    List<LabeledSource<?>> sources = Arrays.asList(
+        new LabeledSource<>("source1", source1), new LabeledSource<>("source2", source2));
 
     Integer defaultValue = 0;
     when(fieldDef.getDefaultValue()).thenReturn(defaultValue);
@@ -179,11 +176,10 @@ class AverageValueStrategyTest {
     Object source2 = new Object();
     Object source3 = new Object();
 
-    List<LabeledSource<?>> sources =
-        Arrays.asList(
-            new LabeledSource<>("source1", source1),
-            new LabeledSource<>("source2", source2),
-            new LabeledSource<>("source3", source3));
+    List<LabeledSource<?>> sources = Arrays.asList(
+        new LabeledSource<>("source1", source1),
+        new LabeledSource<>("source2", source2),
+        new LabeledSource<>("source3", source3));
 
     when(fieldDef.getDefaultValue()).thenReturn(null);
 
@@ -208,9 +204,8 @@ class AverageValueStrategyTest {
     Object source1 = new Object();
     Object source2 = new Object();
 
-    List<LabeledSource<?>> sources =
-        Arrays.asList(
-            new LabeledSource<>("source1", source1), new LabeledSource<>("source2", source2));
+    List<LabeledSource<?>> sources = Arrays.asList(
+        new LabeledSource<>("source1", source1), new LabeledSource<>("source2", source2));
 
     when(fieldDef.getDefaultValue()).thenReturn(null);
 
@@ -268,11 +263,10 @@ class AverageValueStrategyTest {
     Object source2 = new Object();
     Object source3 = new Object();
 
-    List<LabeledSource<?>> sources =
-        Arrays.asList(
-            new LabeledSource<>("source1", source1),
-            new LabeledSource<>("source2", source2),
-            new LabeledSource<>("source3", source3));
+    List<LabeledSource<?>> sources = Arrays.asList(
+        new LabeledSource<>("source1", source1),
+        new LabeledSource<>("source2", source2),
+        new LabeledSource<>("source3", source3));
 
     when(fieldDef.getDefaultValue()).thenReturn(null);
 

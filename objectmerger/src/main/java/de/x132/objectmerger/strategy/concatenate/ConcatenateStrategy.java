@@ -1,8 +1,10 @@
-package de.x132.objectmerger.strategy;
+package de.x132.objectmerger.strategy.concatenate;
 
 import de.x132.objectmerger.FieldDefinition;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.ObjectMerger;
+import de.x132.objectmerger.strategy.priority.PriorityFieldDefinition;
+import de.x132.objectmerger.strategy.MergeStrategy;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -16,15 +18,17 @@ public class ConcatenateStrategy implements MergeStrategy<Object> {
   @Override
   public Object merge(List<LabeledSource<?>> sources, FieldDefinition fieldDef, String fieldName) {
     String delimiter = getDelimiter(fieldDef);
-    Map<String, Integer> priority = fieldDef.getPriority();
+    Map<String, Integer> priority = null;
+    if (fieldDef instanceof PriorityFieldDefinition priorityDef) {
+      priority = priorityDef.getPriority();
+    }
 
-    List<String> values =
-        sources.stream()
-            .sorted(getComparator(priority))
-            .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
-            .filter(Objects::nonNull)
-            .map(this::validateAndConvertToString)
-            .collect(Collectors.toList());
+    List<String> values = sources.stream()
+        .sorted(getComparator(priority))
+        .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
+        .filter(Objects::nonNull)
+        .map(this::validateAndConvertToString)
+        .collect(Collectors.toList());
 
     if (values.isEmpty()) {
       return fieldDef.getDefaultValue();

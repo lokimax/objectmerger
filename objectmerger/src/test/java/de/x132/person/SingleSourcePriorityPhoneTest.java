@@ -6,6 +6,8 @@ import de.x132.objectmerger.FieldDefinition;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.MergeDefinition;
 import de.x132.objectmerger.ObjectMerger;
+import de.x132.objectmerger.strategy.priority.PriorityFieldDefinition;
+import de.x132.person.Person;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -13,10 +15,11 @@ import org.junit.jupiter.api.Test;
 public class SingleSourcePriorityPhoneTest {
 
   private MergeDefinition phonePriorityCrmOnlyDefinition() {
-    FieldDefinition phoneDef = new FieldDefinition();
+    PriorityFieldDefinition phoneDef = new PriorityFieldDefinition();
     Map<String, Integer> prio = new HashMap<>();
     prio.put("crm", 1);
     phoneDef.setPriority(prio);
+    phoneDef.setStrategy("priority");
     phoneDef.setDefaultValue(null);
 
     MergeDefinition def = new MergeDefinition();
@@ -41,13 +44,12 @@ public class SingleSourcePriorityPhoneTest {
     MergeDefinition def = phonePriorityCrmOnlyDefinition();
 
     // When
-    Person merged =
-        ObjectMerger.merge(
-            Person.class,
-            def,
-            new LabeledSource<>("analytics", analytics),
-            new LabeledSource<>("crm", crm),
-            new LabeledSource<>("database", database));
+    Person merged = ObjectMerger.merge(
+        Person.class,
+        def,
+        new LabeledSource<>("analytics", analytics),
+        new LabeledSource<>("crm", crm),
+        new LabeledSource<>("database", database));
 
     // Then
     assertEquals("030-123456", merged.getPhone());
@@ -68,13 +70,12 @@ public class SingleSourcePriorityPhoneTest {
     MergeDefinition def = phonePriorityCrmOnlyDefinition();
 
     // When
-    Person merged =
-        ObjectMerger.merge(
-            Person.class,
-            def,
-            new LabeledSource<>("analytics", analytics),
-            new LabeledSource<>("crm", crm),
-            new LabeledSource<>("database", database));
+    Person merged = ObjectMerger.merge(
+        Person.class,
+        def,
+        new LabeledSource<>("analytics", analytics),
+        new LabeledSource<>("crm", crm),
+        new LabeledSource<>("database", database));
 
     // Then
     assertEquals(null, merged.getPhone());
@@ -92,12 +93,11 @@ public class SingleSourcePriorityPhoneTest {
     MergeDefinition def = phonePriorityCrmOnlyDefinition();
 
     // When: no CRM source is provided
-    Person merged =
-        ObjectMerger.merge(
-            Person.class,
-            def,
-            new LabeledSource<>("analytics", analytics),
-            new LabeledSource<>("database", database));
+    Person merged = ObjectMerger.merge(
+        Person.class,
+        def,
+        new LabeledSource<>("analytics", analytics),
+        new LabeledSource<>("database", database));
 
     // Then
     assertEquals(null, merged.getPhone());

@@ -1,14 +1,9 @@
 package de.x132.objectmerger;
 
-import java.util.Map;
 import lombok.Data;
 
 @Data
-public class FieldDefinition {
-  private Map<String, Integer> priority;
+public abstract class FieldDefinition {
   private String strategy;
-  private String identifyBy;
-  private ItemMergeDefinition itemMergeDefinition;
-  private java.util.List<String> keyTemplateSources;
   private Object defaultValue;
 }
