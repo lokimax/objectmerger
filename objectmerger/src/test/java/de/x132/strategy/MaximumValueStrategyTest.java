@@ -1,4 +1,4 @@
-package de.x132.strategy;
+package de.x132.objectmerger.strategy;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -8,9 +8,9 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
-import de.x132.FieldDefinition;
-import de.x132.LabeledSource;
-import de.x132.ObjectMerger;
+import de.x132.objectmerger.FieldDefinition;
+import de.x132.objectmerger.LabeledSource;
+import de.x132.objectmerger.ObjectMerger;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;

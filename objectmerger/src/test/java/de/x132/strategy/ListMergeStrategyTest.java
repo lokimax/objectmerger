@@ -1,4 +1,4 @@
-package de.x132.strategy;
+package de.x132.objectmerger.strategy;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import de.x132.FieldDefinition;
-import de.x132.ItemMergeDefinition;
-import de.x132.LabeledSource;
+import de.x132.objectmerger.FieldDefinition;
+import de.x132.objectmerger.ItemMergeDefinition;
+import de.x132.objectmerger.LabeledSource;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;

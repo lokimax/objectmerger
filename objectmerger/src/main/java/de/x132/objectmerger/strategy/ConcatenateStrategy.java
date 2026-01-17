@@ -1,8 +1,8 @@
-package de.x132.strategy;
+package de.x132.objectmerger.strategy;
 
-import de.x132.FieldDefinition;
-import de.x132.LabeledSource;
-import de.x132.ObjectMerger;
+import de.x132.objectmerger.FieldDefinition;
+import de.x132.objectmerger.LabeledSource;
+import de.x132.objectmerger.ObjectMerger;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;

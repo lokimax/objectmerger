@@ -2,8 +2,8 @@ package de.x132.objectmerger.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.x132.LabeledSource;
-import de.x132.MergeDefinition;
+import de.x132.objectmerger.LabeledSource;
+import de.x132.objectmerger.MergeDefinition;
 import de.x132.objectmerger.model.Person;
 import de.x132.objectmerger.util.MergeDefinitionConverter;
 import java.util.*;

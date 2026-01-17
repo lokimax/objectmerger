@@ -2,10 +2,10 @@ package de.x132.person;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.x132.FieldDefinition;
-import de.x132.LabeledSource;
-import de.x132.MergeDefinition;
-import de.x132.ObjectMerger;
+import de.x132.objectmerger.FieldDefinition;
+import de.x132.objectmerger.LabeledSource;
+import de.x132.objectmerger.MergeDefinition;
+import de.x132.objectmerger.ObjectMerger;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;

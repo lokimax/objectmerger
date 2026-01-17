@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.google.gson.Gson;
-import de.x132.LabeledSource;
-import de.x132.MergeDefinition;
-import de.x132.ObjectMerger;
+import de.x132.objectmerger.LabeledSource;
+import de.x132.objectmerger.MergeDefinition;
+import de.x132.objectmerger.ObjectMerger;
 import java.io.FileReader;
 import org.junit.jupiter.api.Test;
 

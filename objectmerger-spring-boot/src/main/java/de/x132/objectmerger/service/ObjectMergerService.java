@@ -1,9 +1,9 @@
 package de.x132.objectmerger.service;
 
 import com.google.gson.Gson;
-import de.x132.LabeledSource;
-import de.x132.MergeDefinition;
-import de.x132.ObjectMerger;
+import de.x132.objectmerger.LabeledSource;
+import de.x132.objectmerger.MergeDefinition;
+import de.x132.objectmerger.ObjectMerger;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;

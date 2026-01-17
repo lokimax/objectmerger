@@ -2,7 +2,7 @@ package de.x132.objectmerger.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import de.x132.MergeDefinition;
+import de.x132.objectmerger.MergeDefinition;
 import java.util.Map;
 
 /**

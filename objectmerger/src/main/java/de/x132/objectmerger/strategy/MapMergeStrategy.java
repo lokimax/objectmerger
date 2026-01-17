@@ -1,8 +1,8 @@
-package de.x132.strategy;
+package de.x132.objectmerger.strategy;
 
-import de.x132.FieldDefinition;
-import de.x132.LabeledSource;
-import de.x132.ObjectMerger;
+import de.x132.objectmerger.FieldDefinition;
+import de.x132.objectmerger.LabeledSource;
+import de.x132.objectmerger.ObjectMerger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +29,9 @@ public class MapMergeStrategy implements MergeStrategy<Object> {
             .ifPresent(
                 source -> {
                   @SuppressWarnings("unchecked")
-                  Map<Object, Object> sourceMap = (Map<Object, Object>) ObjectMerger.getFieldValue(source.getSource(),
-                      fieldName);
+                  Map<Object, Object> sourceMap =
+                      (Map<Object, Object>)
+                          ObjectMerger.getFieldValue(source.getSource(), fieldName);
                   if (sourceMap != null) {
                     targetKeys.addAll(sourceMap.keySet());
                   }
@@ -40,7 +41,8 @@ public class MapMergeStrategy implements MergeStrategy<Object> {
       // Default Mode (Union): Use keys from ALL sources
       for (LabeledSource<?> source : sources) {
         @SuppressWarnings("unchecked")
-        Map<Object, Object> sourceMap = (Map<Object, Object>) ObjectMerger.getFieldValue(source.getSource(), fieldName);
+        Map<Object, Object> sourceMap =
+            (Map<Object, Object>) ObjectMerger.getFieldValue(source.getSource(), fieldName);
         if (sourceMap != null) {
           targetKeys.addAll(sourceMap.keySet());
         }
@@ -56,7 +58,8 @@ public class MapMergeStrategy implements MergeStrategy<Object> {
       // Collect values for this key from ALL sources
       for (LabeledSource<?> source : sources) {
         @SuppressWarnings("unchecked")
-        Map<Object, Object> sourceMap = (Map<Object, Object>) ObjectMerger.getFieldValue(source.getSource(), fieldName);
+        Map<Object, Object> sourceMap =
+            (Map<Object, Object>) ObjectMerger.getFieldValue(source.getSource(), fieldName);
 
         if (sourceMap != null && sourceMap.containsKey(key)) {
           Object value = sourceMap.get(key);
@@ -87,9 +90,10 @@ public class MapMergeStrategy implements MergeStrategy<Object> {
   @SuppressWarnings("unchecked")
   private <T> T doMerge(
       Class<T> valueClass, FieldDefinition fieldDef, List<LabeledSource<?>> values) {
-    LabeledSource<T>[] sources = values.stream()
-        .map(item -> new LabeledSource<T>(item.getLabel(), (T) item.getSource()))
-        .toArray(LabeledSource[]::new);
+    LabeledSource<T>[] sources =
+        values.stream()
+            .map(item -> new LabeledSource<T>(item.getLabel(), (T) item.getSource()))
+            .toArray(LabeledSource[]::new);
 
     return ObjectMerger.merge(
         valueClass, ObjectMerger.toMergeDefinition(fieldDef.getItemMergeDefinition()), sources);

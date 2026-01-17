@@ -1,4 +1,4 @@
-package de.x132;
+package de.x132.objectmerger;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

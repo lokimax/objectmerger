@@ -79,7 +79,7 @@ The `objectmerger` module contains the business logic.
 *   `ObjectMerger`: Main entry point. Static `merge()` method.
 *   `MergeStrategy<T>`: Interface for all strategies.
 *   `FieldDefinition`: POJO holding the configuration for a field.
-*   `de.x132.strategy.*`: Implementation of strategies (Priority, Min, Max, etc.).
+*   `de.x132.objectmerger.strategy.*`: Implementation of strategies (Priority, Min, Max, etc.).
 
 ## 6. Runtime View
 

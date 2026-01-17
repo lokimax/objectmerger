@@ -1,6 +1,6 @@
-package de.x132;
+package de.x132.objectmerger;
 
-import de.x132.strategy.MergeStrategy;
+import de.x132.objectmerger.strategy.MergeStrategy;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;

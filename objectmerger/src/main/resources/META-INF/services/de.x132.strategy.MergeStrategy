@@ -1,8 +1,0 @@
-de.x132.strategy.AverageValueStrategy
-de.x132.strategy.ConcatenateStrategy
-de.x132.strategy.ListMergeStrategy
-de.x132.strategy.MapMergeStrategy
-de.x132.strategy.MaximumValueStrategy
-de.x132.strategy.MinimumValueStrategy
-de.x132.strategy.PriorityMergeStrategy
-de.x132.strategy.SumValueStrategy

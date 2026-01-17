@@ -1,7 +1,7 @@
 package de.x132.objectmerger.controller;
 
-import de.x132.LabeledSource;
-import de.x132.MergeDefinition;
+import de.x132.objectmerger.LabeledSource;
+import de.x132.objectmerger.MergeDefinition;
 import de.x132.objectmerger.dto.MergeRequest;
 import de.x132.objectmerger.service.ObjectMergerService;
 import de.x132.objectmerger.util.MergeDefinitionConverter;

@@ -1,4 +1,4 @@
-package de.x132;
+package de.x132.objectmerger;
 
 import java.util.Map;
 import lombok.Data;

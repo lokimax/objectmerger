@@ -1,7 +1,7 @@
-package de.x132.strategy;
+package de.x132.objectmerger.strategy;
 
-import de.x132.FieldDefinition;
-import de.x132.LabeledSource;
+import de.x132.objectmerger.FieldDefinition;
+import de.x132.objectmerger.LabeledSource;
 import java.util.List;
 
 /**
