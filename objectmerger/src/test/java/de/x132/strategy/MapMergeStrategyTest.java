@@ -41,8 +41,7 @@ class MapMergeStrategyTest {
     TestObject obj1 = new TestObject(map1);
     TestObject obj2 = new TestObject(map2);
 
-    List<LabeledSource<?>> sources =
-        List.of(new LabeledSource<>("db", obj1), new LabeledSource<>("api", obj2));
+    List<LabeledSource<?>> sources = List.of(new LabeledSource<>("db", obj1), new LabeledSource<>("api", obj2));
 
     @SuppressWarnings("unchecked")
     Map<Object, Object> result = (Map<Object, Object>) strategy.merge(sources, null, "mapField");
@@ -84,7 +83,7 @@ class MapMergeStrategyTest {
   }
 
   @Test
-  @DisplayName("Should merge multiple sources but only keep keys from leading map")
+  @DisplayName("Should merge multiple sources and keep keys from ALL maps (default union)")
   void testMultipleSources() {
     Map<String, String> map1 = new HashMap<>();
     map1.put("key1", "value1");
@@ -95,20 +94,18 @@ class MapMergeStrategyTest {
     TestObject obj1 = new TestObject(map1);
     TestObject obj2 = new TestObject(map2);
 
-    List<LabeledSource<?>> sources =
-        List.of(new LabeledSource<>("db", obj1), new LabeledSource<>("api", obj2));
+    List<LabeledSource<?>> sources = List.of(new LabeledSource<>("db", obj1), new LabeledSource<>("api", obj2));
 
     @SuppressWarnings("unchecked")
     Map<Object, Object> result = (Map<Object, Object>) strategy.merge(sources, null, "mapField");
     assertNotNull(result);
-    // Key1 is in the leader, so it should be present
+    // Union behavior: Both keys should be present
     assertTrue(result.containsKey("key1"));
-    // Key2 is ONLY in the follower, so it should be IGNORED
-    assertFalse(result.containsKey("key2"));
+    assertTrue(result.containsKey("key2"));
   }
 
   @Test
-  @DisplayName("Should strictly follow the template map keys")
+  @DisplayName("Should strictly follow the template map keys when configured")
   void testMapTemplateBehavior() {
     Map<String, String> leaderMap = new HashMap<>();
     leaderMap.put("common", "leaderValue");
@@ -121,11 +118,15 @@ class MapMergeStrategyTest {
     TestObject obj1 = new TestObject(leaderMap);
     TestObject obj2 = new TestObject(followerMap);
 
-    List<LabeledSource<?>> sources =
-        List.of(new LabeledSource<>("leader", obj1), new LabeledSource<>("follower", obj2));
+    List<LabeledSource<?>> sources = List.of(new LabeledSource<>("leader", obj1),
+        new LabeledSource<>("follower", obj2));
+
+    // Configure strictly using "leader" as template
+    de.x132.FieldDefinition def = new de.x132.FieldDefinition();
+    def.setKeyTemplateSources(List.of("leader"));
 
     @SuppressWarnings("unchecked")
-    Map<Object, Object> result = (Map<Object, Object>) strategy.merge(sources, null, "mapField");
+    Map<Object, Object> result = (Map<Object, Object>) strategy.merge(sources, def, "mapField");
     assertNotNull(result);
 
     // Should contain keys from leader
@@ -133,8 +134,7 @@ class MapMergeStrategyTest {
     assertTrue(result.containsKey("leaderOnly"));
 
     // Should NOT contain keys that are only in follower
-    assertFalse(
-        result.containsKey("followerOnly"), "Should not contain keys only present in follower map");
+    assertFalse(result.containsKey("followerOnly"), "Should not contain keys only present in follower map");
   }
 
   @Test
@@ -149,8 +149,7 @@ class MapMergeStrategyTest {
     TestObject obj1 = new TestObject(map1);
     TestObject obj2 = new TestObject(map2);
 
-    List<LabeledSource<?>> sources =
-        List.of(new LabeledSource<>("db", obj1), new LabeledSource<>("api", obj2));
+    List<LabeledSource<?>> sources = List.of(new LabeledSource<>("db", obj1), new LabeledSource<>("api", obj2));
 
     @SuppressWarnings("unchecked")
     Map<Object, Object> result = (Map<Object, Object>) strategy.merge(sources, null, "mapField");

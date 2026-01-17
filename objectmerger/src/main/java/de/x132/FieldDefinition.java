@@ -9,5 +9,6 @@ public class FieldDefinition {
   private String strategy;
   private String identifyBy;
   private ItemMergeDefinition itemMergeDefinition;
+  private java.util.List<String> keyTemplateSources;
   private Object defaultValue;
 }

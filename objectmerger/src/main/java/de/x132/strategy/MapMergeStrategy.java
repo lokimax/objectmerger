@@ -15,27 +15,48 @@ public class MapMergeStrategy implements MergeStrategy<Object> {
       return new HashMap<>();
     }
 
-    // The first source acts as the template (master) for keys
-    LabeledSource<?> templateSource = sources.get(0);
-    @SuppressWarnings("unchecked")
-    Map<Object, Object> templateMap =
-        (Map<Object, Object>) ObjectMerger.getFieldValue(templateSource.getSource(), fieldName);
+    // 1. Determine the set of keys to include in the result
+    java.util.Set<Object> targetKeys = new java.util.HashSet<>();
 
-    if (templateMap == null) {
-      return new HashMap<>();
+    if (fieldDef != null
+        && fieldDef.getKeyTemplateSources() != null
+        && !fieldDef.getKeyTemplateSources().isEmpty()) {
+      // Template Mode: Only use keys from specified sources
+      for (String label : fieldDef.getKeyTemplateSources()) {
+        sources.stream()
+            .filter(s -> s.getLabel().equals(label))
+            .findFirst()
+            .ifPresent(
+                source -> {
+                  @SuppressWarnings("unchecked")
+                  Map<Object, Object> sourceMap = (Map<Object, Object>) ObjectMerger.getFieldValue(source.getSource(),
+                      fieldName);
+                  if (sourceMap != null) {
+                    targetKeys.addAll(sourceMap.keySet());
+                  }
+                });
+      }
+    } else {
+      // Default Mode (Union): Use keys from ALL sources
+      for (LabeledSource<?> source : sources) {
+        @SuppressWarnings("unchecked")
+        Map<Object, Object> sourceMap = (Map<Object, Object>) ObjectMerger.getFieldValue(source.getSource(), fieldName);
+        if (sourceMap != null) {
+          targetKeys.addAll(sourceMap.keySet());
+        }
+      }
     }
 
     Map<Object, Object> mergedMap = new HashMap<>();
 
-    // Iterate ONLY over the keys of the template map
-    for (Object key : templateMap.keySet()) {
+    // 2. Iterate over determined keys and match values from all sources
+    for (Object key : targetKeys) {
       java.util.List<LabeledSource<?>> valuesForKey = new java.util.ArrayList<>();
 
       // Collect values for this key from ALL sources
       for (LabeledSource<?> source : sources) {
         @SuppressWarnings("unchecked")
-        Map<Object, Object> sourceMap =
-            (Map<Object, Object>) ObjectMerger.getFieldValue(source.getSource(), fieldName);
+        Map<Object, Object> sourceMap = (Map<Object, Object>) ObjectMerger.getFieldValue(source.getSource(), fieldName);
 
         if (sourceMap != null && sourceMap.containsKey(key)) {
           Object value = sourceMap.get(key);
@@ -66,10 +87,9 @@ public class MapMergeStrategy implements MergeStrategy<Object> {
   @SuppressWarnings("unchecked")
   private <T> T doMerge(
       Class<T> valueClass, FieldDefinition fieldDef, List<LabeledSource<?>> values) {
-    LabeledSource<T>[] sources =
-        values.stream()
-            .map(item -> new LabeledSource<T>(item.getLabel(), (T) item.getSource()))
-            .toArray(LabeledSource[]::new);
+    LabeledSource<T>[] sources = values.stream()
+        .map(item -> new LabeledSource<T>(item.getLabel(), (T) item.getSource()))
+        .toArray(LabeledSource[]::new);
 
     return ObjectMerger.merge(
         valueClass, ObjectMerger.toMergeDefinition(fieldDef.getItemMergeDefinition()), sources);

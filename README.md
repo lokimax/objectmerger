@@ -149,10 +149,22 @@ This builds all modules. The resulting artifacts are located in `target/` of the
 | **sum** | Sum of all numeric values. | `{"strategy": "sum"}` |
 | **concatenate**| Joins strings. | `{"strategy": "concatenate"}` |
 | **mergeList** | Merges lists by ID. | `{"strategy": "mergeList", "identifyBy": "id"}` |
-| **mergeMap** | Merges maps. *First source is template.* | `{"strategy": "mergeMap"}` |
+| **mergeMap** | Vereinigt Maps (Union oder Template) | `{"strategy": "mergeMap"}` |
 
 ### 8.2 Map Template Logic
-For the `mergeMap` strategy, the **first source** provided to the merger acts as the **template**. Only keys present in this template map will be present in the final result. Keys found in subsequent sources but missing in the template are ignored. This ensures a controlled merge result structure.
+Vereinigt Map-Objekte aus mehreren Quellen.
+
+*   **Standard (Union)**: Keys aus **allen** Quellen werden vereinigt.
+*   **Template Mode**: Wenn `keyTemplateSources` definiert ist, werden nur Keys aus diesen Quellen verwendet.
+
+```json
+{
+  "settings": {
+    "strategy": "mergeMap",
+    "keyTemplateSources": ["source1"]
+  }
+}
+```
 
 ## 9. Glossary
 
