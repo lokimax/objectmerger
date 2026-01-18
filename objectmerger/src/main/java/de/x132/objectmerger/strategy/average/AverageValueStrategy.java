@@ -35,7 +35,6 @@ public class AverageValueStrategy implements MergeStrategy<Object, FieldDefiniti
             .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
             .filter(Objects::nonNull)
             .count();
-
     if (count == 0) {
       return fieldDef.getDefaultValue();
     }
