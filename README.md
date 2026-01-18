@@ -99,6 +99,13 @@ Product merged = ObjectMerger.merge(
     dbDetails,
     apiDetails
 );
+
+// 3a. Merge (Map-Based / Dynamic)
+Map<String, Object> mergedMap = ObjectMerger.merge(
+    definition,
+    new LabeledSource<>("db", map1),
+    new LabeledSource<>("api", map2)
+);
 ```
 
 ### 6.2 Using the CLI

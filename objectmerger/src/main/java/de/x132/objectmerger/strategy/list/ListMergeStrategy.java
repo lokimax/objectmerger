@@ -43,9 +43,18 @@ public class ListMergeStrategy implements MergeStrategy<Object, ListFieldDefinit
         .map(
             items -> {
               try {
-                Class<?> itemClass =
-                    Class.forName(fieldDef.getItemMergeDefinition().getTargetClass());
-                return doMerge(itemClass, fieldDef, items);
+                if (fieldDef.getItemMergeDefinition() != null
+                    && fieldDef.getItemMergeDefinition().getTargetClass() != null) {
+                  Class<?> itemClass =
+                      Class.forName(fieldDef.getItemMergeDefinition().getTargetClass());
+                  return doMerge(itemClass, fieldDef, items);
+                } else if (items.stream().allMatch(i -> i.getSource() instanceof Map)) {
+                  return doMapMerge(fieldDef, items);
+                } else {
+                  // Fallback or error if no definition and not maps
+                  throw new IllegalArgumentException(
+                      "Cannot merge list items: missing target class in definition and items are not Maps.");
+                }
               } catch (ClassNotFoundException e) {
                 throw new RuntimeException("Failed to merge list items", e);
               }
@@ -62,6 +71,28 @@ public class ListMergeStrategy implements MergeStrategy<Object, ListFieldDefinit
             .toArray(LabeledSource[]::new);
     return ObjectMerger.merge(
         itemClass, ObjectMerger.toMergeDefinition(fieldDef.getItemMergeDefinition()), sources);
+  }
+
+  @SuppressWarnings("unchecked")
+  private Map<String, Object> doMapMerge(
+      ListFieldDefinition fieldDef, List<LabeledSource<?>> items) {
+
+    // Create definition from ItemMergeDefinition or use empty if null (merging
+    // nothing but satisfying call)
+    de.x132.objectmerger.MergeDefinition def =
+        (fieldDef.getItemMergeDefinition() != null)
+            ? ObjectMerger.toMergeDefinition(fieldDef.getItemMergeDefinition())
+            : new de.x132.objectmerger.MergeDefinition();
+
+    LabeledSource<Map<String, Object>>[] sources =
+        items.stream()
+            .map(
+                item ->
+                    new LabeledSource<Map<String, Object>>(
+                        item.getLabel(), (Map<String, Object>) item.getSource()))
+            .toArray(LabeledSource[]::new);
+
+    return ObjectMerger.merge(def, sources);
   }
 
   @Override

@@ -54,6 +54,36 @@ public class ObjectMerger {
     }
   }
 
+  /**
+   * Merges multiple sources into a target map based on the provided definition.
+   *
+   * @param mergeDefinition The definition of how fields should be merged.
+   * @param sources The sources to merge (Maps).
+   * @return A new Map with merged values.
+   */
+  @SafeVarargs
+  public static Map<String, Object> merge(
+      MergeDefinition mergeDefinition, LabeledSource<Map<String, Object>>... sources) {
+    Map<String, Object> result = new java.util.HashMap<>();
+    Map<String, FieldDefinition> definitions = mergeDefinition.getDefinitions();
+    List<LabeledSource<Map<String, Object>>> sourceList = Arrays.asList(sources);
+
+    for (Map.Entry<String, FieldDefinition> entry : definitions.entrySet()) {
+      String fieldName = entry.getKey();
+      FieldDefinition fieldDef = entry.getValue();
+
+      MergeStrategy<?, ?> strategy = resolveStrategy(fieldDef);
+      if (strategy != null) {
+        // Cast to raw type to allow capture in helper
+        @SuppressWarnings("rawtypes")
+        MergeStrategy rawStrategy = strategy;
+        Object mergedValue = executeStrategy(rawStrategy, sourceList, fieldDef, fieldName);
+        result.put(fieldName, mergedValue);
+      }
+    }
+    return result;
+  }
+
   private static <T> void processField(
       MergeContext<T> context, String fieldName, FieldDefinition fieldDef) {
     try {
@@ -83,7 +113,6 @@ public class ObjectMerger {
     return StrategyRegistry.getInstance().getStrategy(strategyName);
   }
 
-  @SuppressWarnings("unchecked")
   private static <T, C extends FieldDefinition> void applyStrategy(
       MergeStrategy<T, C> strategy,
       List<? extends LabeledSource<?>> sources,
@@ -92,6 +121,17 @@ public class ObjectMerger {
       Field field,
       Object result)
       throws IllegalAccessException {
+
+    T mergedValue = executeStrategy(strategy, sources, fieldDef, fieldName);
+    field.set(result, mergedValue);
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <T, C extends FieldDefinition> T executeStrategy(
+      MergeStrategy<T, C> strategy,
+      List<? extends LabeledSource<?>> sources,
+      FieldDefinition fieldDef,
+      String fieldName) {
 
     if (!strategy.getConfigurationClass().isInstance(fieldDef)) {
       throw new IllegalArgumentException(
@@ -103,14 +143,16 @@ public class ObjectMerger {
               strategy.getName()));
     }
 
-    // Safe cast because we checked instance above
     C config = (C) fieldDef;
-    T mergedValue = strategy.merge(new java.util.ArrayList<>(sources), config, fieldName);
-    field.set(result, mergedValue);
+    return strategy.merge(new java.util.ArrayList<>(sources), config, fieldName);
   }
 
   public static Object getFieldValue(Object obj, String fieldName) {
     if (obj == null) return null;
+    if (obj instanceof Map) {
+      return ((Map<?, ?>) obj).get(fieldName);
+    }
+
     try {
       Field field = obj.getClass().getDeclaredField(fieldName);
       field.setAccessible(true);
