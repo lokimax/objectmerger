@@ -149,6 +149,7 @@ This builds all modules. The resulting artifacts are located in `target/` of the
 | **concatenate**| Joins strings. | `{"strategy": "concatenate"}` |
 | **mergeList** | Merges lists by ID. | `{"strategy": "mergeList", "identifyBy": "id"}` |
 | **mergeMap** | Vereinigt Maps (Union oder Template) | `{"strategy": "mergeMap"}` |
+| **mvel** | Execute custom scripts. | `{"strategy": "mvel", "expression": "return 1;"}` |
 
 ### 8.2 Map Template Logic
 Vereinigt Map-Objekte aus mehreren Quellen.
@@ -161,6 +162,23 @@ Vereinigt Map-Objekte aus mehreren Quellen.
   "settings": {
     "strategy": "mergeMap",
     "keyTemplateSources": ["source1"]
+  }
+}
+```
+
+### 8.3 MVEL Scripting
+Allows complex logic using [MVEL](http://mvel.documentnode.com/).
+
+**Context Variables:**
+* `sources`: `Map<String, Object>` (Label -> Object)
+* `labeledSources`: `List<LabeledSource>`
+
+**Example:**
+```json
+{
+  "age": {
+    "strategy": "mvel",
+    "expression": "java.util.Collections.max(sources.values().!=[null].!=[age==null].age)"
   }
 }
 ```
