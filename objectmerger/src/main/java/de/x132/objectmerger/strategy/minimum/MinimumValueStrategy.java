@@ -1,8 +1,8 @@
 package de.x132.objectmerger.strategy.minimum;
 
-import de.x132.objectmerger.FieldDefinition;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.ObjectMerger;
+import de.x132.objectmerger.strategy.FieldDefinition;
 import de.x132.objectmerger.strategy.MergeStrategy;
 import java.util.Comparator;
 import java.util.List;

@@ -7,11 +7,11 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import de.x132.objectmerger.FieldDefinition;
-import de.x132.objectmerger.StandardFieldDefinition;
+import de.x132.objectmerger.strategy.FieldDefinition;
 import de.x132.objectmerger.strategy.list.ListFieldDefinition;
 import de.x132.objectmerger.strategy.map.MapFieldDefinition;
 import de.x132.objectmerger.strategy.priority.PriorityFieldDefinition;
+import de.x132.objectmerger.strategy.standard.StandardFieldDefinition;
 import java.lang.reflect.Type;
 
 public class TestGsonHelper {

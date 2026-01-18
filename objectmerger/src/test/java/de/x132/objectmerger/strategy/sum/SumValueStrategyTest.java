@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import de.x132.objectmerger.LabeledSource;
-import de.x132.objectmerger.StandardFieldDefinition;
+import de.x132.objectmerger.strategy.standard.StandardFieldDefinition;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -19,8 +19,8 @@ public class MergeDefinitionConverter {
   static {
     GsonBuilder builder = new GsonBuilder();
     builder.registerTypeAdapter(
-        de.x132.objectmerger.FieldDefinition.class,
-        (com.google.gson.JsonDeserializer<de.x132.objectmerger.FieldDefinition>)
+        de.x132.objectmerger.strategy.FieldDefinition.class,
+        (com.google.gson.JsonDeserializer<de.x132.objectmerger.strategy.FieldDefinition>)
             (json, typeOfT, context) -> {
               com.google.gson.JsonObject jsonObject = json.getAsJsonObject();
               String strategy =
@@ -28,7 +28,7 @@ public class MergeDefinitionConverter {
                       ? jsonObject.get("strategy").getAsString()
                       : "standard";
 
-              Class<? extends de.x132.objectmerger.FieldDefinition> targetClass;
+              Class<? extends de.x132.objectmerger.strategy.FieldDefinition> targetClass;
 
               switch (strategy) {
                 case "priority":
@@ -41,7 +41,8 @@ public class MergeDefinitionConverter {
                   targetClass = ListFieldDefinition.class;
                   break;
                 default:
-                  targetClass = de.x132.objectmerger.StandardFieldDefinition.class;
+                  targetClass =
+                      de.x132.objectmerger.strategy.standard.StandardFieldDefinition.class;
                   break;
               }
 

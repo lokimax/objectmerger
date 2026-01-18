@@ -2,8 +2,8 @@ package de.x132.objectmerger.util;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.x132.objectmerger.FieldDefinition;
 import de.x132.objectmerger.MergeDefinition;
+import de.x132.objectmerger.strategy.FieldDefinition;
 import de.x132.objectmerger.strategy.priority.PriorityFieldDefinition;
 import java.util.LinkedHashMap;
 import java.util.Map;

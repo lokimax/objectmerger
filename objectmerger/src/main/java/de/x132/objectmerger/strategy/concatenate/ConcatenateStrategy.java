@@ -1,8 +1,8 @@
 package de.x132.objectmerger.strategy.concatenate;
 
-import de.x132.objectmerger.FieldDefinition;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.ObjectMerger;
+import de.x132.objectmerger.strategy.FieldDefinition;
 import de.x132.objectmerger.strategy.MergeStrategy;
 import de.x132.objectmerger.strategy.priority.PriorityFieldDefinition;
 import java.util.Comparator;
