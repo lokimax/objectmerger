@@ -11,6 +11,17 @@
     
     <name>ObjectMerger Parent</name>
     <description>Parent POM for ObjectMerger multi-module project</description>
+    <url>https://x132.de</url>
+
+    <developers>
+        <developer>
+            <id>max</id>
+            <name>Max Wick</name>
+            <email>max@x132.de</email>
+            <organization>x132</organization>
+            <organizationUrl>https://x132.de</organizationUrl>
+        </developer>
+    </developers>
 
     <modules>
         <module>objectmerger</module>
