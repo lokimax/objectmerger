@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.x132.objectmerger.MergeDefinition;
 import de.x132.objectmerger.strategy.FieldDefinition;
+import de.x132.objectmerger.strategy.mvel.MvelFieldDefinition;
 import de.x132.objectmerger.strategy.priority.PriorityFieldDefinition;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
@@ -26,8 +28,7 @@ class MergeDefinitionConverterTest {
     assertNotNull(result.getDefinitions());
     assertTrue(result.getDefinitions().containsKey("name"));
 
-    PriorityFieldDefinition nameField =
-        (PriorityFieldDefinition) result.getDefinitions().get("name");
+    PriorityFieldDefinition nameField = (PriorityFieldDefinition) result.getDefinitions().get("name");
     assertNotNull(nameField);
     assertNotNull(nameField.getPriority());
     assertEquals(1, nameField.getPriority().get("source1"));
@@ -139,5 +140,20 @@ class MergeDefinitionConverterTest {
   @DisplayName("Should throw IllegalArgumentException for null input")
   void testConvertNullInput() {
     assertThrows(IllegalArgumentException.class, () -> MergeDefinitionConverter.fromMap(null));
+  }
+
+  @Test
+  @DisplayName("Should parse MvelFieldDefinition")
+  void parseMvelFieldDefinition() {
+    Map<String, Object> fieldMap = new HashMap<>();
+    fieldMap.put("strategy", "mvel");
+    fieldMap.put("expression", "sources['a'] + sources['b']");
+
+    Map<String, Map<String, Object>> input = Map.of("testField", fieldMap);
+    MergeDefinition definition = MergeDefinitionConverter.fromMap(input);
+
+    FieldDefinition fieldDef = definition.getDefinitions().get("testField");
+    assertInstanceOf(MvelFieldDefinition.class, fieldDef);
+    assertEquals("sources['a'] + sources['b']", ((MvelFieldDefinition) fieldDef).getExpression());
   }
 }
