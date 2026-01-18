@@ -45,7 +45,8 @@ class MapMergeStrategyTest {
         List.of(new LabeledSource<>("db", obj1), new LabeledSource<>("api", obj2));
 
     @SuppressWarnings("unchecked")
-    Map<Object, Object> result = (Map<Object, Object>) strategy.merge(sources, null, "mapField");
+    Map<Object, Object> result =
+        (Map<Object, Object>) strategy.merge(sources, new MapFieldDefinition(), "mapField");
     assertNotNull(result);
     assertTrue(result.containsKey("key1"));
   }
@@ -68,7 +69,8 @@ class MapMergeStrategyTest {
     List<LabeledSource<?>> sources = List.of(new LabeledSource<>("db", obj));
 
     @SuppressWarnings("unchecked")
-    Map<Object, Object> result = (Map<Object, Object>) strategy.merge(sources, null, "mapField");
+    Map<Object, Object> result =
+        (Map<Object, Object>) strategy.merge(sources, new MapFieldDefinition(), "mapField");
     assertNotNull(result);
   }
 
@@ -79,7 +81,7 @@ class MapMergeStrategyTest {
 
     List<LabeledSource<?>> sources = List.of(new LabeledSource<>("db", obj));
 
-    Object result = strategy.merge(sources, null, "mapField");
+    Object result = strategy.merge(sources, new MapFieldDefinition(), "mapField");
     assertNotNull(result);
   }
 
@@ -99,7 +101,8 @@ class MapMergeStrategyTest {
         List.of(new LabeledSource<>("db", obj1), new LabeledSource<>("api", obj2));
 
     @SuppressWarnings("unchecked")
-    Map<Object, Object> result = (Map<Object, Object>) strategy.merge(sources, null, "mapField");
+    Map<Object, Object> result =
+        (Map<Object, Object>) strategy.merge(sources, new MapFieldDefinition(), "mapField");
     assertNotNull(result);
     // Union behavior: Both keys should be present
     assertTrue(result.containsKey("key1"));
@@ -156,7 +159,8 @@ class MapMergeStrategyTest {
         List.of(new LabeledSource<>("db", obj1), new LabeledSource<>("api", obj2));
 
     @SuppressWarnings("unchecked")
-    Map<Object, Object> result = (Map<Object, Object>) strategy.merge(sources, null, "mapField");
+    Map<Object, Object> result =
+        (Map<Object, Object>) strategy.merge(sources, new MapFieldDefinition(), "mapField");
     assertNotNull(result);
     assertTrue(result.containsKey("key1"));
   }

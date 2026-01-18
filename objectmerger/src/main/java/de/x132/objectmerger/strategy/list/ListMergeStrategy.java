@@ -1,6 +1,5 @@
 package de.x132.objectmerger.strategy.list;
 
-import de.x132.objectmerger.FieldDefinition;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.ObjectMerger;
 import de.x132.objectmerger.strategy.MergeStrategy;
@@ -10,16 +9,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ListMergeStrategy implements MergeStrategy<Object> {
+public class ListMergeStrategy implements MergeStrategy<Object, ListFieldDefinition> {
 
   @Override
-  public Class<? extends FieldDefinition> getConfigurationClass() {
+  public Class<ListFieldDefinition> getConfigurationClass() {
     return ListFieldDefinition.class;
   }
 
   @Override
-  public Object merge(List<LabeledSource<?>> sources, FieldDefinition fieldDef, String fieldName) {
-    ListFieldDefinition listDef = (ListFieldDefinition) fieldDef;
+  public Object merge(
+      List<LabeledSource<?>> sources, ListFieldDefinition fieldDef, String fieldName) {
 
     Map<Object, List<LabeledSource<?>>> groupedBy =
         sources.stream()
@@ -37,7 +36,7 @@ public class ListMergeStrategy implements MergeStrategy<Object> {
                 Collectors.groupingBy(
                     labeledSource ->
                         ObjectMerger.getFieldValue(
-                            labeledSource.getSource(), listDef.getIdentifyBy()),
+                            labeledSource.getSource(), fieldDef.getIdentifyBy()),
                     Collectors.toList()));
 
     return groupedBy.values().stream()
@@ -45,8 +44,8 @@ public class ListMergeStrategy implements MergeStrategy<Object> {
             items -> {
               try {
                 Class<?> itemClass =
-                    Class.forName(listDef.getItemMergeDefinition().getTargetClass());
-                return doMerge(itemClass, listDef, items);
+                    Class.forName(fieldDef.getItemMergeDefinition().getTargetClass());
+                return doMerge(itemClass, fieldDef, items);
               } catch (ClassNotFoundException e) {
                 throw new RuntimeException("Failed to merge list items", e);
               }

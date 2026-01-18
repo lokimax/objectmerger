@@ -7,7 +7,12 @@ import de.x132.objectmerger.strategy.MergeStrategy;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class SumValueStrategy implements MergeStrategy<Number> {
+public class SumValueStrategy implements MergeStrategy<Number, FieldDefinition> {
+
+  @Override
+  public Class<FieldDefinition> getConfigurationClass() {
+    return FieldDefinition.class;
+  }
 
   @Override
   public Number merge(List<LabeledSource<?>> sources, FieldDefinition fieldDef, String fieldName) {

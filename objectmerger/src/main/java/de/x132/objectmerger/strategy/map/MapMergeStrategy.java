@@ -1,6 +1,5 @@
 package de.x132.objectmerger.strategy.map;
 
-import de.x132.objectmerger.FieldDefinition;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.ObjectMerger;
 import de.x132.objectmerger.strategy.MergeStrategy;
@@ -8,30 +7,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MapMergeStrategy implements MergeStrategy<Object> {
+public class MapMergeStrategy implements MergeStrategy<Object, MapFieldDefinition> {
 
   @Override
-  public Class<? extends FieldDefinition> getConfigurationClass() {
-    return FieldDefinition.class;
+  public Class<MapFieldDefinition> getConfigurationClass() {
+    return MapFieldDefinition.class;
   }
 
   @Override
-  public Object merge(List<LabeledSource<?>> sources, FieldDefinition fieldDef, String fieldName) {
+  public Object merge(
+      List<LabeledSource<?>> sources, MapFieldDefinition fieldDef, String fieldName) {
     if (sources.isEmpty()) {
       return new HashMap<>();
     }
 
-    MapFieldDefinition mapDef =
-        (fieldDef instanceof MapFieldDefinition) ? (MapFieldDefinition) fieldDef : null;
+    // fieldDef is already MapFieldDefinition, no cast needed.
 
     // 1. Determine the set of keys to include in the result
     java.util.Set<Object> targetKeys = new java.util.HashSet<>();
 
-    if (mapDef != null
-        && mapDef.getKeyTemplateSources() != null
-        && !mapDef.getKeyTemplateSources().isEmpty()) {
+    if (fieldDef.getKeyTemplateSources() != null && !fieldDef.getKeyTemplateSources().isEmpty()) {
       // Template Mode: Only use keys from specified sources
-      for (String label : mapDef.getKeyTemplateSources()) {
+      for (String label : fieldDef.getKeyTemplateSources()) {
         sources.stream()
             .filter(s -> s.getLabel().equals(label))
             .findFirst()
@@ -76,11 +73,11 @@ public class MapMergeStrategy implements MergeStrategy<Object> {
         }
       }
 
-      if (mapDef != null && mapDef.getItemMergeDefinition() != null) {
+      if (fieldDef.getItemMergeDefinition() != null) {
         // Merge the values using itemMergeDefinition
         try {
-          Class<?> valueClass = Class.forName(mapDef.getItemMergeDefinition().getTargetClass());
-          Object mergedValue = doMerge(valueClass, mapDef, valuesForKey);
+          Class<?> valueClass = Class.forName(fieldDef.getItemMergeDefinition().getTargetClass());
+          Object mergedValue = doMerge(valueClass, fieldDef, valuesForKey);
           mergedMap.put(key, mergedValue);
         } catch (ClassNotFoundException e) {
           throw new RuntimeException("Failed to merge map values", e);
