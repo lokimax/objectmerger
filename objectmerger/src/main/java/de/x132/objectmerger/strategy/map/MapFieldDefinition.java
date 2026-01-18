@@ -9,6 +9,6 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class MapFieldDefinition extends FieldDefinition {
-    private ItemMergeDefinition itemMergeDefinition;
-    private List<String> keyTemplateSources;
+  private ItemMergeDefinition itemMergeDefinition;
+  private List<String> keyTemplateSources;
 }

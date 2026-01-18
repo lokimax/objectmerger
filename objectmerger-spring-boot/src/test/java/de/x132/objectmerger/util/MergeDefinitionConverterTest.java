@@ -3,8 +3,8 @@ package de.x132.objectmerger.util;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.x132.objectmerger.FieldDefinition;
-import de.x132.objectmerger.strategy.priority.PriorityFieldDefinition;
 import de.x132.objectmerger.MergeDefinition;
+import de.x132.objectmerger.strategy.priority.PriorityFieldDefinition;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +17,8 @@ class MergeDefinitionConverterTest {
   @DisplayName("Should convert simple priority definition")
   void testConvertSimplePriorityDefinition() {
     Map<String, Map<String, Object>> input = new LinkedHashMap<>();
-    input.put("name", Map.of("strategy", "priority", "priority", Map.of("source1", 1, "source2", 2)));
+    input.put(
+        "name", Map.of("strategy", "priority", "priority", Map.of("source1", 1, "source2", 2)));
 
     MergeDefinition result = MergeDefinitionConverter.fromMap(input);
 
@@ -25,7 +26,8 @@ class MergeDefinitionConverterTest {
     assertNotNull(result.getDefinitions());
     assertTrue(result.getDefinitions().containsKey("name"));
 
-    PriorityFieldDefinition nameField = (PriorityFieldDefinition) result.getDefinitions().get("name");
+    PriorityFieldDefinition nameField =
+        (PriorityFieldDefinition) result.getDefinitions().get("name");
     assertNotNull(nameField);
     assertNotNull(nameField.getPriority());
     assertEquals(1, nameField.getPriority().get("source1"));
@@ -54,7 +56,10 @@ class MergeDefinitionConverterTest {
   @DisplayName("Should convert multiple field definitions")
   void testConvertMultipleFields() {
     Map<String, Map<String, Object>> input = new LinkedHashMap<>();
-    input.put("name", Map.of("strategy", "priority", "priority", Map.of("database", 1, "crm", 2, "analytics", 3)));
+    input.put(
+        "name",
+        Map.of(
+            "strategy", "priority", "priority", Map.of("database", 1, "crm", 2, "analytics", 3)));
     input.put("age", Map.of("strategy", "maximum"));
     input.put("email", Map.of("strategy", "priority", "priority", Map.of("database", 1)));
 

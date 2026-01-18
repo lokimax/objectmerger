@@ -16,17 +16,21 @@ class ListMergeTest {
 
   @Test
   void testMergeFamilies() throws Exception {
-    Family dbFamily = gson.fromJson(new FileReader("src/test/resources/family/db-family.json"), Family.class);
-    Family guiFamily = gson.fromJson(new FileReader("src/test/resources/family/gui-family.json"), Family.class);
-    MergeDefinition mergeDefinition = gson.fromJson(
-        new FileReader("src/test/resources/family/merge-definition.json"),
-        MergeDefinition.class);
+    Family dbFamily =
+        gson.fromJson(new FileReader("src/test/resources/family/db-family.json"), Family.class);
+    Family guiFamily =
+        gson.fromJson(new FileReader("src/test/resources/family/gui-family.json"), Family.class);
+    MergeDefinition mergeDefinition =
+        gson.fromJson(
+            new FileReader("src/test/resources/family/merge-definition.json"),
+            MergeDefinition.class);
 
-    Family mergedFamily = ObjectMerger.merge(
-        Family.class,
-        mergeDefinition,
-        new LabeledSource<>("DB", dbFamily),
-        new LabeledSource<>("GUI", guiFamily));
+    Family mergedFamily =
+        ObjectMerger.merge(
+            Family.class,
+            mergeDefinition,
+            new LabeledSource<>("DB", dbFamily),
+            new LabeledSource<>("GUI", guiFamily));
 
     assertNotNull(mergedFamily);
     assertEquals("Miller Family", mergedFamily.getFamilyName());

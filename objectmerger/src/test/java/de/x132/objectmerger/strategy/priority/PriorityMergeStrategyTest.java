@@ -6,8 +6,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import de.x132.objectmerger.FieldDefinition;
-import de.x132.objectmerger.strategy.priority.PriorityFieldDefinition;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.ObjectMerger;
 import de.x132.objectmerger.strategy.MergeStrategy;
@@ -46,10 +44,11 @@ class PriorityMergeStrategyTest {
     priority.put("source2", 1);
     priority.put("source3", 2);
 
-    List<LabeledSource<?>> sources = Arrays.asList(
-        new LabeledSource<>("source1", source1),
-        new LabeledSource<>("source2", source2),
-        new LabeledSource<>("source3", source3));
+    List<LabeledSource<?>> sources =
+        Arrays.asList(
+            new LabeledSource<>("source1", source1),
+            new LabeledSource<>("source2", source2),
+            new LabeledSource<>("source3", source3));
 
     when(fieldDef.getPriority()).thenReturn(priority);
     when(fieldDef.getDefaultValue()).thenReturn(null);
@@ -87,10 +86,11 @@ class PriorityMergeStrategyTest {
     priority.put("source2", 2);
     priority.put("source3", 3);
 
-    List<LabeledSource<?>> sources = Arrays.asList(
-        new LabeledSource<>("source1", source1),
-        new LabeledSource<>("source2", source2),
-        new LabeledSource<>("source3", source3));
+    List<LabeledSource<?>> sources =
+        Arrays.asList(
+            new LabeledSource<>("source1", source1),
+            new LabeledSource<>("source2", source2),
+            new LabeledSource<>("source3", source3));
 
     when(fieldDef.getPriority()).thenReturn(priority);
     when(fieldDef.getDefaultValue()).thenReturn(null);
@@ -126,8 +126,9 @@ class PriorityMergeStrategyTest {
     priority.put("source1", 1);
     priority.put("source2", 2);
 
-    List<LabeledSource<?>> sources = Arrays.asList(
-        new LabeledSource<>("source1", source1), new LabeledSource<>("source2", source2));
+    List<LabeledSource<?>> sources =
+        Arrays.asList(
+            new LabeledSource<>("source1", source1), new LabeledSource<>("source2", source2));
 
     Integer defaultValue = 0;
     when(fieldDef.getPriority()).thenReturn(priority);
@@ -162,10 +163,11 @@ class PriorityMergeStrategyTest {
     priority.put("source1", 1);
     // source2 and source3 are not in the priority map
 
-    List<LabeledSource<?>> sources = Arrays.asList(
-        new LabeledSource<>("source1", source1),
-        new LabeledSource<>("source2", source2),
-        new LabeledSource<>("source3", source3));
+    List<LabeledSource<?>> sources =
+        Arrays.asList(
+            new LabeledSource<>("source1", source1),
+            new LabeledSource<>("source2", source2),
+            new LabeledSource<>("source3", source3));
 
     when(fieldDef.getPriority()).thenReturn(priority);
     when(fieldDef.getDefaultValue()).thenReturn(null);
@@ -195,5 +197,4 @@ class PriorityMergeStrategyTest {
     // Arrange & Act & Assert
     assertTrue(strategy instanceof MergeStrategy);
   }
-
 }

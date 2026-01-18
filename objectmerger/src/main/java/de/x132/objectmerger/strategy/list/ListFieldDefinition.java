@@ -8,6 +8,6 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ListFieldDefinition extends FieldDefinition {
-    private String identifyBy;
-    private ItemMergeDefinition itemMergeDefinition;
+  private String identifyBy;
+  private ItemMergeDefinition itemMergeDefinition;
 }

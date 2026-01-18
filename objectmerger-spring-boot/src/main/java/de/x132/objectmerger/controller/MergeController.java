@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/merge")
-@Tag(name = "ObjectMerger", description = "Merge multiple sources into a single object using strategies")
+@Tag(
+    name = "ObjectMerger",
+    description = "Merge multiple sources into a single object using strategies")
 public class MergeController {
 
   private final ObjectMergerService mergerService;
@@ -30,7 +32,10 @@ public class MergeController {
   }
 
   @PostMapping(consumes = "application/json", produces = "application/json")
-  @Operation(summary = "Merge multiple sources (JSON)", description = "Merge multiple labeled sources into a single object using the provided merge definition (JSON format)")
+  @Operation(
+      summary = "Merge multiple sources (JSON)",
+      description =
+          "Merge multiple labeled sources into a single object using the provided merge definition (JSON format)")
   @ApiResponse(responseCode = "200", description = "Merge successful")
   @ApiResponse(responseCode = "400", description = "Invalid request or merge failed")
   public ResponseEntity<?> merge(@RequestBody MergeRequest request) {
@@ -40,9 +45,11 @@ public class MergeController {
 
       // Convert DTOs to LabeledSources
       @SuppressWarnings("unchecked")
-      List<LabeledSource<?>> sources = (List) request.getSources().stream()
-          .map(dto -> new LabeledSource<>(dto.getLabel(), dto.getData()))
-          .toList();
+      List<LabeledSource<?>> sources =
+          (List)
+              request.getSources().stream()
+                  .map(dto -> new LabeledSource<>(dto.getLabel(), dto.getData()))
+                  .toList();
 
       // Perform merge
       Object result = mergerService.merge(request.getTargetClass(), definition, sources);
@@ -57,7 +64,10 @@ public class MergeController {
   }
 
   @PostMapping(value = "/yaml", consumes = "application/x-yaml", produces = "application/x-yaml")
-  @Operation(summary = "Merge multiple sources (YAML)", description = "Merge multiple labeled sources into a single object using the provided merge definition (YAML format)")
+  @Operation(
+      summary = "Merge multiple sources (YAML)",
+      description =
+          "Merge multiple labeled sources into a single object using the provided merge definition (YAML format)")
   @ApiResponse(responseCode = "200", description = "Merge successful")
   @ApiResponse(responseCode = "400", description = "Invalid request or merge failed")
   public ResponseEntity<?> mergeYaml(@RequestBody MergeRequest request) {
@@ -67,9 +77,11 @@ public class MergeController {
 
       // Convert DTOs to LabeledSources
       @SuppressWarnings("unchecked")
-      List<LabeledSource<?>> sources = (List) request.getSources().stream()
-          .map(dto -> new LabeledSource<>(dto.getLabel(), dto.getData()))
-          .toList();
+      List<LabeledSource<?>> sources =
+          (List)
+              request.getSources().stream()
+                  .map(dto -> new LabeledSource<>(dto.getLabel(), dto.getData()))
+                  .toList();
 
       // Perform merge
       Object result = mergerService.merge(request.getTargetClass(), definition, sources);
@@ -90,23 +102,35 @@ public class MergeController {
   }
 
   @PostMapping("/example")
-  @Operation(summary = "Merge Person example", description = "Example merge of a Person object from three sources (database, crm, analytics)")
+  @Operation(
+      summary = "Merge Person example",
+      description =
+          "Example merge of a Person object from three sources (database, crm, analytics)")
   public ResponseEntity<?> mergePersonExample() {
     try {
       // Create merge definition using converter
       Map<String, Map<String, Object>> defMap = new LinkedHashMap<>();
 
       // name: priority based
-      defMap.put("name", Map.of("strategy", "priority", "priority", Map.of("database", 1, "crm", 2, "analytics", 3)));
+      defMap.put(
+          "name",
+          Map.of(
+              "strategy", "priority", "priority", Map.of("database", 1, "crm", 2, "analytics", 3)));
 
       // age: maximum
       defMap.put("age", Map.of("strategy", "maximum", "defaultValue", 0));
 
       // email: priority based
-      defMap.put("email", Map.of("strategy", "priority", "priority", Map.of("database", 1, "crm", 2, "analytics", 3)));
+      defMap.put(
+          "email",
+          Map.of(
+              "strategy", "priority", "priority", Map.of("database", 1, "crm", 2, "analytics", 3)));
 
       // phone: priority based (different order)
-      defMap.put("phone", Map.of("strategy", "priority", "priority", Map.of("analytics", 1, "crm", 2, "database", 3)));
+      defMap.put(
+          "phone",
+          Map.of(
+              "strategy", "priority", "priority", Map.of("analytics", 1, "crm", 2, "database", 3)));
 
       MergeDefinition definition = MergeDefinitionConverter.fromMap(defMap);
 
@@ -130,10 +154,12 @@ public class MergeController {
       analyticsData.put("phone", "030-654321");
 
       @SuppressWarnings("unchecked")
-      List<LabeledSource<?>> sources = (List) List.of(
-          new LabeledSource<>("database", dbData),
-          new LabeledSource<>("crm", crmData),
-          new LabeledSource<>("analytics", analyticsData));
+      List<LabeledSource<?>> sources =
+          (List)
+              List.of(
+                  new LabeledSource<>("database", dbData),
+                  new LabeledSource<>("crm", crmData),
+                  new LabeledSource<>("analytics", analyticsData));
 
       // Merge using the service
       Object result = mergerService.merge("de.x132.objectmerger.model.Person", definition, sources);

@@ -7,10 +7,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import de.x132.objectmerger.FieldDefinition;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.ObjectMerger;
-import de.x132.objectmerger.StandardFieldDefinition;
 import de.x132.objectmerger.strategy.MergeStrategy;
 import de.x132.objectmerger.strategy.priority.PriorityFieldDefinition;
 import java.util.Arrays;
@@ -43,10 +41,11 @@ class ConcatenateStrategyTest {
     Object source2 = new Object();
     Object source3 = new Object();
 
-    List<LabeledSource<?>> sources = Arrays.asList(
-        new LabeledSource<>("source1", source1),
-        new LabeledSource<>("source2", source2),
-        new LabeledSource<>("source3", source3));
+    List<LabeledSource<?>> sources =
+        Arrays.asList(
+            new LabeledSource<>("source1", source1),
+            new LabeledSource<>("source2", source2),
+            new LabeledSource<>("source3", source3));
 
     when(fieldDef.getPriority()).thenReturn(null);
     when(fieldDef.getDefaultValue()).thenReturn(null);
@@ -84,10 +83,11 @@ class ConcatenateStrategyTest {
     priority.put("source1", 2);
     priority.put("source2", 3);
 
-    List<LabeledSource<?>> sources = Arrays.asList(
-        new LabeledSource<>("source1", source1),
-        new LabeledSource<>("source2", source2),
-        new LabeledSource<>("source3", source3));
+    List<LabeledSource<?>> sources =
+        Arrays.asList(
+            new LabeledSource<>("source1", source1),
+            new LabeledSource<>("source2", source2),
+            new LabeledSource<>("source3", source3));
 
     when(fieldDef.getPriority()).thenReturn(priority);
     when(fieldDef.getDefaultValue()).thenReturn(null);
@@ -120,10 +120,11 @@ class ConcatenateStrategyTest {
     Object source2 = new Object();
     Object source3 = new Object();
 
-    List<LabeledSource<?>> sources = Arrays.asList(
-        new LabeledSource<>("source1", source1),
-        new LabeledSource<>("source2", source2),
-        new LabeledSource<>("source3", source3));
+    List<LabeledSource<?>> sources =
+        Arrays.asList(
+            new LabeledSource<>("source1", source1),
+            new LabeledSource<>("source2", source2),
+            new LabeledSource<>("source3", source3));
 
     when(fieldDef.getPriority()).thenReturn(null);
     when(fieldDef.getDefaultValue()).thenReturn(null);
@@ -155,8 +156,9 @@ class ConcatenateStrategyTest {
     Object source1 = new Object();
     Object source2 = new Object();
 
-    List<LabeledSource<?>> sources = Arrays.asList(
-        new LabeledSource<>("source1", source1), new LabeledSource<>("source2", source2));
+    List<LabeledSource<?>> sources =
+        Arrays.asList(
+            new LabeledSource<>("source1", source1), new LabeledSource<>("source2", source2));
 
     String defaultValue = "No notes";
     when(fieldDef.getPriority()).thenReturn(null);
@@ -245,10 +247,11 @@ class ConcatenateStrategyTest {
     priority.put("source2", 1);
     priority.put("source3", 3);
 
-    List<LabeledSource<?>> sources = Arrays.asList(
-        new LabeledSource<>("source1", source1),
-        new LabeledSource<>("source2", source2),
-        new LabeledSource<>("source3", source3));
+    List<LabeledSource<?>> sources =
+        Arrays.asList(
+            new LabeledSource<>("source1", source1),
+            new LabeledSource<>("source2", source2),
+            new LabeledSource<>("source3", source3));
 
     when(fieldDef.getPriority()).thenReturn(priority);
     when(fieldDef.getDefaultValue()).thenReturn(null);
@@ -281,10 +284,11 @@ class ConcatenateStrategyTest {
     Object source2 = new Object();
     Object source3 = new Object();
 
-    List<LabeledSource<?>> sources = Arrays.asList(
-        new LabeledSource<>("source1", source1),
-        new LabeledSource<>("source2", source2),
-        new LabeledSource<>("source3", source3));
+    List<LabeledSource<?>> sources =
+        Arrays.asList(
+            new LabeledSource<>("source1", source1),
+            new LabeledSource<>("source2", source2),
+            new LabeledSource<>("source3", source3));
 
     when(fieldDef.getPriority()).thenReturn(null);
     when(fieldDef.getDefaultValue()).thenReturn(null);

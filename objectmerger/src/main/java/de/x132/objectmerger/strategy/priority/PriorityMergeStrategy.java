@@ -3,11 +3,9 @@ package de.x132.objectmerger.strategy.priority;
 import de.x132.objectmerger.FieldDefinition;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.ObjectMerger;
-import de.x132.objectmerger.strategy.priority.PriorityFieldDefinition;
 import de.x132.objectmerger.strategy.MergeStrategy;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Map;
 
 public class PriorityMergeStrategy implements MergeStrategy<Object> {

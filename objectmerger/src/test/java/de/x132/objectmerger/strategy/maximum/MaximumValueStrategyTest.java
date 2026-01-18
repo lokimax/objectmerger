@@ -11,8 +11,6 @@ import static org.mockito.Mockito.when;
 import de.x132.objectmerger.FieldDefinition;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.ObjectMerger;
-import de.x132.objectmerger.StandardFieldDefinition;
-import de.x132.objectmerger.strategy.MergeStrategy;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,10 +39,11 @@ class MaximumValueStrategyTest {
     Object source2 = new Object();
     Object source3 = new Object();
 
-    List<LabeledSource<?>> sources = Arrays.asList(
-        new LabeledSource<>("source1", source1),
-        new LabeledSource<>("source2", source2),
-        new LabeledSource<>("source3", source3));
+    List<LabeledSource<?>> sources =
+        Arrays.asList(
+            new LabeledSource<>("source1", source1),
+            new LabeledSource<>("source2", source2),
+            new LabeledSource<>("source3", source3));
 
     try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
       // Configure mock to return different age values
@@ -72,8 +71,9 @@ class MaximumValueStrategyTest {
     Object source1 = new Object();
     Object source2 = new Object();
 
-    List<LabeledSource<?>> sources = Arrays.asList(
-        new LabeledSource<>("source1", source1), new LabeledSource<>("source2", source2));
+    List<LabeledSource<?>> sources =
+        Arrays.asList(
+            new LabeledSource<>("source1", source1), new LabeledSource<>("source2", source2));
 
     try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
       // Configure mock to return null values
@@ -100,10 +100,11 @@ class MaximumValueStrategyTest {
     Object source2 = new Object();
     Object source3 = new Object();
 
-    List<LabeledSource<?>> sources = Arrays.asList(
-        new LabeledSource<>("source1", source1),
-        new LabeledSource<>("source2", source2),
-        new LabeledSource<>("source3", source3));
+    List<LabeledSource<?>> sources =
+        Arrays.asList(
+            new LabeledSource<>("source1", source1),
+            new LabeledSource<>("source2", source2),
+            new LabeledSource<>("source3", source3));
 
     try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
       // Configure mock: null, 40, null
@@ -172,11 +173,12 @@ class MaximumValueStrategyTest {
     Object source3 = new Object();
     Object source4 = new Object();
 
-    List<LabeledSource<?>> sources = Arrays.asList(
-        new LabeledSource<>("s1", source1),
-        new LabeledSource<>("s2", source2),
-        new LabeledSource<>("s3", source3),
-        new LabeledSource<>("s4", source4));
+    List<LabeledSource<?>> sources =
+        Arrays.asList(
+            new LabeledSource<>("s1", source1),
+            new LabeledSource<>("s2", source2),
+            new LabeledSource<>("s3", source3),
+            new LabeledSource<>("s4", source4));
 
     try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
       // Configure: 10, null, 50, 30

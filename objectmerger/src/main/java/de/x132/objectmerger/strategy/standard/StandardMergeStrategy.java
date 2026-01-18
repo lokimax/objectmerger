@@ -9,26 +9,26 @@ import java.util.Objects;
 
 public class StandardMergeStrategy implements MergeStrategy<Object> {
 
-    @Override
-    public Class<? extends FieldDefinition> getConfigurationClass() {
-        return FieldDefinition.class;
+  @Override
+  public Class<? extends FieldDefinition> getConfigurationClass() {
+    return FieldDefinition.class;
+  }
+
+  @Override
+  public Object merge(List<LabeledSource<?>> sources, FieldDefinition fieldDef, String fieldName) {
+    if (sources.isEmpty()) {
+      return fieldDef.getDefaultValue();
     }
 
-    @Override
-    public Object merge(List<LabeledSource<?>> sources, FieldDefinition fieldDef, String fieldName) {
-        if (sources.isEmpty()) {
-            return fieldDef.getDefaultValue();
-        }
+    return sources.stream()
+        .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
+        .filter(Objects::nonNull)
+        .findFirst()
+        .orElse(fieldDef.getDefaultValue());
+  }
 
-        return sources.stream()
-                .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
-                .filter(Objects::nonNull)
-                .findFirst()
-                .orElse(fieldDef.getDefaultValue());
-    }
-
-    @Override
-    public String getName() {
-        return "standard";
-    }
+  @Override
+  public String getName() {
+    return "standard";
+  }
 }

@@ -2,17 +2,14 @@ package de.x132.objectmerger.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import de.x132.objectmerger.FieldDefinition;
 import de.x132.objectmerger.MergeDefinition;
-import de.x132.objectmerger.StandardFieldDefinition;
 import de.x132.objectmerger.strategy.list.ListFieldDefinition;
 import de.x132.objectmerger.strategy.map.MapFieldDefinition;
 import de.x132.objectmerger.strategy.priority.PriorityFieldDefinition;
 import java.util.Map;
 
 /**
- * Converts JSON/Map-based merge definitions to proper MergeDefinition objects
- * using Gson for
+ * Converts JSON/Map-based merge definitions to proper MergeDefinition objects using Gson for
  * serialization.
  */
 public class MergeDefinitionConverter {
@@ -23,29 +20,33 @@ public class MergeDefinitionConverter {
     GsonBuilder builder = new GsonBuilder();
     builder.registerTypeAdapter(
         de.x132.objectmerger.FieldDefinition.class,
-        (com.google.gson.JsonDeserializer<de.x132.objectmerger.FieldDefinition>) (json, typeOfT, context) -> {
-          com.google.gson.JsonObject jsonObject = json.getAsJsonObject();
-          String strategy = jsonObject.has("strategy") ? jsonObject.get("strategy").getAsString() : "standard";
+        (com.google.gson.JsonDeserializer<de.x132.objectmerger.FieldDefinition>)
+            (json, typeOfT, context) -> {
+              com.google.gson.JsonObject jsonObject = json.getAsJsonObject();
+              String strategy =
+                  jsonObject.has("strategy")
+                      ? jsonObject.get("strategy").getAsString()
+                      : "standard";
 
-          Class<? extends de.x132.objectmerger.FieldDefinition> targetClass;
+              Class<? extends de.x132.objectmerger.FieldDefinition> targetClass;
 
-          switch (strategy) {
-            case "priority":
-              targetClass = PriorityFieldDefinition.class;
-              break;
-            case "mergeMap":
-              targetClass = MapFieldDefinition.class;
-              break;
-            case "mergeList":
-              targetClass = ListFieldDefinition.class;
-              break;
-            default:
-              targetClass = de.x132.objectmerger.StandardFieldDefinition.class;
-              break;
-          }
+              switch (strategy) {
+                case "priority":
+                  targetClass = PriorityFieldDefinition.class;
+                  break;
+                case "mergeMap":
+                  targetClass = MapFieldDefinition.class;
+                  break;
+                case "mergeList":
+                  targetClass = ListFieldDefinition.class;
+                  break;
+                default:
+                  targetClass = de.x132.objectmerger.StandardFieldDefinition.class;
+                  break;
+              }
 
-          return context.deserialize(json, targetClass);
-        });
+              return context.deserialize(json, targetClass);
+            });
     gson = builder.create();
   }
 

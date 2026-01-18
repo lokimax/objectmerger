@@ -11,11 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Utility class for merging objects based on a definition and strategies.
  *
- * <p>
- * This class uses reflection to iterate over fields and apply specific merge
- * strategies. It
- * supports different strategies for resolving conflicts or combining values
- * from multiple sources.
+ * <p>This class uses reflection to iterate over fields and apply specific merge strategies. It
+ * supports different strategies for resolving conflicts or combining values from multiple sources.
  * Strategies are loaded via Java SPI (Service Provider Interface).
  */
 @Slf4j
@@ -33,16 +30,14 @@ public class ObjectMerger {
   }
 
   /**
-   * Merges multiple sources into a target object based on the provided
-   * definition.
+   * Merges multiple sources into a target object based on the provided definition.
    *
-   * @param targetClass     The class of the result object.
+   * @param targetClass The class of the result object.
    * @param mergeDefinition The definition of how fields should be merged.
-   * @param sources         The sources to merge.
-   * @param <T>             The type of the result object.
+   * @param sources The sources to merge.
+   * @param <T> The type of the result object.
    * @return A new instance of T with merged values.
-   * @throws RuntimeException If merging fails (e.g. instantiation or field access
-   *                          errors).
+   * @throws RuntimeException If merging fails (e.g. instantiation or field access errors).
    */
   @SafeVarargs
   public static <T> T merge(
@@ -80,7 +75,8 @@ public class ObjectMerger {
                   fieldDef.getClass().getSimpleName(),
                   strategy.getName()));
         }
-        Object mergedValue = strategy.merge(new java.util.ArrayList<>(context.sources()), fieldDef, fieldName);
+        Object mergedValue =
+            strategy.merge(new java.util.ArrayList<>(context.sources()), fieldDef, fieldName);
         field.set(context.result(), mergedValue);
       }
     } catch (NoSuchFieldException e) {
@@ -105,8 +101,7 @@ public class ObjectMerger {
   }
 
   public static Object getFieldValue(Object obj, String fieldName) {
-    if (obj == null)
-      return null;
+    if (obj == null) return null;
     try {
       Field field = obj.getClass().getDeclaredField(fieldName);
       field.setAccessible(true);

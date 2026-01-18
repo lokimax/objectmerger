@@ -8,5 +8,5 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class PriorityFieldDefinition extends FieldDefinition {
-    private Map<String, Integer> priority;
+  private Map<String, Integer> priority;
 }

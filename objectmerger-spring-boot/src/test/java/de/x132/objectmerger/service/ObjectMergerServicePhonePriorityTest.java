@@ -38,13 +38,15 @@ class ObjectMergerServicePhonePriorityTest {
     Person database = new Person();
     database.setPhone(null);
 
-    List<LabeledSource<?>> sources = Arrays.asList(
-        new LabeledSource<>("analytics", analytics),
-        new LabeledSource<>("crm", crm),
-        new LabeledSource<>("database", database));
+    List<LabeledSource<?>> sources =
+        Arrays.asList(
+            new LabeledSource<>("analytics", analytics),
+            new LabeledSource<>("crm", crm),
+            new LabeledSource<>("database", database));
 
     // When
-    Object result = mergerService.merge("de.x132.objectmerger.model.Person", crmOnlyPhoneDefinition(), sources);
+    Object result =
+        mergerService.merge("de.x132.objectmerger.model.Person", crmOnlyPhoneDefinition(), sources);
 
     // Then
     assertNotNull(result);
@@ -65,13 +67,15 @@ class ObjectMergerServicePhonePriorityTest {
     Person database = new Person();
     database.setPhone("030-000000");
 
-    List<LabeledSource<?>> sources = Arrays.asList(
-        new LabeledSource<>("analytics", analytics),
-        new LabeledSource<>("crm", crm),
-        new LabeledSource<>("database", database));
+    List<LabeledSource<?>> sources =
+        Arrays.asList(
+            new LabeledSource<>("analytics", analytics),
+            new LabeledSource<>("crm", crm),
+            new LabeledSource<>("database", database));
 
     // When
-    Object result = mergerService.merge("de.x132.objectmerger.model.Person", crmOnlyPhoneDefinition(), sources);
+    Object result =
+        mergerService.merge("de.x132.objectmerger.model.Person", crmOnlyPhoneDefinition(), sources);
 
     // Then
     assertNotNull(result);
@@ -89,11 +93,13 @@ class ObjectMergerServicePhonePriorityTest {
     Person database = new Person();
     database.setPhone("030-000000");
 
-    List<LabeledSource<?>> sources = Arrays.asList(
-        new LabeledSource<>("analytics", analytics), new LabeledSource<>("database", database));
+    List<LabeledSource<?>> sources =
+        Arrays.asList(
+            new LabeledSource<>("analytics", analytics), new LabeledSource<>("database", database));
 
     // When
-    Object result = mergerService.merge("de.x132.objectmerger.model.Person", crmOnlyPhoneDefinition(), sources);
+    Object result =
+        mergerService.merge("de.x132.objectmerger.model.Person", crmOnlyPhoneDefinition(), sources);
 
     // Then
     assertNotNull(result);
