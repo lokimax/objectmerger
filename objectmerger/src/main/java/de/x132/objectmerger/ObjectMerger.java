@@ -1,11 +1,11 @@
 package de.x132.objectmerger;
 
+import de.x132.objectmerger.registry.StrategyRegistry;
 import de.x132.objectmerger.strategy.MergeStrategy;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.ServiceLoader;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -17,17 +17,6 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class ObjectMerger {
-
-  private static final Map<String, MergeStrategy<?>> STRATEGIES;
-
-  static {
-    STRATEGIES = new java.util.HashMap<>();
-    // ServiceLoader.load(Class<S>) returns ServiceLoader<S>
-    ServiceLoader<MergeStrategy> loader = ServiceLoader.load(MergeStrategy.class);
-    for (MergeStrategy<?> strategy : loader) {
-      STRATEGIES.put(strategy.getName(), strategy);
-    }
-  }
 
   /**
    * Merges multiple sources into a target object based on the provided definition.
@@ -92,12 +81,7 @@ public class ObjectMerger {
 
   private static MergeStrategy<?> resolveStrategy(FieldDefinition fieldDef) {
     String strategyName = fieldDef.getStrategy() != null ? fieldDef.getStrategy() : "standard";
-    MergeStrategy<?> strategy = STRATEGIES.get(strategyName);
-    if (strategy == null) {
-      log.warn("Unknown strategy '{}' for field. Using default (standard).", strategyName);
-      return STRATEGIES.get("standard");
-    }
-    return strategy;
+    return StrategyRegistry.getInstance().getStrategy(strategyName);
   }
 
   public static Object getFieldValue(Object obj, String fieldName) {
