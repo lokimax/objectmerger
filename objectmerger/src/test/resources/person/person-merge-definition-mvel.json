@@ -1,0 +1,20 @@
+{
+    "definitions": {
+        "name": {
+            "strategy": "mvel",
+            "expression": "sources['database'] != null ? sources['database'].name : (sources['crm'] != null ? sources['crm'].name : sources['analytics'].name)"
+        },
+        "age": {
+            "strategy": "mvel",
+            "expression": "max = 0; foreach (v : sources.values()) { if (v != null && v.age != null && v.age > max) max = v.age; } return max;"
+        },
+        "email": {
+            "strategy": "mvel",
+            "expression": "sources['database'] != null ? sources['database'].email : (sources['crm'] != null ? sources['crm'].email : sources['analytics'].email)"
+        },
+        "phone": {
+            "strategy": "mvel",
+            "expression": "sources['analytics'] != null ? sources['analytics'].phone : (sources['crm'] != null ? sources['crm'].phone : sources['database'].phone)"
+        }
+    }
+}

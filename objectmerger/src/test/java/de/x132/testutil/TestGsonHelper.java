@@ -48,6 +48,10 @@ public class TestGsonHelper {
         return context.deserialize(json, PriorityFieldDefinition.class);
       }
 
+      if ("mvel".equals(strategy)) {
+        return context.deserialize(json, de.x132.objectmerger.strategy.mvel.MvelFieldDefinition.class);
+      }
+
       return context.deserialize(json, StandardFieldDefinition.class);
     }
   }
