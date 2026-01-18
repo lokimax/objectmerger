@@ -1,19 +1,22 @@
-# ObjectMerger - Architecture Documentation
+# ObjectMerger
+
 
 > **Note**: This documentation follows the [arc42](https://arc42.org/) template structure.
 
 ## 1. Introduction and Goals
 
-**ObjectMerger** is a Java library designed for the intelligent merging of object data from multiple sources (e.g., databases, APIs, external services). It solves the problem of consolidating data fragments into a single, cohesive "Golden Record" by using configurable strategies to resolve conflicts and combine values.
+**ObjectMerger** is a Java library designed for the intelligent merging and consolidation of object data from multiple sources (e.g., databases, external APIs, legacy systems). It solves the problem of creating a single, cohesive "Golden Record" from scattered data fragments by using configurable strategies to resolve conflicts and combine values.
+
+This library is particularly useful in environments where data is distributed across multiple systems (e.g., a CRM, an ERP, and a bespoke internal application) and needs to be unified for consumption.
 
 ### 1.1 Goals
-*   **Data Consolidation**: Create a single view of an object from multiple data fragments.
+*   **Data Consolidation**: Create a single view of an object from multiple heterogeneous data sources.
 *   **Conflict Resolution**: Automatically resolve conflicting data based on priorities or rules.
 *   **Flexibility**: Support various merge strategies (priority, numeric aggregation, concatenation) adjustable via configuration.
 *   **Extensibility**: Allow custom strategies via Java SPI.
 
 ### 1.2 Key Features
-*   **Priority-based Selection**: Source A beats Source B.
+*   **Priority-based Selection**: Source A beats Source B (e.g., "Master Data" overrides "Cache").
 *   **Numeric Aggregation**: Min, Max, Average, Sum.
 *   **String Manipulation**: Concatenation of values.
 *   **Complex Types**: Deep merging of Lists and Maps.
@@ -27,32 +30,28 @@
 
 ## 3. Context and Scope
 
-ObjectMerger is used in environments where data is distributed across multiple systems.
+ObjectMerger is used in environments where data is distributed across multiple systems or APIs.
 
 ```mermaid
 graph TD
-    User([User / System])
-    CLI([ObjectMerger CLI])
-    REST([Spring Boot REST API])
+    User([Consumer])
     Lib([ObjectMerger Library])
     
     DB[(Database)]
     CRM[(CRM System)]
     API[(External API)]
 
-    User --> CLI
-    User --> REST
-    CLI --> Lib
-    REST --> Lib
+    User --> Lib
     
     Lib -.-> DB
     Lib -.-> CRM
     Lib -.-> API
 ```
 
-*   **ObjectMerger Library**: The core logic.
-*   **CLI**: For batch processing or scripting.
-*   **Spring Boot API**: For real-time merging services.
+*   **ObjectMerger Library**: The core logic that performs the merging.
+*   **Integration**: Can be embedded in any Java application (CLI, REST API, Batch Job).
+
+> **Note**: This repository includes a **CLI** and a **Spring Boot Application** as usage examples / reference implementations.
 
 ## 4. Solution Strategy
 
@@ -67,10 +66,10 @@ The core concept relies on **Strategies** and **Definitions**.
 The project is structured as a multi-module Maven project.
 
 | Module | Description | Dependency |
-|Ref|---|---|
-| **objectmerger** | Core library containing the merge logic and standard strategies. | - |
-| **objectmerger-cli** | Command-line interface for file-based JSON merging. | `objectmerger` |
-| **objectmerger-spring-boot** | REST API application with Swagger UI. | `objectmerger` |
+|---|---|---|
+| **objectmerger** | **Core library**. Contains the merge logic and standard strategies. | - |
+| **objectmerger-cli** | *Example*: Command-line interface for file-based JSON merging. | `objectmerger` |
+| **objectmerger-spring-boot** | *Example*: REST API application with Swagger UI. | `objectmerger` |
 
 ### 5.1 Level 1: Core Library (Whitebox)
 
