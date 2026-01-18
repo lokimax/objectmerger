@@ -14,7 +14,13 @@ import lombok.extern.slf4j.Slf4j;
  *
  * <p>This class uses reflection to iterate over fields and apply specific merge strategies. It
  * supports different strategies for resolving conflicts or combining values from multiple sources.
- * Strategies are loaded via Java SPI (Service Provider Interface).
+ *
+ * <h2>Strategy Loading</h2>
+ *
+ * Strategies are loaded via Java SPI (Service Provider Interface). The system looks for
+ * implementations of {@link MergeStrategy} registered in {@code
+ * META-INF/services/de.x132.objectmerger.strategy.MergeStrategy}. If a strategy specified in the
+ * {@link MergeDefinition} is not found, the "standard" strategy is used as a fallback.
  */
 @Slf4j
 public class ObjectMerger {

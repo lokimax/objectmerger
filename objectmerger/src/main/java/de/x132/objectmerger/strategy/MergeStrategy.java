@@ -6,7 +6,20 @@ import java.util.List;
 /**
  * Strategy for merging values from multiple sources into a single value.
  *
+ * <h2>Extension via SPI</h2>
+ *
+ * <p>Values are merged by strategies loaded via Java's {@link java.util.ServiceLoader} mechanism.
+ * To implement a custom strategy:
+ *
+ * <ol>
+ *   <li>Implement this interface.
+ *   <li>Create a specific {@link FieldDefinition} subclass if custom configuration is needed.
+ *   <li>Register your implementation in {@code
+ *       META-INF/services/de.x132.objectmerger.strategy.MergeStrategy}.
+ * </ol>
+ *
  * @param <T> The type of the merged value.
+ * @param <C> The specific type of {@link FieldDefinition} required by this strategy.
  */
 public interface MergeStrategy<T, C extends FieldDefinition> {
 
@@ -29,7 +42,12 @@ public interface MergeStrategy<T, C extends FieldDefinition> {
   String getName();
 
   /**
-   * Returns the expected configuration class for this strategy. Default is FieldDefinition.class.
+   * Returns the expected configuration class for this strategy.
+   *
+   * <p><strong>Contract:</strong> This method must NOT return {@code null}. It must return the
+   * specific subclass of {@link FieldDefinition} that this strategy expects. This is used by the
+   * runtime to validate that the configuration provided in the merge definition matches the
+   * strategy's requirements.
    *
    * @return The expected FieldDefinition subclass.
    */
