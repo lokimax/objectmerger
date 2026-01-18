@@ -6,7 +6,7 @@
         },
         "age": {
             "strategy": "mvel",
-            "expression": "max = 0; foreach (v : sources.values()) { if (v != null && v.age != null && v.age > max) max = v.age; } return max;"
+            "expression": "list = []; foreach (v : sources.values()) { if (v != null && v.age != null) list.add(v.age); } return java.util.Collections.max(list);"
         },
         "email": {
             "strategy": "mvel",
