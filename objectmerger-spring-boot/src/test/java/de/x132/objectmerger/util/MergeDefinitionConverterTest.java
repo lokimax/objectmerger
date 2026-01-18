@@ -28,7 +28,8 @@ class MergeDefinitionConverterTest {
     assertNotNull(result.getDefinitions());
     assertTrue(result.getDefinitions().containsKey("name"));
 
-    PriorityFieldDefinition nameField = (PriorityFieldDefinition) result.getDefinitions().get("name");
+    PriorityFieldDefinition nameField =
+        (PriorityFieldDefinition) result.getDefinitions().get("name");
     assertNotNull(nameField);
     assertNotNull(nameField.getPriority());
     assertEquals(1, nameField.getPriority().get("source1"));

@@ -7,5 +7,5 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class MvelFieldDefinition extends FieldDefinition {
-    private String expression;
+  private String expression;
 }
