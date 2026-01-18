@@ -7,7 +7,12 @@ import de.x132.objectmerger.strategy.MergeStrategy;
 import java.util.List;
 import java.util.Objects;
 
-public class AverageValueStrategy implements MergeStrategy<Object> {
+public class AverageValueStrategy implements MergeStrategy<Object, FieldDefinition> {
+
+  @Override
+  public Class<FieldDefinition> getConfigurationClass() {
+    return FieldDefinition.class;
+  }
 
   @Override
   public Object merge(List<LabeledSource<?>> sources, FieldDefinition fieldDef, String fieldName) {

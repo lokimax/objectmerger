@@ -1,6 +1,5 @@
 package de.x132.objectmerger.strategy.priority;
 
-import de.x132.objectmerger.FieldDefinition;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.ObjectMerger;
 import de.x132.objectmerger.strategy.MergeStrategy;
@@ -8,20 +7,17 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-public class PriorityMergeStrategy implements MergeStrategy<Object> {
+public class PriorityMergeStrategy implements MergeStrategy<Object, PriorityFieldDefinition> {
 
   @Override
-  public Class<? extends FieldDefinition> getConfigurationClass() {
+  public Class<PriorityFieldDefinition> getConfigurationClass() {
     return PriorityFieldDefinition.class;
   }
 
   @Override
-  public Object merge(List<LabeledSource<?>> sources, FieldDefinition fieldDef, String fieldName) {
-    if (!(fieldDef instanceof PriorityFieldDefinition priorityDef)) {
-      throw new IllegalArgumentException("PriorityMergeStrategy requires PriorityFieldDefinition");
-    }
-
-    Map<String, Integer> priorityMap = priorityDef.getPriority();
+  public Object merge(
+      List<LabeledSource<?>> sources, PriorityFieldDefinition fieldDef, String fieldName) {
+    Map<String, Integer> priorityMap = fieldDef.getPriority();
 
     if (priorityMap == null || priorityMap.isEmpty()) {
       throw new IllegalArgumentException("PriorityMergeStrategy requires a non-empty priority map");

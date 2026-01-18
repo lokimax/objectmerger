@@ -53,20 +53,12 @@ public class ObjectMerger {
       Field field = context.targetClass().getDeclaredField(fieldName);
       field.setAccessible(true);
 
-      MergeStrategy<?> strategy = resolveStrategy(fieldDef);
+      MergeStrategy<?, ?> strategy = resolveStrategy(fieldDef);
       if (strategy != null) {
-        if (!strategy.getConfigurationClass().isInstance(fieldDef)) {
-          throw new IllegalArgumentException(
-              String.format(
-                  "Field '%s' requires configuration of type '%s' but got '%s' for strategy '%s'",
-                  fieldName,
-                  strategy.getConfigurationClass().getSimpleName(),
-                  fieldDef.getClass().getSimpleName(),
-                  strategy.getName()));
-        }
-        Object mergedValue =
-            strategy.merge(new java.util.ArrayList<>(context.sources()), fieldDef, fieldName);
-        field.set(context.result(), mergedValue);
+        // Cast to raw type to allow capture in helper
+        @SuppressWarnings("rawtypes")
+        MergeStrategy rawStrategy = strategy;
+        applyStrategy(rawStrategy, context.sources(), fieldDef, fieldName, field, context.result());
       }
     } catch (NoSuchFieldException e) {
       log.warn(
@@ -79,9 +71,35 @@ public class ObjectMerger {
     }
   }
 
-  private static MergeStrategy<?> resolveStrategy(FieldDefinition fieldDef) {
+  private static MergeStrategy<?, ?> resolveStrategy(FieldDefinition fieldDef) {
     String strategyName = fieldDef.getStrategy() != null ? fieldDef.getStrategy() : "standard";
     return StrategyRegistry.getInstance().getStrategy(strategyName);
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <T, C extends FieldDefinition> void applyStrategy(
+      MergeStrategy<T, C> strategy,
+      List<? extends LabeledSource<?>> sources,
+      FieldDefinition fieldDef,
+      String fieldName,
+      Field field,
+      Object result)
+      throws IllegalAccessException {
+
+    if (!strategy.getConfigurationClass().isInstance(fieldDef)) {
+      throw new IllegalArgumentException(
+          String.format(
+              "Field '%s' requires configuration of type '%s' but got '%s' for strategy '%s'",
+              fieldName,
+              strategy.getConfigurationClass().getSimpleName(),
+              fieldDef.getClass().getSimpleName(),
+              strategy.getName()));
+    }
+
+    // Safe cast because we checked instance above
+    C config = (C) fieldDef;
+    T mergedValue = strategy.merge(new java.util.ArrayList<>(sources), config, fieldName);
+    field.set(result, mergedValue);
   }
 
   public static Object getFieldValue(Object obj, String fieldName) {

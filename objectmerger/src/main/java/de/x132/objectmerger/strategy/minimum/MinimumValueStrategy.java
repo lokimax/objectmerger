@@ -8,7 +8,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
-public class MinimumValueStrategy implements MergeStrategy<Object> {
+public class MinimumValueStrategy implements MergeStrategy<Object, FieldDefinition> {
+
+  @Override
+  public Class<FieldDefinition> getConfigurationClass() {
+    return FieldDefinition.class;
+  }
 
   @Override
   public Object merge(List<LabeledSource<?>> sources, FieldDefinition fieldDef, String fieldName) {

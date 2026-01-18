@@ -9,7 +9,7 @@ import java.util.List;
  *
  * @param <T> The type of the merged value.
  */
-public interface MergeStrategy<T> {
+public interface MergeStrategy<T, C extends FieldDefinition> {
 
   /**
    * Merges the values for a specific field from the given sources.
@@ -19,7 +19,7 @@ public interface MergeStrategy<T> {
    * @param fieldName The name of the field being merged.
    * @return The merged value.
    */
-  T merge(List<LabeledSource<?>> sources, FieldDefinition fieldDef, String fieldName);
+  T merge(List<LabeledSource<?>> sources, C fieldDef, String fieldName);
 
   /**
    * Returns the unique name of this strategy. This name is used in the configuration to refer to
@@ -34,7 +34,5 @@ public interface MergeStrategy<T> {
    *
    * @return The expected FieldDefinition subclass.
    */
-  default Class<? extends FieldDefinition> getConfigurationClass() {
-    return FieldDefinition.class;
-  }
+  Class<C> getConfigurationClass();
 }

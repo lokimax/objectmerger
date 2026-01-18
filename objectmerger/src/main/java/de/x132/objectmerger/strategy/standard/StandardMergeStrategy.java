@@ -7,10 +7,10 @@ import de.x132.objectmerger.strategy.MergeStrategy;
 import java.util.List;
 import java.util.Objects;
 
-public class StandardMergeStrategy implements MergeStrategy<Object> {
+public class StandardMergeStrategy implements MergeStrategy<Object, FieldDefinition> {
 
   @Override
-  public Class<? extends FieldDefinition> getConfigurationClass() {
+  public Class<FieldDefinition> getConfigurationClass() {
     return FieldDefinition.class;
   }
 
