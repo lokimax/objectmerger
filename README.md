@@ -5,7 +5,7 @@
 
 ## 1. Introduction and Goals
 
-**ObjectMerger** is a Java library designed for the intelligent merging and consolidation of object data from multiple sources (e.g., databases, external APIs, legacy systems). It solves the problem of creating a single, cohesive "Golden Record" from scattered data fragments by using configurable strategies to resolve conflicts and combine values.
+**ObjectMerger** is a Java library designed for the **configurable, strategy-based** merging and consolidation of object data from multiple sources (e.g., databases, external APIs, legacy systems). It solves the problem of creating a single, cohesive "Golden Record" from scattered data fragments by using configurable strategies to resolve conflicts and combine values.
 
 This library is particularly useful in environments where data is distributed across multiple systems (e.g., a CRM, an ERP, and a bespoke internal application) and needs to be unified for consumption.
 
