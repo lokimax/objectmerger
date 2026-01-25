@@ -3,9 +3,12 @@ package de.x132.objectmerger.strategy.map;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.ObjectMerger;
 import de.x132.objectmerger.strategy.MergeStrategy;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class MapMergeStrategy implements MergeStrategy<Object, MapFieldDefinition> {
 
@@ -24,7 +27,7 @@ public class MapMergeStrategy implements MergeStrategy<Object, MapFieldDefinitio
     // fieldDef is already MapFieldDefinition, no cast needed.
 
     // 1. Determine the set of keys to include in the result
-    java.util.Set<Object> targetKeys = new java.util.HashSet<>();
+    Set<Object> targetKeys = new HashSet<>();
 
     if (fieldDef.getKeyTemplateSources() != null && !fieldDef.getKeyTemplateSources().isEmpty()) {
       // Template Mode: Only use keys from specified sources
@@ -59,7 +62,7 @@ public class MapMergeStrategy implements MergeStrategy<Object, MapFieldDefinitio
 
     // 2. Iterate over determined keys and match values from all sources
     for (Object key : targetKeys) {
-      java.util.List<LabeledSource<?>> valuesForKey = new java.util.ArrayList<>();
+      List<LabeledSource<?>> valuesForKey = new ArrayList<>();
 
       // Collect values for this key from ALL sources
       for (LabeledSource<?> source : sources) {
@@ -96,6 +99,18 @@ public class MapMergeStrategy implements MergeStrategy<Object, MapFieldDefinitio
   @SuppressWarnings("unchecked")
   private <T> T doMerge(
       Class<T> valueClass, MapFieldDefinition fieldDef, List<LabeledSource<?>> values) {
+    if (Map.class.isAssignableFrom(valueClass)) {
+      LabeledSource<Map<String, Object>>[] sources =
+          values.stream()
+              .map(
+                  item ->
+                      new LabeledSource<Map<String, Object>>(
+                          item.getLabel(), (Map<String, Object>) item.getSource()))
+              .toArray(LabeledSource[]::new);
+      return (T)
+          ObjectMerger.merge(
+              ObjectMerger.toMergeDefinition(fieldDef.getItemMergeDefinition()), sources);
+    }
     LabeledSource<T>[] sources =
         values.stream()
             .map(item -> new LabeledSource<T>(item.getLabel(), (T) item.getSource()))
