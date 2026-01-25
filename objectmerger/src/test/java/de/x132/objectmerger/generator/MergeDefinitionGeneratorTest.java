@@ -63,7 +63,7 @@ class MergeDefinitionGeneratorTest {
 
     ListFieldDefinition listDef = (ListFieldDefinition) fieldDef;
 
-    assertEquals("list", listDef.getStrategy());
+    assertEquals("mergeList", listDef.getStrategy());
     assertEquals("id", listDef.getIdentifyBy());
   }
 }
