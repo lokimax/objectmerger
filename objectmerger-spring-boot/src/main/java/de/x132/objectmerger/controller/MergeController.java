@@ -3,6 +3,7 @@ package de.x132.objectmerger.controller;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.MergeDefinition;
 import de.x132.objectmerger.dto.MergeRequest;
+import de.x132.objectmerger.generator.MergeDefinitionGenerator;
 import de.x132.objectmerger.service.ObjectMergerService;
 import de.x132.objectmerger.util.MergeDefinitionConverter;
 import io.swagger.v3.oas.annotations.Operation;
@@ -175,5 +176,36 @@ public class MergeController {
                   "type",
                   e.getClass().getSimpleName()));
     }
+  }
+
+  @PostMapping("/generator/class")
+  @Operation(
+      summary = "Generate definition from Class",
+      description = "Generates a default merge definition based on the fields of a known class")
+  public ResponseEntity<?> generateFromClass(@RequestBody Map<String, String> request) {
+    String className = request.get("className");
+    // Security/Simplicity: Only allow specific classes or packages
+    if (!"Person".equalsIgnoreCase(className)
+        && !"de.x132.objectmerger.model.Person".equals(className)) {
+      return ResponseEntity.badRequest()
+          .body(Map.of("error", "Only 'Person' is supported for generation example"));
+    }
+
+    try {
+      Class<?> clazz = Class.forName("de.x132.objectmerger.model.Person");
+      MergeDefinition definition = MergeDefinitionGenerator.generate(clazz);
+      return ResponseEntity.ok(definition);
+    } catch (ClassNotFoundException e) {
+      return ResponseEntity.internalServerError().body(Map.of("error", "Model class not found"));
+    }
+  }
+
+  @PostMapping("/generator/json")
+  @Operation(
+      summary = "Generate definition from JSON",
+      description = "Generates a default merge definition based on the keys of a JSON object")
+  public ResponseEntity<?> generateFromJson(@RequestBody Map<String, Object> json) {
+    MergeDefinition definition = MergeDefinitionGenerator.generate(json);
+    return ResponseEntity.ok(definition);
   }
 }
