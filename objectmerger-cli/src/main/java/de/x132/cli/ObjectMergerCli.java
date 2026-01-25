@@ -7,54 +7,40 @@ import com.google.gson.JsonSyntaxException;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.MergeDefinition;
 import de.x132.objectmerger.ObjectMerger;
+import de.x132.objectmerger.strategy.FieldDefinition;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.List;
 import java.util.concurrent.Callable;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-@Command(
-    name = "objectmerger",
-    mixinStandardHelpOptions = true,
-    version = "0.1.0",
-    description = "Merge multiple JSON sources into a single object using a merge definition.")
+@Command(name = "objectmerger", mixinStandardHelpOptions = true, version = "0.1.0", description = "Merge multiple JSON sources into a single object using a merge definition.")
 public class ObjectMergerCli implements Callable<Integer> {
 
-  @Option(
-      names = {"-t", "--target-class"},
-      required = true,
-      description = "Fully qualified target class name (e.g., de.x132.person.Person)")
-  private String targetClassName;
-
-  @Option(
-      names = {"-d", "--definition"},
-      required = true,
-      description = "Path to merge definition JSON file")
+  @Option(names = { "-d", "--definition" }, required = true, description = "Path to merge definition JSON file")
   private Path definitionPath;
 
-  @Option(
-      names = {"-s", "--source"},
-      required = true,
-      arity = "1..*",
-      description = "Source in format label=path/to.json (repeat for multiple sources)")
+  @Option(names = { "-s",
+      "--source" }, required = true, arity = "1..*", description = "Source in format label=path/to.json (repeat for multiple sources)")
   private List<String> sources;
 
-  @Option(
-      names = {"-o", "--output"},
-      description = "Output JSON file; defaults to stdout")
+  @Option(names = { "-o", "--output" }, description = "Output JSON file; defaults to stdout")
   private Path outputPath;
 
-  private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+  private final Gson gson = new GsonBuilder()
+      .setPrettyPrinting()
+      .registerTypeAdapter(FieldDefinition.class, new FieldDefinitionDeserializer())
+      .create();
 
   @Override
   public Integer call() throws Exception {
     try {
-      Class<?> targetClass = Class.forName(targetClassName);
 
       // Load merge definition
       MergeDefinition definition;
@@ -62,8 +48,12 @@ public class ObjectMergerCli implements Callable<Integer> {
         definition = gson.fromJson(reader, MergeDefinition.class);
       }
 
+      // Rename variable to match ObjectMerger.merge parameter name (optional but
+      // cleaner)
+      MergeDefinition mergeDefinition = definition;
+
       // Load sources
-      List<LabeledSource<?>> labeledSources = new ArrayList<>();
+      List<LabeledSource<Map<String, Object>>> labeledSources = new ArrayList<>();
       for (String src : sources) {
         int eq = src.indexOf('=');
         if (eq <= 0 || eq == src.length() - 1) {
@@ -72,18 +62,14 @@ public class ObjectMergerCli implements Callable<Integer> {
         String label = src.substring(0, eq);
         Path path = Path.of(src.substring(eq + 1));
         try (FileReader reader = new FileReader(path.toFile())) {
-          Object obj = gson.fromJson(reader, targetClass);
+          Map<String, Object> obj = gson.fromJson(reader, Map.class);
           labeledSources.add(new LabeledSource<>(label, obj));
         }
       }
 
-      Object merged =
-          ObjectMerger.merge(
-              targetClass,
-              definition,
-              labeledSources.stream()
-                  .map(ls -> new LabeledSource<>(ls.getLabel(), ls.getSource()))
-                  .toArray(LabeledSource[]::new));
+      Map<String, Object> merged = ObjectMerger.merge(
+          mergeDefinition,
+          labeledSources.toArray(LabeledSource[]::new));
 
       String jsonOut = gson.toJson(merged);
       if (outputPath != null) {
@@ -95,9 +81,7 @@ public class ObjectMergerCli implements Callable<Integer> {
         System.out.println(jsonOut);
       }
       return 0;
-    } catch (ClassNotFoundException e) {
-      System.err.println("Target class not found: " + targetClassName);
-      return 2;
+
     } catch (JsonSyntaxException | JsonIOException e) {
       System.err.println("Failed to parse JSON: " + e.getMessage());
       return 3;
