@@ -1,10 +1,13 @@
 package de.x132.objectmerger.strategy.map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.x132.objectmerger.ItemMergeDefinition;
 import de.x132.objectmerger.LabeledSource;
+import de.x132.objectmerger.strategy.standard.StandardFieldDefinition;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -163,5 +166,64 @@ class MapMergeStrategyTest {
         (Map<Object, Object>) strategy.merge(sources, new MapFieldDefinition(), "mapField");
     assertNotNull(result);
     assertTrue(result.containsKey("key1"));
+  }
+
+  @Test
+  @DisplayName("Should merge nested maps recursively if item definition is present")
+  void testRecursiveMapMerge() {
+    // Inner Maps (Values)
+    Map<String, Object> inner1 = new HashMap<>();
+    inner1.put("v1", 1);
+
+    Map<String, Object> inner2 = new HashMap<>();
+    inner2.put("v2", 2);
+
+    // Outer Maps (Sources for MapMergeStrategy)
+    Map<String, Object> outer1 = new HashMap<>();
+    outer1.put("key1", inner1);
+
+    Map<String, Object> outer2 = new HashMap<>();
+    outer2.put("key1", inner2);
+
+    // Wrapper for ObjectMerger.getFieldValue extraction
+    Map<String, Object> wrapper1 = new HashMap<>();
+    wrapper1.put("root", outer1);
+
+    Map<String, Object> wrapper2 = new HashMap<>();
+    wrapper2.put("root", outer2);
+
+    List<LabeledSource<?>> mergeSources =
+        List.of(new LabeledSource<>("s1", wrapper1), new LabeledSource<>("s2", wrapper2));
+
+    MapFieldDefinition def = new MapFieldDefinition();
+
+    // Define how to merge the VALUES of the outer map (which are inner maps)
+    ItemMergeDefinition itemDef = new ItemMergeDefinition();
+    itemDef.setTargetClass(HashMap.class.getName());
+
+    // We must define the keys of the inner map we want to merge
+    StandardFieldDefinition stdDef = new StandardFieldDefinition();
+    itemDef.setDefinitions(Map.of("v1", stdDef, "v2", stdDef));
+
+    def.setItemMergeDefinition(itemDef);
+
+    @SuppressWarnings("unchecked")
+    Map<String, Object> result = (Map<String, Object>) strategy.merge(mergeSources, def, "root");
+    // Result should be the merged outer map
+    assertNotNull(result);
+    assertTrue(result.containsKey("key1"), "Result should have key1");
+
+    Object mergedInner = result.get("key1");
+    assertNotNull(mergedInner);
+    assertTrue(mergedInner instanceof Map, "Inner value should be a map");
+
+    @SuppressWarnings("unchecked")
+    Map<String, Object> innerMap = (Map<String, Object>) mergedInner;
+
+    // Check if inner values were merged based on definitions
+    assertTrue(innerMap.containsKey("v1"));
+    assertTrue(innerMap.containsKey("v2"));
+    assertEquals(1, (Integer) innerMap.get("v1"));
+    assertEquals(2, (Integer) innerMap.get("v2"));
   }
 }
