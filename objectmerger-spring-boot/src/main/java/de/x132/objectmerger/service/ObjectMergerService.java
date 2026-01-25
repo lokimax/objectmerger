@@ -28,6 +28,33 @@ public class ObjectMergerService {
     @SuppressWarnings("unchecked")
     Class<Object> clazz = (Class<Object>) Class.forName(targetClass);
 
+    if (java.util.Map.class.isAssignableFrom(clazz)) {
+      System.out.println("DEBUG: Processing Map merge for targetClass: " + targetClass);
+      if (definition == null || definition.getDefinitions() == null) {
+        System.out.println("DEBUG: Definition is null or empty!");
+      } else {
+        System.out.println("DEBUG: Definition keys: " + definition.getDefinitions().keySet());
+      }
+
+      // Handle Map target class using the Map-specific merge method
+      @SuppressWarnings("unchecked")
+      List<LabeledSource<java.util.Map<String, Object>>> mapSources = new ArrayList<>();
+      for (LabeledSource<?> source : sources) {
+        Object sourceData = source.getSource();
+        if (sourceData instanceof java.util.Map) {
+          mapSources.add(
+              new LabeledSource<>(source.getLabel(), (java.util.Map<String, Object>) sourceData));
+        } else {
+          // If source is not a map but target is map, try to convert via Gson?
+          // Or just error. For now assume sources are maps if target is map.
+          String json = gson.toJson(sourceData);
+          java.util.Map<String, Object> map = gson.fromJson(json, java.util.Map.class);
+          mapSources.add(new LabeledSource<>(source.getLabel(), map));
+        }
+      }
+      return ObjectMerger.merge(definition, mapSources.toArray(new LabeledSource[0]));
+    }
+
     // Convert sources from Maps to POJOs if necessary
     List<LabeledSource<Object>> convertedSources = new ArrayList<>();
     for (LabeledSource<?> source : sources) {

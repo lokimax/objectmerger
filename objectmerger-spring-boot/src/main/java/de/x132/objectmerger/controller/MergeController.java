@@ -184,19 +184,18 @@ public class MergeController {
       description = "Generates a default merge definition based on the fields of a known class")
   public ResponseEntity<?> generateFromClass(@RequestBody Map<String, String> request) {
     String className = request.get("className");
-    // Security/Simplicity: Only allow specific classes or packages
-    if (!"Person".equalsIgnoreCase(className)
-        && !"de.x132.objectmerger.model.Person".equals(className)) {
-      return ResponseEntity.badRequest()
-          .body(Map.of("error", "Only 'Person' is supported for generation example"));
+
+    // Legacy support: map "Person" to full qualified class name
+    if ("Person".equalsIgnoreCase(className)) {
+      className = "de.x132.objectmerger.model.Person";
     }
 
     try {
-      Class<?> clazz = Class.forName("de.x132.objectmerger.model.Person");
+      Class<?> clazz = Class.forName(className);
       MergeDefinition definition = MergeDefinitionGenerator.generate(clazz);
       return ResponseEntity.ok(definition);
     } catch (ClassNotFoundException e) {
-      return ResponseEntity.internalServerError().body(Map.of("error", "Model class not found"));
+      return ResponseEntity.badRequest().body(Map.of("error", "Class not found: " + className));
     }
   }
 
