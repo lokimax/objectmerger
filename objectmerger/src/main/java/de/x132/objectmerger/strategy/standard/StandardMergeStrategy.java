@@ -27,8 +27,10 @@ public class StandardMergeStrategy implements MergeStrategy<Object, FieldDefinit
         .orElse(fieldDef.getDefaultValue());
   }
 
+  public static final String NAME = "standard";
+
   @Override
   public String getName() {
-    return "standard";
+    return NAME;
   }
 }

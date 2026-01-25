@@ -50,8 +50,10 @@ public class AverageValueStrategy implements MergeStrategy<Object, FieldDefiniti
     return average;
   }
 
+  public static final String NAME = "average";
+
   @Override
   public String getName() {
-    return "average";
+    return NAME;
   }
 }

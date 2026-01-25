@@ -35,8 +35,10 @@ public class MaximumValueStrategy implements MergeStrategy<Object, FieldDefiniti
         .orElse(fieldDef.getDefaultValue());
   }
 
+  public static final String NAME = "maximum";
+
   @Override
   public String getName() {
-    return "maximum";
+    return NAME;
   }
 }

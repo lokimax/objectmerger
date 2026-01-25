@@ -35,8 +35,10 @@ public class PriorityMergeStrategy implements MergeStrategy<Object, PriorityFiel
         .orElse(fieldDef.getDefaultValue());
   }
 
+  public static final String NAME = "priority";
+
   @Override
   public String getName() {
-    return "priority";
+    return NAME;
   }
 }

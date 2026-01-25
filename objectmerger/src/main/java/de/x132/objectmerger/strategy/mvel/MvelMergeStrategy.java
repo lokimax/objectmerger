@@ -12,7 +12,7 @@ import org.mvel2.MVEL;
 @Slf4j
 public class MvelMergeStrategy implements MergeStrategy<Object, MvelFieldDefinition> {
 
-  private static final String NAME = "mvel";
+  public static final String NAME = "mvel";
 
   @Override
   public Object merge(

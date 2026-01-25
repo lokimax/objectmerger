@@ -95,8 +95,10 @@ public class ListMergeStrategy implements MergeStrategy<Object, ListFieldDefinit
     return ObjectMerger.merge(def, sources);
   }
 
+  public static final String NAME = "mergeList";
+
   @Override
   public String getName() {
-    return "mergeList";
+    return NAME;
   }
 }

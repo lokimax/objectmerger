@@ -120,8 +120,10 @@ public class MapMergeStrategy implements MergeStrategy<Object, MapFieldDefinitio
         valueClass, ObjectMerger.toMergeDefinition(fieldDef.getItemMergeDefinition()), sources);
   }
 
+  public static final String NAME = "mergeMap";
+
   @Override
   public String getName() {
-    return "mergeMap";
+    return NAME;
   }
 }
