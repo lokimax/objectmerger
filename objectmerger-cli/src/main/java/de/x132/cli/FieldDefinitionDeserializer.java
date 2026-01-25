@@ -13,24 +13,25 @@ import java.lang.reflect.Type;
 
 public class FieldDefinitionDeserializer implements JsonDeserializer<FieldDefinition> {
 
-    @Override
-    public FieldDefinition deserialize(
-            JsonElement json, Type typeOfT, JsonDeserializationContext context)
-            throws JsonParseException {
+  @Override
+  public FieldDefinition deserialize(
+      JsonElement json, Type typeOfT, JsonDeserializationContext context)
+      throws JsonParseException {
 
-        JsonObject jsonObject = json.getAsJsonObject();
-        String strategyName = jsonObject.has("strategy") ? jsonObject.get("strategy").getAsString() : "standard";
+    JsonObject jsonObject = json.getAsJsonObject();
+    String strategyName =
+        jsonObject.has("strategy") ? jsonObject.get("strategy").getAsString() : "standard";
 
-        MergeStrategy<?, ?> strategy = StrategyRegistry.getInstance().getStrategy(strategyName);
+    MergeStrategy<?, ?> strategy = StrategyRegistry.getInstance().getStrategy(strategyName);
 
-        // The configuration class for the strategy
-        Class<? extends FieldDefinition> configClass = strategy.getConfigurationClass();
+    // The configuration class for the strategy
+    Class<? extends FieldDefinition> configClass = strategy.getConfigurationClass();
 
-        // Prevent infinite recursion if the strategy returns the abstract base class
-        if (configClass == FieldDefinition.class) {
-            configClass = StandardFieldDefinition.class;
-        }
-
-        return context.deserialize(json, configClass);
+    // Prevent infinite recursion if the strategy returns the abstract base class
+    if (configClass == FieldDefinition.class) {
+      configClass = StandardFieldDefinition.class;
     }
+
+    return context.deserialize(json, configClass);
+  }
 }
