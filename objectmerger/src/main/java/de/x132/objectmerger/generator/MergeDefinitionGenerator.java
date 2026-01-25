@@ -58,7 +58,7 @@ public class MergeDefinitionGenerator {
 
       de.x132.objectmerger.strategy.list.ListFieldDefinition def =
           new de.x132.objectmerger.strategy.list.ListFieldDefinition();
-      def.setStrategy("mergeList");
+      def.setStrategy(de.x132.objectmerger.strategy.list.ListMergeStrategy.NAME);
       if (identifyBy != null) {
         def.setIdentifyBy(identifyBy);
       }
@@ -69,7 +69,7 @@ public class MergeDefinitionGenerator {
     } else if (value instanceof Map) {
       de.x132.objectmerger.strategy.map.MapFieldDefinition def =
           new de.x132.objectmerger.strategy.map.MapFieldDefinition();
-      def.setStrategy("mergeMap");
+      def.setStrategy(de.x132.objectmerger.strategy.map.MapMergeStrategy.NAME);
       // Inspect first value to see if itemMergeDefinition is needed (recurse)
       Map<?, ?> map = (Map<?, ?>) value;
       if (!map.isEmpty()) {
@@ -89,7 +89,7 @@ public class MergeDefinitionGenerator {
   private static FieldDefinition createDefaultPriorityDefinition() {
     de.x132.objectmerger.strategy.priority.PriorityFieldDefinition def =
         new de.x132.objectmerger.strategy.priority.PriorityFieldDefinition();
-    def.setStrategy("priority");
+    def.setStrategy(de.x132.objectmerger.strategy.priority.PriorityMergeStrategy.NAME);
     def.setPriority(Map.of("source_1", 1, "source_2", 2));
     return def;
   }

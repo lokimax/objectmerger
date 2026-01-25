@@ -67,8 +67,10 @@ public class ConcatenateStrategy implements MergeStrategy<Object, FieldDefinitio
             + value.getClass().getSimpleName());
   }
 
+  public static final String NAME = "concatenate";
+
   @Override
   public String getName() {
-    return "concatenate";
+    return NAME;
   }
 }

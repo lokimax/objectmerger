@@ -72,8 +72,10 @@ public class SumValueStrategy implements MergeStrategy<Number, FieldDefinition> 
     return null;
   }
 
+  public static final String NAME = "sum";
+
   @Override
   public String getName() {
-    return "sum";
+    return NAME;
   }
 }

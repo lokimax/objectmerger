@@ -35,8 +35,10 @@ public class MinimumValueStrategy implements MergeStrategy<Object, FieldDefiniti
         .orElse(fieldDef.getDefaultValue());
   }
 
+  public static final String NAME = "minimum";
+
   @Override
   public String getName() {
-    return "minimum";
+    return NAME;
   }
 }
