@@ -15,6 +15,16 @@ public class MvelMergeStrategy implements MergeStrategy<Object, MvelFieldDefinit
   public static final String NAME = "mvel";
 
   @Override
+  public String getName() {
+    return NAME;
+  }
+
+  @Override
+  public Class<MvelFieldDefinition> getConfigurationClass() {
+    return MvelFieldDefinition.class;
+  }
+
+  @Override
   public Object merge(
       List<LabeledSource<?>> sources, MvelFieldDefinition fieldDef, String fieldName) {
     if (fieldDef == null
@@ -51,15 +61,5 @@ public class MvelMergeStrategy implements MergeStrategy<Object, MvelFieldDefinit
     // Provide 'sources' as a map for easy access in MVEL: sources['priority']
     context.put("sources", simpleSources);
     return context;
-  }
-
-  @Override
-  public String getName() {
-    return NAME;
-  }
-
-  @Override
-  public Class<MvelFieldDefinition> getConfigurationClass() {
-    return MvelFieldDefinition.class;
   }
 }

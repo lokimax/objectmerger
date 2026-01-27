@@ -12,6 +12,13 @@ import java.util.Set;
 
 public class MapMergeStrategy implements MergeStrategy<Object, MapFieldDefinition> {
 
+  public static final String NAME = "mergeMap";
+
+  @Override
+  public String getName() {
+    return NAME;
+  }
+
   @Override
   public Class<MapFieldDefinition> getConfigurationClass() {
     return MapFieldDefinition.class;
@@ -118,12 +125,5 @@ public class MapMergeStrategy implements MergeStrategy<Object, MapFieldDefinitio
 
     return ObjectMerger.merge(
         valueClass, ObjectMerger.toMergeDefinition(fieldDef.getItemMergeDefinition()), sources);
-  }
-
-  public static final String NAME = "mergeMap";
-
-  @Override
-  public String getName() {
-    return NAME;
   }
 }

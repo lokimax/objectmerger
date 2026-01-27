@@ -9,6 +9,13 @@ import java.util.List;
 
 public class SumValueStrategy implements MergeStrategy<Number, FieldDefinition> {
 
+  public static final String NAME = "sum";
+
+  @Override
+  public String getName() {
+    return NAME;
+  }
+
   @Override
   public Class<FieldDefinition> getConfigurationClass() {
     return FieldDefinition.class;
@@ -70,12 +77,5 @@ public class SumValueStrategy implements MergeStrategy<Number, FieldDefinition> 
       }
     }
     return null;
-  }
-
-  public static final String NAME = "sum";
-
-  @Override
-  public String getName() {
-    return NAME;
   }
 }

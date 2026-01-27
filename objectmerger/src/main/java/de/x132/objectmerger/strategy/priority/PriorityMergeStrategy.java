@@ -9,6 +9,13 @@ import java.util.Map;
 
 public class PriorityMergeStrategy implements MergeStrategy<Object, PriorityFieldDefinition> {
 
+  public static final String NAME = "priority";
+
+  @Override
+  public String getName() {
+    return NAME;
+  }
+
   @Override
   public Class<PriorityFieldDefinition> getConfigurationClass() {
     return PriorityFieldDefinition.class;
@@ -33,12 +40,5 @@ public class PriorityMergeStrategy implements MergeStrategy<Object, PriorityFiel
         .min(Comparator.comparingInt(s -> priorityMap.get(s.getLabel())))
         .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
         .orElse(fieldDef.getDefaultValue());
-  }
-
-  public static final String NAME = "priority";
-
-  @Override
-  public String getName() {
-    return NAME;
   }
 }
