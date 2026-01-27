@@ -156,6 +156,8 @@ This builds all modules. The resulting artifacts are located in `target/` of the
 | **concatenate**| Joins strings. | `{"strategy": "concatenate"}` |
 | **mergeList** | Merges lists by ID. | `{"strategy": "mergeList", "identifyBy": "id"}` |
 | **mergeMap** | Vereinigt Maps (Union oder Template) | `{"strategy": "mergeMap"}` |
+| **latestDate** | Latest date/time (Date, LocalDate, etc.). | `{"strategy": "latestDate"}` |
+| **earliestDate** | Earliest date/time. | `{"strategy": "earliestDate"}` |
 | **mvel** | Execute custom scripts. | `{"strategy": "mvel", "expression": "return 1;"}` |
 
 ### 8.2 Map Template Logic
