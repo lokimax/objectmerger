@@ -14,6 +14,12 @@ import java.util.stream.Collectors;
 public class ConcatenateStrategy implements MergeStrategy<Object, FieldDefinition> {
 
   private static final String DEFAULT_DELIMITER = ",";
+  public static final String NAME = "concatenate";
+
+  @Override
+  public String getName() {
+    return NAME;
+  }
 
   @Override
   public Class<FieldDefinition> getConfigurationClass() {
@@ -65,12 +71,5 @@ public class ConcatenateStrategy implements MergeStrategy<Object, FieldDefinitio
     throw new IllegalArgumentException(
         "Field must be a String for concatenate strategy, but was: "
             + value.getClass().getSimpleName());
-  }
-
-  public static final String NAME = "concatenate";
-
-  @Override
-  public String getName() {
-    return NAME;
   }
 }

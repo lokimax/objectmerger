@@ -9,6 +9,13 @@ import java.util.Objects;
 
 public class StandardMergeStrategy implements MergeStrategy<Object, FieldDefinition> {
 
+  public static final String NAME = "standard";
+
+  @Override
+  public String getName() {
+    return NAME;
+  }
+
   @Override
   public Class<FieldDefinition> getConfigurationClass() {
     return FieldDefinition.class;
@@ -25,12 +32,5 @@ public class StandardMergeStrategy implements MergeStrategy<Object, FieldDefinit
         .filter(Objects::nonNull)
         .findFirst()
         .orElse(fieldDef.getDefaultValue());
-  }
-
-  public static final String NAME = "standard";
-
-  @Override
-  public String getName() {
-    return NAME;
   }
 }

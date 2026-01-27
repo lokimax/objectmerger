@@ -11,6 +11,13 @@ import java.util.stream.Stream;
 
 public class ListMergeStrategy implements MergeStrategy<Object, ListFieldDefinition> {
 
+  public static final String NAME = "mergeList";
+
+  @Override
+  public String getName() {
+    return NAME;
+  }
+
   @Override
   public Class<ListFieldDefinition> getConfigurationClass() {
     return ListFieldDefinition.class;
@@ -93,12 +100,5 @@ public class ListMergeStrategy implements MergeStrategy<Object, ListFieldDefinit
             .toArray(LabeledSource[]::new);
 
     return ObjectMerger.merge(def, sources);
-  }
-
-  public static final String NAME = "mergeList";
-
-  @Override
-  public String getName() {
-    return NAME;
   }
 }

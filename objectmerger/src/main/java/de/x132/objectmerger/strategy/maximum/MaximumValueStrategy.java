@@ -10,6 +10,13 @@ import java.util.Objects;
 
 public class MaximumValueStrategy implements MergeStrategy<Object, FieldDefinition> {
 
+  public static final String NAME = "maximum";
+
+  @Override
+  public String getName() {
+    return NAME;
+  }
+
   @Override
   public Class<FieldDefinition> getConfigurationClass() {
     return FieldDefinition.class;
@@ -33,12 +40,5 @@ public class MaximumValueStrategy implements MergeStrategy<Object, FieldDefiniti
                           + value.getClass().getSimpleName());
                 }))
         .orElse(fieldDef.getDefaultValue());
-  }
-
-  public static final String NAME = "maximum";
-
-  @Override
-  public String getName() {
-    return NAME;
   }
 }
