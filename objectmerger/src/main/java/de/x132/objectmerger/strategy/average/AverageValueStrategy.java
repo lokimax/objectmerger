@@ -9,6 +9,13 @@ import java.util.Objects;
 
 public class AverageValueStrategy implements MergeStrategy<Object, FieldDefinition> {
 
+  public static final String NAME = "average";
+
+  @Override
+  public String getName() {
+    return NAME;
+  }
+
   @Override
   public Class<FieldDefinition> getConfigurationClass() {
     return FieldDefinition.class;
@@ -48,12 +55,5 @@ public class AverageValueStrategy implements MergeStrategy<Object, FieldDefiniti
       return (int) average;
     }
     return average;
-  }
-
-  public static final String NAME = "average";
-
-  @Override
-  public String getName() {
-    return NAME;
   }
 }
