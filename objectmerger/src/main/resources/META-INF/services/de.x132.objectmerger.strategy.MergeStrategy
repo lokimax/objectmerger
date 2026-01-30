@@ -3,8 +3,7 @@ de.x132.objectmerger.strategy.standard.StandardMergeStrategy
 de.x132.objectmerger.strategy.map.MapMergeStrategy
 de.x132.objectmerger.strategy.list.ListMergeStrategy
 de.x132.objectmerger.strategy.sum.SumValueStrategy
-de.x132.objectmerger.strategy.date.LatestDateStrategy
-de.x132.objectmerger.strategy.date.EarliestDateStrategy
+
 de.x132.objectmerger.strategy.average.AverageValueStrategy
 de.x132.objectmerger.strategy.concatenate.ConcatenateStrategy
 de.x132.objectmerger.strategy.minimum.MinimumValueStrategy

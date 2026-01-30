@@ -149,15 +149,13 @@ This builds all modules. The resulting artifacts are located in `target/` of the
 | Strategy | Description | configuration example |
 |---|---|---|
 | **priority** | Selects value from highest priority source. | `{"priority": {"db": 1, "api": 2}}` |
-| **minimum** | Smallest numeric value. | `{"strategy": "minimum"}` |
-| **maximum** | Largest numeric value. | `{"strategy": "maximum"}` |
+| **minimum** | Smallest value (Number, Date, String, etc.). | `{"strategy": "minimum"}` |
+| **maximum** | Largest value (Number, Date, String, etc.). | `{"strategy": "maximum"}` |
 | **average** | Average of all numeric values. | `{"strategy": "average"}` |
 | **sum** | Sum of all numeric values. | `{"strategy": "sum"}` |
 | **concatenate**| Joins strings. | `{"strategy": "concatenate"}` |
 | **mergeList** | Merges lists by ID. | `{"strategy": "mergeList", "identifyBy": "id"}` |
 | **mergeMap** | Vereinigt Maps (Union oder Template) | `{"strategy": "mergeMap"}` |
-| **latestDate** | Latest date/time (Date, LocalDate, etc.). | `{"strategy": "latestDate"}` |
-| **earliestDate** | Earliest date/time. | `{"strategy": "earliestDate"}` |
 | **mvel** | Execute custom scripts. | `{"strategy": "mvel", "expression": "return 1;"}` |
 
 ### 8.2 Map Template Logic
