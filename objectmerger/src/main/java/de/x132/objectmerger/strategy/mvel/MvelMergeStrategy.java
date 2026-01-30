@@ -31,7 +31,7 @@ public class MvelMergeStrategy implements MergeStrategy<Object, MvelFieldDefinit
         || fieldDef.getExpression() == null
         || fieldDef.getExpression().isEmpty()) {
       log.warn("MVEL strategy invoked for field '{}' but no expression provided.", fieldName);
-      return null;
+      return fieldDef != null ? fieldDef.getDefaultValue() : null;
     }
 
     try {
@@ -44,9 +44,7 @@ public class MvelMergeStrategy implements MergeStrategy<Object, MvelFieldDefinit
       return MVEL.executeExpression(compiledExpression, context);
     } catch (Exception e) {
       log.error("Error executing MVEL expression for field '{}': {}", fieldName, e.getMessage());
-      // Depending on requirement, we might want to return null, throw, or return a
-      // fallback
-      return null;
+      return fieldDef.getDefaultValue();
     }
   }
 
