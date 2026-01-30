@@ -149,8 +149,8 @@ This builds all modules. The resulting artifacts are located in `target/` of the
 | Strategy | Description | configuration example |
 |---|---|---|
 | **priority** | Selects value from highest priority source. | `{"priority": {"db": 1, "api": 2}}` |
-| **minimum** | Smallest numeric value. | `{"strategy": "minimum"}` |
-| **maximum** | Largest numeric value. | `{"strategy": "maximum"}` |
+| **minimum** | Smallest value (Number, Date, String, etc.). | `{"strategy": "minimum"}` |
+| **maximum** | Largest value (Number, Date, String, etc.). | `{"strategy": "maximum"}` |
 | **average** | Average of all numeric values. | `{"strategy": "average"}` |
 | **sum** | Sum of all numeric values. | `{"strategy": "sum"}` |
 | **concatenate**| Joins strings. | `{"strategy": "concatenate"}` |
