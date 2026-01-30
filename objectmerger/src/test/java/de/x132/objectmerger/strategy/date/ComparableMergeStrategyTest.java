@@ -20,8 +20,7 @@ class ComparableMergeStrategyTest {
 
   private final MaximumValueStrategy maxStrategy = new MaximumValueStrategy();
   private final MinimumValueStrategy minStrategy = new MinimumValueStrategy();
-  private final FieldDefinition fieldDef = new FieldDefinition() {
-  }; // Anonymous concrete subclass
+  private final FieldDefinition fieldDef = new FieldDefinition() {}; // Anonymous concrete subclass
 
   @Test
   @DisplayName("MaximumValueStrategy picks the latest java.util.Date")
@@ -91,8 +90,7 @@ class ComparableMergeStrategyTest {
   // So we need a simple wrapper class.
 
   private List<LabeledSource<?>> wrap(Object... values) {
-    if (values == null)
-      return Collections.emptyList();
+    if (values == null) return Collections.emptyList();
     return Arrays.stream(values)
         .map(v -> new LabeledSource<>("test", new ValueWrapper(v)))
         .collect(java.util.stream.Collectors.toList());
