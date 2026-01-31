@@ -5,7 +5,7 @@ import de.x132.objectmerger.strategy.conditional.ConditionCase;
 import java.util.List;
 
 public interface ConditionalConfig {
-    List<ConditionCase> getCases();
+  List<ConditionCase> getCases();
 
-    FieldDefinition getDefaultStrategy();
+  FieldDefinition getDefaultStrategy();
 }

@@ -1,10 +1,9 @@
 package de.x132.objectmerger.strategy;
 
+import de.x132.objectmerger.strategy.config.Defaultable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import de.x132.objectmerger.strategy.config.Defaultable;
 
 @Data
 @NoArgsConstructor

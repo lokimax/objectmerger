@@ -4,13 +4,13 @@ import de.x132.objectmerger.ItemMergeDefinition;
 import java.util.List;
 
 public interface ListConfig {
-    boolean isDeduplicate();
+  boolean isDeduplicate();
 
-    String getIdentifyBy();
+  String getIdentifyBy();
 
-    ItemMergeDefinition getItemMergeDefinition();
+  ItemMergeDefinition getItemMergeDefinition();
 
-    List<String> getKeyOriginLabels();
+  List<String> getKeyOriginLabels();
 
-    boolean isRequirePresenceInAllKeyOrigins();
+  boolean isRequirePresenceInAllKeyOrigins();
 }

@@ -29,10 +29,7 @@ public class PriorityMergeStrategy implements MergeStrategy<Object, PriorityFiel
   }
 
   private Object merge(
-      List<LabeledSource<?>> sources,
-      Prioritizable config,
-      String fieldName,
-      Object defaultValue) {
+      List<LabeledSource<?>> sources, Prioritizable config, String fieldName, Object defaultValue) {
     Map<String, Integer> priorityMap = config.getPriority();
 
     if (priorityMap == null || priorityMap.isEmpty()) {
