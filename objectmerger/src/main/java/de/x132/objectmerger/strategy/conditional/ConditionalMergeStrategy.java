@@ -5,6 +5,7 @@ import de.x132.objectmerger.ObjectMerger;
 import de.x132.objectmerger.registry.StrategyRegistry;
 import de.x132.objectmerger.strategy.FieldDefinition;
 import de.x132.objectmerger.strategy.MergeStrategy;
+import de.x132.objectmerger.strategy.config.ConditionalConfig;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,11 @@ public class ConditionalMergeStrategy implements MergeStrategy<Object, Condition
   @SuppressWarnings("unchecked")
   public Object merge(
       List<LabeledSource<?>> sources, ConditionalFieldDefinition fieldDef, String fieldName) {
+    return mergeInternal(sources, fieldDef, fieldName);
+  }
+
+  private Object mergeInternal(
+      List<LabeledSource<?>> sources, ConditionalConfig fieldDef, String fieldName) {
 
     // 1. Prepare MVEL Context
     Map<String, Object> context = new HashMap<>();

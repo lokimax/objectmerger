@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import de.x132.objectmerger.strategy.config.ListConfig;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,25 +29,27 @@ public class ListMergeStrategy implements MergeStrategy<Object, ListFieldDefinit
   @Override
   public Object merge(
       List<LabeledSource<?>> sources, ListFieldDefinition fieldDef, String fieldName) {
+    return mergeInternal(sources, fieldDef, fieldName);
+  }
 
-    Map<Object, List<LabeledSource<?>>> groupedBy =
-        sources.stream()
-            .flatMap(
-                source -> {
-                  Collection<?> collection =
-                      (Collection<?>) ObjectMerger.getFieldValue(source.getSource(), fieldName);
-                  if (collection == null) {
-                    return Stream.empty();
-                  }
-                  return collection.stream()
-                      .map(item -> new LabeledSource<>(source.getLabel(), item));
-                })
-            .collect(
-                Collectors.groupingBy(
-                    labeledSource ->
-                        ObjectMerger.getFieldValue(
-                            labeledSource.getSource(), fieldDef.getIdentifyBy()),
-                    Collectors.toList()));
+  private Object mergeInternal(
+      List<LabeledSource<?>> sources, ListConfig fieldDef, String fieldName) {
+
+    Map<Object, List<LabeledSource<?>>> groupedBy = sources.stream()
+        .flatMap(
+            source -> {
+              Collection<?> collection = (Collection<?>) ObjectMerger.getFieldValue(source.getSource(), fieldName);
+              if (collection == null) {
+                return Stream.empty();
+              }
+              return collection.stream()
+                  .map(item -> new LabeledSource<>(source.getLabel(), item));
+            })
+        .collect(
+            Collectors.groupingBy(
+                labeledSource -> ObjectMerger.getFieldValue(
+                    labeledSource.getSource(), fieldDef.getIdentifyBy()),
+                Collectors.toList()));
 
     if (fieldDef.getKeyOriginLabels() != null && !fieldDef.getKeyOriginLabels().isEmpty()) {
       groupedBy
@@ -58,9 +61,8 @@ public class ListMergeStrategy implements MergeStrategy<Object, ListFieldDefinit
                 if (fieldDef.isRequirePresenceInAllKeyOrigins()) {
                   return !fieldDef.getKeyOriginLabels().stream()
                       .allMatch(
-                          requiredLabel ->
-                              sourcesForId.stream()
-                                  .anyMatch(s -> requiredLabel.equals(s.getLabel())));
+                          requiredLabel -> sourcesForId.stream()
+                              .anyMatch(s -> requiredLabel.equals(s.getLabel())));
                 } else {
                   return sourcesForId.stream()
                       .noneMatch(s -> fieldDef.getKeyOriginLabels().contains(s.getLabel()));
@@ -74,8 +76,7 @@ public class ListMergeStrategy implements MergeStrategy<Object, ListFieldDefinit
               try {
                 if (fieldDef.getItemMergeDefinition() != null
                     && fieldDef.getItemMergeDefinition().getTargetClass() != null) {
-                  Class<?> itemClass =
-                      Class.forName(fieldDef.getItemMergeDefinition().getTargetClass());
+                  Class<?> itemClass = Class.forName(fieldDef.getItemMergeDefinition().getTargetClass());
                   return doMerge(itemClass, fieldDef, items);
                 } else if (items.stream().allMatch(i -> i.getSource() instanceof Map)) {
                   return doMapMerge(fieldDef, items);
@@ -92,34 +93,30 @@ public class ListMergeStrategy implements MergeStrategy<Object, ListFieldDefinit
 
   @SuppressWarnings("unchecked")
   private <T> T doMerge(
-      Class<T> itemClass, ListFieldDefinition fieldDef, List<LabeledSource<?>> items) {
-    LabeledSource<T>[] sources =
-        items.stream()
-            .map(item -> new LabeledSource<T>(item.getLabel(), (T) item.getSource()))
-            .toArray(LabeledSource[]::new);
+      Class<T> itemClass, ListConfig fieldDef, List<LabeledSource<?>> items) {
+    LabeledSource<T>[] sources = items.stream()
+        .map(item -> new LabeledSource<T>(item.getLabel(), (T) item.getSource()))
+        .toArray(LabeledSource[]::new);
     return ObjectMerger.merge(
         itemClass, ObjectMerger.toMergeDefinition(fieldDef.getItemMergeDefinition()), sources);
   }
 
   @SuppressWarnings("unchecked")
   private Map<String, Object> doMapMerge(
-      ListFieldDefinition fieldDef, List<LabeledSource<?>> items) {
+      ListConfig fieldDef, List<LabeledSource<?>> items) {
 
-    MergeDefinition def =
-        (fieldDef.getItemMergeDefinition() != null)
-            ? ObjectMerger.toMergeDefinition(fieldDef.getItemMergeDefinition())
-            : new MergeDefinition();
+    MergeDefinition def = (fieldDef.getItemMergeDefinition() != null)
+        ? ObjectMerger.toMergeDefinition(fieldDef.getItemMergeDefinition())
+        : new MergeDefinition();
     if (def.getDefinitions() == null) {
       def.setDefinitions(new HashMap<>());
     }
 
-    LabeledSource<Map<String, Object>>[] sources =
-        items.stream()
-            .map(
-                item ->
-                    new LabeledSource<Map<String, Object>>(
-                        item.getLabel(), (Map<String, Object>) item.getSource()))
-            .toArray(LabeledSource[]::new);
+    LabeledSource<Map<String, Object>>[] sources = items.stream()
+        .map(
+            item -> new LabeledSource<Map<String, Object>>(
+                item.getLabel(), (Map<String, Object>) item.getSource()))
+        .toArray(LabeledSource[]::new);
 
     return ObjectMerger.merge(def, sources);
   }

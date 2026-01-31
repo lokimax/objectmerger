@@ -7,10 +7,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import de.x132.objectmerger.strategy.config.Prioritizable;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class PriorityFieldDefinition extends FieldDefinition {
+public class PriorityFieldDefinition extends FieldDefinition implements Prioritizable {
   private Map<String, Integer> priority;
 }

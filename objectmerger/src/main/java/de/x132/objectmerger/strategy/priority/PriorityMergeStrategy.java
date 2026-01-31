@@ -3,6 +3,7 @@ package de.x132.objectmerger.strategy.priority;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.ObjectMerger;
 import de.x132.objectmerger.strategy.MergeStrategy;
+import de.x132.objectmerger.strategy.config.Prioritizable;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,15 @@ public class PriorityMergeStrategy implements MergeStrategy<Object, PriorityFiel
   @Override
   public Object merge(
       List<LabeledSource<?>> sources, PriorityFieldDefinition fieldDef, String fieldName) {
-    Map<String, Integer> priorityMap = fieldDef.getPriority();
+    return merge(sources, (Prioritizable) fieldDef, fieldName, fieldDef.getDefaultValue());
+  }
+
+  private Object merge(
+      List<LabeledSource<?>> sources,
+      Prioritizable config,
+      String fieldName,
+      Object defaultValue) {
+    Map<String, Integer> priorityMap = config.getPriority();
 
     if (priorityMap == null || priorityMap.isEmpty()) {
       throw new IllegalArgumentException("PriorityMergeStrategy requires a non-empty priority map");
@@ -39,6 +48,6 @@ public class PriorityMergeStrategy implements MergeStrategy<Object, PriorityFiel
         .filter(s -> ObjectMerger.getFieldValue(s.getSource(), fieldName) != null)
         .min(Comparator.comparingInt(s -> priorityMap.get(s.getLabel())))
         .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
-        .orElse(fieldDef.getDefaultValue());
+        .orElse(defaultValue);
   }
 }

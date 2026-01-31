@@ -8,11 +8,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import de.x132.objectmerger.strategy.config.ListConfig;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ListFieldDefinition extends FieldDefinition {
+public class ListFieldDefinition extends FieldDefinition implements ListConfig {
   private boolean deduplicate;
   private String identifyBy;
   private ItemMergeDefinition itemMergeDefinition;
