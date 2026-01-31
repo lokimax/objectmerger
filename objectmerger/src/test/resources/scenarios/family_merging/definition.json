@@ -1,0 +1,30 @@
+{
+    "members": {
+        "strategy": "mergeList",
+        "identifyBy": "id",
+        "keyOriginLabels": [
+            "family_a",
+            "family_b"
+        ],
+        "requirePresenceInAllKeyOrigins": false,
+        "itemMergeDefinition": {
+            "id": {
+                "strategy": "standard"
+            },
+            "name": {
+                "strategy": "standard"
+            },
+            "role": {
+                "strategy": "standard"
+            },
+            "birthdate": {
+                "strategy": "priority",
+                "priority": {
+                    "api": 1,
+                    "family_a": 10,
+                    "family_b": 10
+                }
+            }
+        }
+    }
+}

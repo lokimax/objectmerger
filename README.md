@@ -154,7 +154,7 @@ This builds all modules. The resulting artifacts are located in `target/` of the
 | **average** | Average of all numeric values. | `{"strategy": "average"}` |
 | **sum** | Sum of all numeric values. | `{"strategy": "sum"}` |
 | **concatenate**| Joins strings. | `{"strategy": "concatenate"}` |
-| **mergeList** | Merges lists by ID. | `{"strategy": "mergeList", "identifyBy": "id"}` |
+| **mergeList** | Merges lists by ID. Supports Template/Intersection. | `{"strategy": "mergeList", "identifyBy": "id", "keyOriginLabels": ["A"], "requirePresenceInAllKeyOrigins": true}` |
 | **mergeMap** | Vereinigt Maps (Union oder Template) | `{"strategy": "mergeMap"}` |
 | **mvel** | Execute custom scripts. | `{"strategy": "mvel", "expression": "return 1;"}` |
 
@@ -169,6 +169,23 @@ Vereinigt Map-Objekte aus mehreren Quellen.
   "settings": {
     "strategy": "mergeMap",
     "keyTemplateSources": ["source1"]
+  }
+```
+
+### 8.3 List Template Logic
+Control which items are retained in the merged list.
+
+*   **Standard (Union)**: Items from **all** sources are merged.
+*   **Template Mode**: If `keyOriginLabels` is set, only items originating from these sources are retained.
+*   **Intersection**: If `requirePresenceInAllKeyOrigins` is true, items must be present in ALL specified key origin sources.
+
+```json
+{
+  "items": {
+    "strategy": "mergeList",
+    "identifyBy": "id",
+    "keyOriginLabels": ["sourceA", "sourceB"],
+    "requirePresenceInAllKeyOrigins": true
   }
 }
 ```

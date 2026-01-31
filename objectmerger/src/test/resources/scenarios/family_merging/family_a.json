@@ -1,0 +1,16 @@
+{
+  "members": [
+    {
+      "id": "p1",
+      "name": "Peter",
+      "birthdate": "1980-01-01",
+      "role": "Father"
+    },
+    {
+      "id": "m1",
+      "name": "Mary",
+      "birthdate": "1982-05-05",
+      "role": "Mother"
+    }
+  ]
+}
