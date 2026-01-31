@@ -2,6 +2,7 @@ package de.x132.objectmerger.strategy.list;
 
 import de.x132.objectmerger.ItemMergeDefinition;
 import de.x132.objectmerger.strategy.FieldDefinition;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,4 +16,6 @@ public class ListFieldDefinition extends FieldDefinition {
   private boolean deduplicate;
   private String identifyBy;
   private ItemMergeDefinition itemMergeDefinition;
+  private List<String> keyOriginLabels;
+  private boolean requirePresenceInAllKeyOrigins;
 }

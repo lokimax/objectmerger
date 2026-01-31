@@ -1,9 +1,11 @@
 package de.x132.objectmerger.strategy.list;
 
 import de.x132.objectmerger.LabeledSource;
+import de.x132.objectmerger.MergeDefinition;
 import de.x132.objectmerger.ObjectMerger;
 import de.x132.objectmerger.strategy.MergeStrategy;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -46,6 +48,26 @@ public class ListMergeStrategy implements MergeStrategy<Object, ListFieldDefinit
                             labeledSource.getSource(), fieldDef.getIdentifyBy()),
                     Collectors.toList()));
 
+    if (fieldDef.getKeyOriginLabels() != null && !fieldDef.getKeyOriginLabels().isEmpty()) {
+      groupedBy
+          .entrySet()
+          .removeIf(
+              entry -> {
+                List<LabeledSource<?>> sourcesForId = entry.getValue();
+
+                if (fieldDef.isRequirePresenceInAllKeyOrigins()) {
+                  return !fieldDef.getKeyOriginLabels().stream()
+                      .allMatch(
+                          requiredLabel ->
+                              sourcesForId.stream()
+                                  .anyMatch(s -> requiredLabel.equals(s.getLabel())));
+                } else {
+                  return sourcesForId.stream()
+                      .noneMatch(s -> fieldDef.getKeyOriginLabels().contains(s.getLabel()));
+                }
+              });
+    }
+
     return groupedBy.values().stream()
         .map(
             items -> {
@@ -58,7 +80,6 @@ public class ListMergeStrategy implements MergeStrategy<Object, ListFieldDefinit
                 } else if (items.stream().allMatch(i -> i.getSource() instanceof Map)) {
                   return doMapMerge(fieldDef, items);
                 } else {
-                  // Fallback or error if no definition and not maps
                   throw new IllegalArgumentException(
                       "Cannot merge list items: missing target class in definition and items are not Maps.");
                 }
@@ -84,12 +105,13 @@ public class ListMergeStrategy implements MergeStrategy<Object, ListFieldDefinit
   private Map<String, Object> doMapMerge(
       ListFieldDefinition fieldDef, List<LabeledSource<?>> items) {
 
-    // Create definition from ItemMergeDefinition or use empty if null (merging
-    // nothing but satisfying call)
-    de.x132.objectmerger.MergeDefinition def =
+    MergeDefinition def =
         (fieldDef.getItemMergeDefinition() != null)
             ? ObjectMerger.toMergeDefinition(fieldDef.getItemMergeDefinition())
-            : new de.x132.objectmerger.MergeDefinition();
+            : new MergeDefinition();
+    if (def.getDefinitions() == null) {
+      def.setDefinitions(new HashMap<>());
+    }
 
     LabeledSource<Map<String, Object>>[] sources =
         items.stream()
