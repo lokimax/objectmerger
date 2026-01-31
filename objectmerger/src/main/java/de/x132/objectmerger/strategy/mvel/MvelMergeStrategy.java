@@ -2,6 +2,7 @@ package de.x132.objectmerger.strategy.mvel;
 
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.strategy.MergeStrategy;
+import de.x132.objectmerger.strategy.config.MvelConfig;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -27,11 +28,16 @@ public class MvelMergeStrategy implements MergeStrategy<Object, MvelFieldDefinit
   @Override
   public Object merge(
       List<LabeledSource<?>> sources, MvelFieldDefinition fieldDef, String fieldName) {
+    return merge(sources, (MvelConfig) fieldDef, fieldName, fieldDef.getDefaultValue());
+  }
+
+  private Object merge(
+      List<LabeledSource<?>> sources, MvelConfig fieldDef, String fieldName, Object defaultValue) {
     if (fieldDef == null
         || fieldDef.getExpression() == null
         || fieldDef.getExpression().isEmpty()) {
       log.warn("MVEL strategy invoked for field '{}' but no expression provided.", fieldName);
-      return fieldDef != null ? fieldDef.getDefaultValue() : null;
+      return defaultValue;
     }
 
     try {
@@ -44,7 +50,7 @@ public class MvelMergeStrategy implements MergeStrategy<Object, MvelFieldDefinit
       return MVEL.executeExpression(compiledExpression, context);
     } catch (Exception e) {
       log.error("Error executing MVEL expression for field '{}': {}", fieldName, e.getMessage());
-      return fieldDef.getDefaultValue();
+      return defaultValue;
     }
   }
 

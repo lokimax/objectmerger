@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class ConcatenateStrategy implements MergeStrategy<Object, FieldDefinition> {
+public class ConcatenateStrategy implements MergeStrategy<String, FieldDefinition<String>> {
 
   private static final String DEFAULT_DELIMITER = ",";
   public static final String NAME = "concatenate";
@@ -21,13 +21,15 @@ public class ConcatenateStrategy implements MergeStrategy<Object, FieldDefinitio
     return NAME;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Class<FieldDefinition> getConfigurationClass() {
-    return FieldDefinition.class;
+  public Class<FieldDefinition<String>> getConfigurationClass() {
+    return (Class) FieldDefinition.class;
   }
 
   @Override
-  public Object merge(List<LabeledSource<?>> sources, FieldDefinition fieldDef, String fieldName) {
+  public String merge(
+      List<LabeledSource<?>> sources, FieldDefinition<String> fieldDef, String fieldName) {
     String delimiter = getDelimiter(fieldDef);
     Map<String, Integer> priority = null;
     if (fieldDef instanceof PriorityFieldDefinition priorityDef) {
@@ -49,7 +51,7 @@ public class ConcatenateStrategy implements MergeStrategy<Object, FieldDefinitio
     return String.join(delimiter, values);
   }
 
-  private String getDelimiter(FieldDefinition fieldDef) {
+  private String getDelimiter(FieldDefinition<?> fieldDef) {
     // Try to get delimiter from a custom field or property
     // For now, return default - can be extended to read from metadata
     return DEFAULT_DELIMITER;

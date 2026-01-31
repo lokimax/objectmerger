@@ -46,7 +46,7 @@ class DateAsIdentifierTest {
     valDef.setStrategy("concatenate");
 
     // Construct item definition
-    Map<String, FieldDefinition> itemFields = new HashMap<>();
+    Map<String, FieldDefinition<?>> itemFields = new HashMap<>();
     itemFields.put("date", dateDef);
     itemFields.put("val", valDef);
 
@@ -54,7 +54,7 @@ class DateAsIdentifierTest {
     itemDef.setDefinitions(itemFields);
     listDef.setItemMergeDefinition(itemDef);
 
-    Map<String, FieldDefinition> rootFields = new HashMap<>();
+    Map<String, FieldDefinition<?>> rootFields = new HashMap<>();
     rootFields.put("list", listDef);
 
     MergeDefinition def = new MergeDefinition(rootFields);

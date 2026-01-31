@@ -7,7 +7,7 @@ import de.x132.objectmerger.strategy.MergeStrategy;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class SumValueStrategy implements MergeStrategy<Number, FieldDefinition> {
+public class SumValueStrategy implements MergeStrategy<Number, FieldDefinition<Number>> {
 
   public static final String NAME = "sum";
 
@@ -16,13 +16,15 @@ public class SumValueStrategy implements MergeStrategy<Number, FieldDefinition> 
     return NAME;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Class<FieldDefinition> getConfigurationClass() {
-    return FieldDefinition.class;
+  public Class<FieldDefinition<Number>> getConfigurationClass() {
+    return (Class) FieldDefinition.class;
   }
 
   @Override
-  public Number merge(List<LabeledSource<?>> sources, FieldDefinition fieldDef, String fieldName) {
+  public Number merge(
+      List<LabeledSource<?>> sources, FieldDefinition<Number> fieldDef, String fieldName) {
     BigDecimal sum = BigDecimal.ZERO;
     boolean hasValue = false;
 

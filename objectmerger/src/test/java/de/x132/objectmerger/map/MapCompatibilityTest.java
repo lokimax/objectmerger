@@ -3,6 +3,7 @@ package de.x132.objectmerger.map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import de.x132.objectmerger.ItemMergeDefinition;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.MergeDefinition;
 import de.x132.objectmerger.ObjectMerger;
@@ -24,7 +25,7 @@ class MapCompatibilityTest {
   void testSalesMerge() {
     // Definition
     MergeDefinition def = new MergeDefinition();
-    Map<String, FieldDefinition> fields = new HashMap<>();
+    Map<String, FieldDefinition<?>> fields = new HashMap<>();
 
     StandardFieldDefinition sumDef = new StandardFieldDefinition();
     sumDef.setStrategy("sum");
@@ -56,7 +57,7 @@ class MapCompatibilityTest {
   void testPersonMerge() {
     // Definition
     MergeDefinition def = new MergeDefinition();
-    Map<String, FieldDefinition> fields = new HashMap<>();
+    Map<String, FieldDefinition<?>> fields = new HashMap<>();
 
     PriorityFieldDefinition nameDef = new PriorityFieldDefinition();
     nameDef.setPriority(Map.of("db", 1, "crm", 2)); // db wins
@@ -92,17 +93,18 @@ class MapCompatibilityTest {
   void testFamilyMerge() {
     // Definition
     MergeDefinition def = new MergeDefinition();
-    Map<String, FieldDefinition> fields = new HashMap<>();
+    Map<String, FieldDefinition<?>> fields = new HashMap<>();
 
     // "members" is a List of objects, merged by "name"
     ListFieldDefinition membersDef = new ListFieldDefinition();
     membersDef.setStrategy("mergeList");
     membersDef.setIdentifyBy("name");
 
+    // ...
+
     // Define how to merge list items (Map based)
-    de.x132.objectmerger.ItemMergeDefinition itemDef =
-        new de.x132.objectmerger.ItemMergeDefinition();
-    Map<String, FieldDefinition> childFields = new HashMap<>();
+    ItemMergeDefinition itemDef = new ItemMergeDefinition();
+    Map<String, FieldDefinition<?>> childFields = new HashMap<>();
 
     // Child name
     PriorityFieldDefinition childNameDef = new PriorityFieldDefinition();

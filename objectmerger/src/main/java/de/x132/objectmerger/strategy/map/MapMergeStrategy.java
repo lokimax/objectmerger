@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class MapMergeStrategy implements MergeStrategy<Object, MapFieldDefinition> {
+public class MapMergeStrategy
+    implements MergeStrategy<Map<Object, Object>, MapFieldDefinition<Map<Object, Object>>> {
 
   public static final String NAME = "mergeMap";
 
@@ -19,14 +20,17 @@ public class MapMergeStrategy implements MergeStrategy<Object, MapFieldDefinitio
     return NAME;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Class<MapFieldDefinition> getConfigurationClass() {
-    return MapFieldDefinition.class;
+  public Class<MapFieldDefinition<Map<Object, Object>>> getConfigurationClass() {
+    return (Class) MapFieldDefinition.class;
   }
 
   @Override
-  public Object merge(
-      List<LabeledSource<?>> sources, MapFieldDefinition fieldDef, String fieldName) {
+  public Map<Object, Object> merge(
+      List<LabeledSource<?>> sources,
+      MapFieldDefinition<Map<Object, Object>> fieldDef,
+      String fieldName) {
     if (sources.isEmpty()) {
       return new HashMap<>();
     }

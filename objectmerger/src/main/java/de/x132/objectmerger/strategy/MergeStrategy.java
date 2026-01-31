@@ -21,7 +21,7 @@ import java.util.List;
  * @param <T> The type of the merged value.
  * @param <C> The specific type of {@link FieldDefinition} required by this strategy.
  */
-public interface MergeStrategy<T, C extends FieldDefinition> {
+public interface MergeStrategy<T, C extends FieldDefinition<T>> {
 
   /**
    * Merges the values for a specific field from the given sources.

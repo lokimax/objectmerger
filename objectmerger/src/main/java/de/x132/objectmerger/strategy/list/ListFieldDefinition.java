@@ -2,6 +2,7 @@ package de.x132.objectmerger.strategy.list;
 
 import de.x132.objectmerger.ItemMergeDefinition;
 import de.x132.objectmerger.strategy.FieldDefinition;
+import de.x132.objectmerger.strategy.config.ListConfig;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ListFieldDefinition extends FieldDefinition {
+public class ListFieldDefinition<T> extends FieldDefinition<T> implements ListConfig {
   private boolean deduplicate;
   private String identifyBy;
   private ItemMergeDefinition itemMergeDefinition;

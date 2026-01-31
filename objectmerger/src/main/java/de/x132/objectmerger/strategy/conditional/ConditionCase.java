@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConditionCase {
+public class ConditionCase<T> {
   /**
    * MVEL expression evaluating to boolean. Available variables: 'sources' (List<LabeledSource>),
    * 'values' (Map<String, Object>).
@@ -16,5 +16,5 @@ public class ConditionCase {
   private String condition;
 
   /** The strategy to apply if condition is true. */
-  private FieldDefinition useStrategy;
+  private FieldDefinition<T> useStrategy;
 }

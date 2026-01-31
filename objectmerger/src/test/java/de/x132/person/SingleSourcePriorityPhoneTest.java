@@ -22,7 +22,7 @@ public class SingleSourcePriorityPhoneTest {
     phoneDef.setDefaultValue(null);
 
     MergeDefinition def = new MergeDefinition();
-    Map<String, FieldDefinition> defs = new HashMap<>();
+    Map<String, FieldDefinition<?>> defs = new HashMap<>();
     defs.put("phone", phoneDef);
     def.setDefinitions(defs);
     return def;

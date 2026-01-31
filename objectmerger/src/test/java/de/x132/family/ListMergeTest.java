@@ -114,9 +114,10 @@ class ListMergeTest {
   }
 
   // Inner Deserializer class
-  public static class TestFieldDefinitionDeserializer implements JsonDeserializer<FieldDefinition> {
+  public static class TestFieldDefinitionDeserializer
+      implements JsonDeserializer<FieldDefinition<?>> {
     @Override
-    public FieldDefinition deserialize(
+    public FieldDefinition<?> deserialize(
         JsonElement json, Type typeOfT, JsonDeserializationContext context)
         throws JsonParseException {
 
@@ -155,10 +156,10 @@ class ListMergeTest {
         throws JsonParseException {
 
       JsonObject jsonObject = json.getAsJsonObject();
-      Map<String, FieldDefinition> map = new HashMap<>();
+      Map<String, FieldDefinition<?>> map = new HashMap<>();
 
       for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-        FieldDefinition def = context.deserialize(entry.getValue(), FieldDefinition.class);
+        FieldDefinition<?> def = context.deserialize(entry.getValue(), FieldDefinition.class);
         map.put(entry.getKey(), def);
       }
 
@@ -175,7 +176,7 @@ class ListMergeTest {
         throws JsonParseException {
 
       JsonObject jsonObject = json.getAsJsonObject();
-      Map<String, FieldDefinition> map = new HashMap<>();
+      Map<String, FieldDefinition<?>> map = new HashMap<>();
       String targetClass = null;
 
       if (jsonObject.has("targetClass")) {
@@ -187,7 +188,7 @@ class ListMergeTest {
         if ("targetClass".equals(entry.getKey())) {
           continue; // Handled above
         }
-        FieldDefinition def = context.deserialize(entry.getValue(), FieldDefinition.class);
+        FieldDefinition<?> def = context.deserialize(entry.getValue(), FieldDefinition.class);
         map.put(entry.getKey(), def);
       }
 

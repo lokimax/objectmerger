@@ -6,12 +6,13 @@ import com.google.gson.Gson;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.MergeDefinition;
 import de.x132.objectmerger.ObjectMerger;
+import de.x132.testutil.TestGsonHelper;
 import java.io.FileReader;
 import org.junit.jupiter.api.Test;
 
 public class MultiSourceMergeTest {
 
-  private static final Gson gson = de.x132.testutil.TestGsonHelper.createGson();
+  private static final Gson gson = TestGsonHelper.createGson();
 
   @Test
   void testMergePersonData() throws Exception {

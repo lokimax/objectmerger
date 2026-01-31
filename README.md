@@ -61,6 +61,9 @@ The core concept relies on **Strategies** and **Definitions**.
 2.  **Field Definition**: Configuration defines how each field of the target object should be merged (e.g., `name` uses `priority`, `age` uses `maximum`).
 3.  **Merge Process**: The `ObjectMerger` iterates over target fields, consults the definition, applies the corresponding `MergeStrategy`, and writes the result to the matching field.
 
+### 4.1 Architecture
+The library uses **Capability Interfaces** (e.g., `Prioritizable`, `ListConfig`) to define configuration requirements. Strategies depend on these interfaces rather than concrete configuration classes, enabling flexible composition.
+
 ## 5. Building Block View
 
 The project is structured as a multi-module Maven project.

@@ -40,11 +40,11 @@ public class ObjectMerger {
       Class<T> targetClass, MergeDefinition mergeDefinition, LabeledSource<T>... sources) {
     try {
       T result = targetClass.getDeclaredConstructor().newInstance();
-      Map<String, FieldDefinition> definitions = mergeDefinition.getDefinitions();
+      Map<String, FieldDefinition<?>> definitions = mergeDefinition.getDefinitions();
       List<LabeledSource<T>> sourceList = Arrays.asList(sources);
       MergeContext<T> context = new MergeContext<>(targetClass, result, sourceList);
 
-      for (Map.Entry<String, FieldDefinition> entry : definitions.entrySet()) {
+      for (Map.Entry<String, FieldDefinition<?>> entry : definitions.entrySet()) {
         processField(context, entry.getKey(), entry.getValue());
       }
       return result;
@@ -65,12 +65,12 @@ public class ObjectMerger {
   public static Map<String, Object> merge(
       MergeDefinition mergeDefinition, LabeledSource<Map<String, Object>>... sources) {
     Map<String, Object> result = new java.util.HashMap<>();
-    Map<String, FieldDefinition> definitions = mergeDefinition.getDefinitions();
+    Map<String, FieldDefinition<?>> definitions = mergeDefinition.getDefinitions();
     List<LabeledSource<Map<String, Object>>> sourceList = Arrays.asList(sources);
 
-    for (Map.Entry<String, FieldDefinition> entry : definitions.entrySet()) {
+    for (Map.Entry<String, FieldDefinition<?>> entry : definitions.entrySet()) {
       String fieldName = entry.getKey();
-      FieldDefinition fieldDef = entry.getValue();
+      FieldDefinition<?> fieldDef = entry.getValue();
 
       MergeStrategy<?, ?> strategy = resolveStrategy(fieldDef);
       if (strategy != null) {
@@ -85,7 +85,7 @@ public class ObjectMerger {
   }
 
   private static <T> void processField(
-      MergeContext<T> context, String fieldName, FieldDefinition fieldDef) {
+      MergeContext<T> context, String fieldName, FieldDefinition<?> fieldDef) {
     try {
       Field field = context.targetClass().getDeclaredField(fieldName);
       field.setAccessible(true);
@@ -108,15 +108,15 @@ public class ObjectMerger {
     }
   }
 
-  private static MergeStrategy<?, ?> resolveStrategy(FieldDefinition fieldDef) {
+  private static MergeStrategy<?, ?> resolveStrategy(FieldDefinition<?> fieldDef) {
     String strategyName = fieldDef.getStrategy() != null ? fieldDef.getStrategy() : "standard";
     return StrategyRegistry.getInstance().getStrategy(strategyName);
   }
 
-  private static <T, C extends FieldDefinition> void applyStrategy(
+  private static <T, C extends FieldDefinition<T>> void applyStrategy(
       MergeStrategy<T, C> strategy,
       List<? extends LabeledSource<?>> sources,
-      FieldDefinition fieldDef,
+      FieldDefinition<?> fieldDef,
       String fieldName,
       Field field,
       Object result)
@@ -127,10 +127,10 @@ public class ObjectMerger {
   }
 
   @SuppressWarnings("unchecked")
-  private static <T, C extends FieldDefinition> T executeStrategy(
+  private static <T, C extends FieldDefinition<T>> T executeStrategy(
       MergeStrategy<T, C> strategy,
       List<? extends LabeledSource<?>> sources,
-      FieldDefinition fieldDef,
+      FieldDefinition<?> fieldDef,
       String fieldName) {
 
     if (!strategy.getConfigurationClass().isInstance(fieldDef)) {

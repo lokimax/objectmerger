@@ -7,7 +7,7 @@ import de.x132.objectmerger.strategy.MergeStrategy;
 import java.util.List;
 import java.util.Objects;
 
-public class AverageValueStrategy implements MergeStrategy<Object, FieldDefinition> {
+public class AverageValueStrategy implements MergeStrategy<Number, FieldDefinition<Number>> {
 
   public static final String NAME = "average";
 
@@ -16,13 +16,15 @@ public class AverageValueStrategy implements MergeStrategy<Object, FieldDefiniti
     return NAME;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Class<FieldDefinition> getConfigurationClass() {
-    return FieldDefinition.class;
+  public Class<FieldDefinition<Number>> getConfigurationClass() {
+    return (Class) FieldDefinition.class;
   }
 
   @Override
-  public Object merge(List<LabeledSource<?>> sources, FieldDefinition fieldDef, String fieldName) {
+  public Number merge(
+      List<LabeledSource<?>> sources, FieldDefinition<Number> fieldDef, String fieldName) {
     double sum =
         sources.stream()
             .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))

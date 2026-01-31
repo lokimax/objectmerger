@@ -6,4 +6,4 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class StandardFieldDefinition extends FieldDefinition {}
+public class StandardFieldDefinition<T> extends FieldDefinition<T> {}

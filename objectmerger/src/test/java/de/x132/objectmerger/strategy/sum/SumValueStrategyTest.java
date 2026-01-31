@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import de.x132.objectmerger.LabeledSource;
-import de.x132.objectmerger.strategy.standard.StandardFieldDefinition;
+import de.x132.objectmerger.strategy.FieldDefinition;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -134,7 +134,8 @@ class SumValueStrategyTest {
             new LabeledSource<>("ebay", ebay),
             new LabeledSource<>("woocommerce", woocommerce));
 
-    StandardFieldDefinition def = new StandardFieldDefinition();
+    // Create a compatible FieldDefinition<Number>
+    FieldDefinition<Number> def = new FieldDefinition<Number>() {};
     def.setStrategy("sum");
 
     Object result = strategy.merge(sources, def, "totalSales");
