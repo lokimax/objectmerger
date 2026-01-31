@@ -62,8 +62,9 @@ class DateAsIdentifierTest {
     Map<String, Object> sourceA = Map.of("list", listA);
     Map<String, Object> sourceB = Map.of("list", listB);
 
-    Map<String, Object> result = ObjectMerger.merge(
-        def, new LabeledSource<>("A", sourceA), new LabeledSource<>("B", sourceB));
+    Map<String, Object> result =
+        ObjectMerger.merge(
+            def, new LabeledSource<>("A", sourceA), new LabeledSource<>("B", sourceB));
 
     List<Map<String, Object>> resultList = (List<Map<String, Object>>) result.get("list");
     assertNotNull(resultList);

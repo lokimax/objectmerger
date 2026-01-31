@@ -4,8 +4,8 @@ import de.x132.objectmerger.strategy.FieldDefinition;
 import de.x132.objectmerger.strategy.conditional.ConditionCase;
 import java.util.List;
 
-public interface ConditionalConfig {
-  List<ConditionCase> getCases();
+public interface ConditionalConfig<T> {
+  List<ConditionCase<T>> getCases();
 
-  FieldDefinition getDefaultStrategy();
+  FieldDefinition<T> getDefaultStrategy();
 }

@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-public class PriorityMergeStrategy implements MergeStrategy<Object, PriorityFieldDefinition> {
+public class PriorityMergeStrategy<T> implements MergeStrategy<T, PriorityFieldDefinition<T>> {
 
   public static final String NAME = "priority";
 
@@ -17,19 +17,21 @@ public class PriorityMergeStrategy implements MergeStrategy<Object, PriorityFiel
     return NAME;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Class<PriorityFieldDefinition> getConfigurationClass() {
-    return PriorityFieldDefinition.class;
+  public Class<PriorityFieldDefinition<T>> getConfigurationClass() {
+    return (Class) PriorityFieldDefinition.class;
   }
 
   @Override
-  public Object merge(
-      List<LabeledSource<?>> sources, PriorityFieldDefinition fieldDef, String fieldName) {
+  public T merge(
+      List<LabeledSource<?>> sources, PriorityFieldDefinition<T> fieldDef, String fieldName) {
     return merge(sources, (Prioritizable) fieldDef, fieldName, fieldDef.getDefaultValue());
   }
 
-  private Object merge(
-      List<LabeledSource<?>> sources, Prioritizable config, String fieldName, Object defaultValue) {
+  @SuppressWarnings("unchecked")
+  private T merge(
+      List<LabeledSource<?>> sources, Prioritizable config, String fieldName, T defaultValue) {
     Map<String, Integer> priorityMap = config.getPriority();
 
     if (priorityMap == null || priorityMap.isEmpty()) {
@@ -40,11 +42,12 @@ public class PriorityMergeStrategy implements MergeStrategy<Object, PriorityFiel
     // priority map.
     // This enforces "one source per property" semantics: unspecified sources are
     // ignored.
-    return sources.stream()
-        .filter(s -> priorityMap.containsKey(s.getLabel()))
-        .filter(s -> ObjectMerger.getFieldValue(s.getSource(), fieldName) != null)
-        .min(Comparator.comparingInt(s -> priorityMap.get(s.getLabel())))
-        .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
-        .orElse(defaultValue);
+    return (T)
+        sources.stream()
+            .filter(s -> priorityMap.containsKey(s.getLabel()))
+            .filter(s -> ObjectMerger.getFieldValue(s.getSource(), fieldName) != null)
+            .min(Comparator.comparingInt(s -> priorityMap.get(s.getLabel())))
+            .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
+            .orElse(defaultValue);
   }
 }

@@ -12,36 +12,28 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Utility class for merging objects based on a definition and strategies.
  *
- * <p>
- * This class uses reflection to iterate over fields and apply specific merge
- * strategies. It
- * supports different strategies for resolving conflicts or combining values
- * from multiple sources.
+ * <p>This class uses reflection to iterate over fields and apply specific merge strategies. It
+ * supports different strategies for resolving conflicts or combining values from multiple sources.
  *
  * <h2>Strategy Loading</h2>
  *
- * Strategies are loaded via Java SPI (Service Provider Interface). The system
- * looks for
+ * Strategies are loaded via Java SPI (Service Provider Interface). The system looks for
  * implementations of {@link MergeStrategy} registered in {@code
- * META-INF/services/de.x132.objectmerger.strategy.MergeStrategy}. If a strategy
- * specified in the
- * {@link MergeDefinition} is not found, the "standard" strategy is used as a
- * fallback.
+ * META-INF/services/de.x132.objectmerger.strategy.MergeStrategy}. If a strategy specified in the
+ * {@link MergeDefinition} is not found, the "standard" strategy is used as a fallback.
  */
 @Slf4j
 public class ObjectMerger {
 
   /**
-   * Merges multiple sources into a target object based on the provided
-   * definition.
+   * Merges multiple sources into a target object based on the provided definition.
    *
-   * @param targetClass     The class of the result object.
+   * @param targetClass The class of the result object.
    * @param mergeDefinition The definition of how fields should be merged.
-   * @param sources         The sources to merge.
-   * @param <T>             The type of the result object.
+   * @param sources The sources to merge.
+   * @param <T> The type of the result object.
    * @return A new instance of T with merged values.
-   * @throws RuntimeException If merging fails (e.g. instantiation or field access
-   *                          errors).
+   * @throws RuntimeException If merging fails (e.g. instantiation or field access errors).
    */
   @SafeVarargs
   public static <T> T merge(
@@ -66,7 +58,7 @@ public class ObjectMerger {
    * Merges multiple sources into a target map based on the provided definition.
    *
    * @param mergeDefinition The definition of how fields should be merged.
-   * @param sources         The sources to merge (Maps).
+   * @param sources The sources to merge (Maps).
    * @return A new Map with merged values.
    */
   @SafeVarargs
@@ -156,8 +148,7 @@ public class ObjectMerger {
   }
 
   public static Object getFieldValue(Object obj, String fieldName) {
-    if (obj == null)
-      return null;
+    if (obj == null) return null;
     if (obj instanceof Map) {
       return ((Map<?, ?>) obj).get(fieldName);
     }

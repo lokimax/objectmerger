@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ListFieldDefinition extends FieldDefinition<Object> implements ListConfig {
+public class ListFieldDefinition<T> extends FieldDefinition<T> implements ListConfig {
   private boolean deduplicate;
   private String identifyBy;
   private ItemMergeDefinition itemMergeDefinition;

@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class ConcatenateStrategy implements MergeStrategy<Object, FieldDefinition<Object>> {
+public class ConcatenateStrategy implements MergeStrategy<String, FieldDefinition<String>> {
 
   private static final String DEFAULT_DELIMITER = ",";
   public static final String NAME = "concatenate";
@@ -23,24 +23,26 @@ public class ConcatenateStrategy implements MergeStrategy<Object, FieldDefinitio
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class<FieldDefinition<Object>> getConfigurationClass() {
+  public Class<FieldDefinition<String>> getConfigurationClass() {
     return (Class) FieldDefinition.class;
   }
 
   @Override
-  public Object merge(List<LabeledSource<?>> sources, FieldDefinition<Object> fieldDef, String fieldName) {
+  public String merge(
+      List<LabeledSource<?>> sources, FieldDefinition<String> fieldDef, String fieldName) {
     String delimiter = getDelimiter(fieldDef);
     Map<String, Integer> priority = null;
     if (fieldDef instanceof PriorityFieldDefinition priorityDef) {
       priority = priorityDef.getPriority();
     }
 
-    List<String> values = sources.stream()
-        .sorted(getComparator(priority))
-        .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
-        .filter(Objects::nonNull)
-        .map(this::validateAndConvertToString)
-        .collect(Collectors.toList());
+    List<String> values =
+        sources.stream()
+            .sorted(getComparator(priority))
+            .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
+            .filter(Objects::nonNull)
+            .map(this::validateAndConvertToString)
+            .collect(Collectors.toList());
 
     if (values.isEmpty()) {
       return fieldDef.getDefaultValue();

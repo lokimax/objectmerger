@@ -9,9 +9,10 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ConditionalFieldDefinition extends FieldDefinition<Object> implements ConditionalConfig {
+public class ConditionalFieldDefinition<T> extends FieldDefinition<T>
+    implements ConditionalConfig<T> {
 
-  private List<ConditionCase> cases = new ArrayList<>();
+  private List<ConditionCase<T>> cases = new ArrayList<>();
 
-  private FieldDefinition defaultStrategy;
+  private FieldDefinition<T> defaultStrategy;
 }

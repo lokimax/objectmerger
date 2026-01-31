@@ -23,7 +23,8 @@ public class SumValueStrategy implements MergeStrategy<Number, FieldDefinition<N
   }
 
   @Override
-  public Number merge(List<LabeledSource<?>> sources, FieldDefinition<Number> fieldDef, String fieldName) {
+  public Number merge(
+      List<LabeledSource<?>> sources, FieldDefinition<Number> fieldDef, String fieldName) {
     BigDecimal sum = BigDecimal.ZERO;
     boolean hasValue = false;
 

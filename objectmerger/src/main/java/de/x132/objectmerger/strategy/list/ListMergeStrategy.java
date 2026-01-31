@@ -12,7 +12,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ListMergeStrategy implements MergeStrategy<Object, ListFieldDefinition> {
+public class ListMergeStrategy
+    implements MergeStrategy<List<Object>, ListFieldDefinition<List<Object>>> {
 
   public static final String NAME = "mergeList";
 
@@ -21,15 +22,19 @@ public class ListMergeStrategy implements MergeStrategy<Object, ListFieldDefinit
     return NAME;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Class<ListFieldDefinition> getConfigurationClass() {
-    return ListFieldDefinition.class;
+  public Class<ListFieldDefinition<List<Object>>> getConfigurationClass() {
+    return (Class) ListFieldDefinition.class;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Object merge(
-      List<LabeledSource<?>> sources, ListFieldDefinition fieldDef, String fieldName) {
-    return mergeInternal(sources, fieldDef, fieldName);
+  public List<Object> merge(
+      List<LabeledSource<?>> sources,
+      ListFieldDefinition<List<Object>> fieldDef,
+      String fieldName) {
+    return (List<Object>) mergeInternal(sources, fieldDef, fieldName);
   }
 
   private Object mergeInternal(
@@ -39,13 +44,13 @@ public class ListMergeStrategy implements MergeStrategy<Object, ListFieldDefinit
         sources.stream()
             .flatMap(
                 source -> {
-                  Collection<?> collection =
-                      (Collection<?>) ObjectMerger.getFieldValue(source.getSource(), fieldName);
-                  if (collection == null) {
+                  Object val = ObjectMerger.getFieldValue(source.getSource(), fieldName);
+                  if (!(val instanceof Collection)) {
                     return Stream.empty();
                   }
+                  Collection<?> collection = (Collection<?>) val;
                   return collection.stream()
-                      .map(item -> new LabeledSource<>(source.getLabel(), item));
+                      .map(item -> new LabeledSource<Object>(source.getLabel(), item));
                 })
             .collect(
                 Collectors.groupingBy(

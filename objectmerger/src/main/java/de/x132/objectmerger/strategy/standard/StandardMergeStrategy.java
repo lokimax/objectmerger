@@ -7,7 +7,7 @@ import de.x132.objectmerger.strategy.MergeStrategy;
 import java.util.List;
 import java.util.Objects;
 
-public class StandardMergeStrategy implements MergeStrategy<Object, FieldDefinition<Object>> {
+public class StandardMergeStrategy<T> implements MergeStrategy<T, FieldDefinition<T>> {
 
   public static final String NAME = "standard";
 
@@ -18,20 +18,21 @@ public class StandardMergeStrategy implements MergeStrategy<Object, FieldDefinit
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class<FieldDefinition<Object>> getConfigurationClass() {
+  public Class<FieldDefinition<T>> getConfigurationClass() {
     return (Class) FieldDefinition.class;
   }
 
   @Override
-  public Object merge(List<LabeledSource<?>> sources, FieldDefinition<Object> fieldDef, String fieldName) {
+  public T merge(List<LabeledSource<?>> sources, FieldDefinition<T> fieldDef, String fieldName) {
     if (sources.isEmpty()) {
       return fieldDef.getDefaultValue();
     }
 
-    return sources.stream()
-        .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
-        .filter(Objects::nonNull)
-        .findFirst()
-        .orElse(fieldDef.getDefaultValue());
+    return (T)
+        sources.stream()
+            .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
+            .filter(Objects::nonNull)
+            .findFirst()
+            .orElse(fieldDef.getDefaultValue());
   }
 }

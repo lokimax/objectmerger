@@ -13,7 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.mvel2.MVEL;
 
 @Slf4j
-public class ConditionalMergeStrategy implements MergeStrategy<Object, ConditionalFieldDefinition> {
+public class ConditionalMergeStrategy<T>
+    implements MergeStrategy<T, ConditionalFieldDefinition<T>> {
 
   public static final String NAME = "conditional";
 
@@ -22,20 +23,21 @@ public class ConditionalMergeStrategy implements MergeStrategy<Object, Condition
     return NAME;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Class<ConditionalFieldDefinition> getConfigurationClass() {
-    return ConditionalFieldDefinition.class;
+  public Class<ConditionalFieldDefinition<T>> getConfigurationClass() {
+    return (Class) ConditionalFieldDefinition.class;
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public Object merge(
-      List<LabeledSource<?>> sources, ConditionalFieldDefinition fieldDef, String fieldName) {
-    return mergeInternal(sources, fieldDef, fieldName);
+  public T merge(
+      List<LabeledSource<?>> sources, ConditionalFieldDefinition<T> fieldDef, String fieldName) {
+    return (T) mergeInternal(sources, fieldDef, fieldName);
   }
 
   private Object mergeInternal(
-      List<LabeledSource<?>> sources, ConditionalConfig fieldDef, String fieldName) {
+      List<LabeledSource<?>> sources, ConditionalConfig<T> fieldDef, String fieldName) {
 
     // 1. Prepare MVEL Context
     Map<String, Object> context = new HashMap<>();
@@ -49,7 +51,7 @@ public class ConditionalMergeStrategy implements MergeStrategy<Object, Condition
 
     // 2. Evaluate Cases
     if (fieldDef.getCases() != null) {
-      for (ConditionCase c : fieldDef.getCases()) {
+      for (ConditionCase<?> c : fieldDef.getCases()) {
         try {
           Object result = MVEL.eval(c.getCondition(), context);
           if (Boolean.TRUE.equals(result)) {
@@ -71,7 +73,7 @@ public class ConditionalMergeStrategy implements MergeStrategy<Object, Condition
     return null; // or throw exception if default is mandatory?
   }
 
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings({"rawtypes", "unchecked"})
   private Object executeSubStrategy(
       FieldDefinition def, List<LabeledSource<?>> sources, String fieldName) {
     String strategyName = def.getStrategy() != null ? def.getStrategy() : "standard";

@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MapFieldDefinition extends FieldDefinition<Object> {
+public class MapFieldDefinition<T> extends FieldDefinition<T> {
   private String keyStrategy;
   private List<String> keyTemplateSources;
   private ItemMergeDefinition itemMergeDefinition;

@@ -40,12 +40,13 @@ class MapCompatibilityTest {
     Map<String, Object> woocommerce = Map.of("totalSales", 1200);
 
     // Merge
-    Map<String, Object> result = ObjectMerger.merge(
-        def,
-        new LabeledSource<>("amazon", amazon),
-        new LabeledSource<>("shopify", shopify),
-        new LabeledSource<>("ebay", ebay),
-        new LabeledSource<>("woocommerce", woocommerce));
+    Map<String, Object> result =
+        ObjectMerger.merge(
+            def,
+            new LabeledSource<>("amazon", amazon),
+            new LabeledSource<>("shopify", shopify),
+            new LabeledSource<>("ebay", ebay),
+            new LabeledSource<>("woocommerce", woocommerce));
 
     // Verify (Expected: 5800)
     assertEquals(5800, ((Number) result.get("totalSales")).intValue());
@@ -78,8 +79,8 @@ class MapCompatibilityTest {
     crm.put("age", 40);
 
     // Merge
-    Map<String, Object> result = ObjectMerger.merge(def, new LabeledSource<>("db", db),
-        new LabeledSource<>("crm", crm));
+    Map<String, Object> result =
+        ObjectMerger.merge(def, new LabeledSource<>("db", db), new LabeledSource<>("crm", crm));
 
     // Verify
     assertEquals("Max DB", result.get("name"));
@@ -134,8 +135,9 @@ class MapCompatibilityTest {
     source2.put("members", Arrays.asList(member1Update));
 
     // Merge
-    Map<String, Object> result = ObjectMerger.merge(
-        def, new LabeledSource<>("s1", source1), new LabeledSource<>("s2", source2));
+    Map<String, Object> result =
+        ObjectMerger.merge(
+            def, new LabeledSource<>("s1", source1), new LabeledSource<>("s2", source2));
 
     // Verify
     List<Object> mergedMembers = (List<Object>) result.get("members");

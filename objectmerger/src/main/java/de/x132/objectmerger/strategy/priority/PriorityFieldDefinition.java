@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class PriorityFieldDefinition extends FieldDefinition<Object> implements Prioritizable {
+public class PriorityFieldDefinition<T> extends FieldDefinition<T> implements Prioritizable {
   private Map<String, Integer> priority;
 }
