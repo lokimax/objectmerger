@@ -1,0 +1,87 @@
+2026-01-31 | Merge pull request #10 from lokimax/feature/list-join-types
+2026-01-31 | feat(list-merge): add ListJoinStrategy with template and intersection logic, including integration tests
+2026-01-30 | Merge pull request #9 from lokimax/feature/mvel-refinement
+2026-01-30 | Merge pull request #8 from lokimax/feature/date-strategies
+2026-01-30 | style: apply spotless formatting to MvelFallbackTest
+2026-01-30 | style: apply spotless formatting
+2026-01-30 | feat(strategy): refine mvel error handling and fallback behavior
+2026-01-30 | refactor(strategy): generalize max/min to support comparable types, remove date strategies
+2026-01-27 | feat: Add `latestDate` and `earliestDate` strategies and a test for `mergeList` with date identifiers.
+2026-01-27 | feat(strategy): implement latestDate and earliestDate strategies
+2026-01-27 | Merge pull request #7 from lokimax/feature/enhance-unit-tests
+2026-01-27 | style: Reformat stream operations for improved readability in `AverageValueStrategy` and `ListMergeStrategy`.
+2026-01-27 | refactor: improve code readability by using direct imports and reformatting stream operations.
+2026-01-27 | test: Enhance StrategyRegistry tests to cover `getStrategy` behavior and name consistency, and delete `data_sample.json`.
+2026-01-27 | Merge pull request #6 from lokimax/refactor/strategy-constants
+2026-01-27 | refactor: reposition `getName()` method and `NAME` constant to the top of merge strategy classes for consistent structure.
+2026-01-25 | Merge pull request #5 from lokimax/refactor/strategy-constants
+2026-01-25 | refactor(core): decentralized strategy constants
+2026-01-25 | Merge pull request #4 from lokimax/feature/unittesting
+2026-01-25 | feat(tests): improve unit test coverage, fix recursive map merging and apply spotless
+2026-01-25 | Merge pull request #3 from lokimax/feature/generator
+2026-01-25 | test: Update expected list strategy to "mergeList" in `MergeDefinitionGeneratorTest` and remove the `ReproductionTest` class.
+2026-01-25 | Refactor: Enhance MergeDefinitionGenerator for recursive lists and maps
+2026-01-25 | Merge pull request #2 from lokimax/feature/generator
+2026-01-25 | feat(generator): Implement MergeDefinition Generator
+2026-01-25 | feat: Update CLI to use `Map<String, Object>` for merging and dynamically deserialize `FieldDefinition` based on strategy.
+2026-01-18 | Fix MapPersonMergeTest: correct class name, imports, and assertions
+2026-01-18 | Feat: Add Map-based merging support with hybrid architecture and verify scenarios
+2026-01-18 | Docs: Add MVEL strategy usage and example
+2026-01-18 | Refactor: Optimize MVEL expressions and clean imports
+2026-01-18 | Test: Add MVEL verification test replicating person merge logic
+2026-01-18 | Style: Apply Spotless formatting
+2026-01-18 | Feat: Integrate MVEL strategy for scriptable merge logic
+2026-01-18 | Docs: Add SPI documentation and strictness test
+2026-01-18 | Refactor: Move FieldDefinition to strategy package and re-introduce Lombok
+2026-01-18 | Merge pull request #1 from lokimax/refactor/strategy-generics
+2026-01-18 | Fix: Resolve syntax error in ObjectMerger and apply spotless formatting
+2026-01-18 | Refactor: Implement strict generics for MergeStrategy and remove Lombok dependencies
+2026-01-18 | refactor: extract StrategyRegistry from ObjectMerger to separate concerns (SRP)
+2026-01-18 | docs: improve description precision (replace 'intelligent' with 'strategy-based')
+2026-01-18 | style: apply spotless formatting fixes
+2026-01-18 | docs: refactor README to emphasize library focus and fix formatting
+2026-01-17 | Refactor MergeStrategies and fix build configuration
+2026-01-17 | refactor: Move classes to de.x132.objectmerger and cleanup references
+2026-01-17 | feat: Refine MapMergeStrategy to support optional template mode
+2026-01-17 | docs: Refactor README to arc42 template structure
+2026-01-14 | style: Apply spotless formatting to fix CI
+2026-01-14 | test: Fix SumValueStrategyTest to properly test mixed types and nulls
+2026-01-14 | docs: Update README to reflect Map-Template-Logic behavior
+2026-01-14 | feat: Implement Map-Template-Logic where leading map determines keys
+2026-01-13 | feat(core): implement SPI for dynamic MergeStrategy discovery
+2026-01-12 | refactor(core): improve maintainability, logging and CI
+2026-01-07 | Docs: use inline YAML in README; remove example-merge-request.yaml
+2026-01-07 | Clean repo: remove build artifacts and IDE configs; ignore all target dirs, .vscode, and .editorconfig
+2026-01-07 | Merge YAML support documentation into README
+2026-01-07 | Add YAML support for REST API
+2026-01-07 | docs: remove references to non-existent module READMEs
+2026-01-07 | docs: update README for multi-module project structure
+2026-01-07 | refactor: rename objectmerger-core to objectmerger
+2026-01-07 | refactor: restructure project to multi-module Maven layout
+2026-01-07 | test: add comprehensive Spring Boot integration tests
+2026-01-07 | docs: add Spring Boot REST API documentation to README
+2026-01-07 | feat(spring-boot): add REST API example with Swagger/OpenAPI\n\n- New module: examples/objectmerger-spring-boot\n- Spring Boot 3.2 + Springdoc-OpenAPI 2.1.0\n- MergeController with /api/v1/merge endpoint\n- MergeDefinitionConverter using Gson for type serialization\n- Health check and Person merge example endpoints\n- Swagger UI available at /swagger-ui.html\n- Demonstrates REST API usage and interactive API docs\n
+2026-01-07 | docs(cli): add Maven-based CLI example module with Person demo\n\n- New module: examples/objectmerger-cli (Picocli + Gson)\n- Implemented ObjectMergerCli with JSON sources + merge definition\n- Added sample person JSON + merge definition\n- Build via shade plugin to executable jar\n- README: usage instructions and commands\n
+2026-01-07 | feat: implement SumValueStrategy for aggregating numeric values
+2026-01-07 | docs: update README with MapMergeStrategy documentation
+2026-01-07 | feat: implement MapMergeStrategy for merging Map objects by key
+2026-01-07 | refactor: remove unnecessary type cast and suppress warnings
+2026-01-07 | fix: correct syntax errors in strategy files after Spotless formatting
+2026-01-07 | refactor: optimize imports and format code with Spotless
+2026-01-07 | feat: add ConcatenateStrategy for string concatenation with priority support
+2026-01-07 | refactor: use Lombok @Data and @AllArgsConstructor for test helper classes in ListMergeStrategyTest
+2026-01-07 | feat: improve MaximumValueStrategy and MinimumValueStrategy with type validation and better error messages
+2026-01-07 | fix: remove unused DB/GUI fields from FieldDefinition and fix AverageValueStrategy tests
+2026-01-07 | docs: add MIT License
+2026-01-07 | feat: add AverageValueStrategy and MinimumValueStrategy with comprehensive tests, update README
+2026-01-07 | feat: add PriorityMergeStrategy and comprehensive tests, update README
+2026-01-07 | Extract PriorityMergeStrategy from findBestSource method
+2026-01-07 | Add unit tests for merge strategies (MaximumValueStrategy, ListMergeStrategy)
+2026-01-07 | Organize test resources into separate folders by test case
+2026-01-07 | Remove priority for maximum strategy in test definitions
+2026-01-07 | Fix: add Collectors import; cast sourceList for strategy; update test expectation
+2026-01-07 | Refactor: Restructure tests and make merger POJO-based
+2026-01-07 | Refactor: Decouple from Jackson, use Gson
+2026-01-07 | Refactor: Change package and artifact name
+2026-01-07 | Upgrade Java to 21
+2026-01-07 | Initial commit

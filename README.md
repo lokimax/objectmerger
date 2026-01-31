@@ -207,6 +207,33 @@ Allows complex logic using [MVEL](http://mvel.documentnode.com/).
 }
 ```
 
+### 8.8 Conditional Strategy (MVEL)
+The `conditional` strategy acts as a wrapper that routes to different strategies based on dynamic conditions evaluated using MVEL.
+
+**Behavior:**
+1.  Evaluates `cases` in order.
+2.  If `condition` evaluates to `true`, executes `useStrategy`.
+3.  If no case matches, executes `defaultStrategy`.
+
+**Context Variables:**
+- `sources`: List of available `LabeledSource` objects.
+- `values`: Map of values for the current field (key = source label).
+
+**Example:**
+```json
+{
+  "field": "status",
+  "strategy": "conditional",
+  "cases": [
+    {
+      "condition": "values.containsKey('master') && values.get('master') == 'active'", 
+      "useStrategy": { "strategy": "priority", "priority": {"master": 1} }
+    }
+  ],
+  "defaultStrategy": { "strategy": "majority" }
+}
+```
+
 ## 9. Glossary
 
 | Term | Definition |
