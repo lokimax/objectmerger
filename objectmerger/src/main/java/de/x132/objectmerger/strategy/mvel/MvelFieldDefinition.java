@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MvelFieldDefinition extends FieldDefinition implements MvelConfig {
+public class MvelFieldDefinition extends FieldDefinition<Object> implements MvelConfig {
   private String expression;
 }

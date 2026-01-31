@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class ConcatenateStrategy implements MergeStrategy<Object, FieldDefinition> {
+public class ConcatenateStrategy implements MergeStrategy<Object, FieldDefinition<Object>> {
 
   private static final String DEFAULT_DELIMITER = ",";
   public static final String NAME = "concatenate";
@@ -21,26 +21,26 @@ public class ConcatenateStrategy implements MergeStrategy<Object, FieldDefinitio
     return NAME;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Class<FieldDefinition> getConfigurationClass() {
-    return FieldDefinition.class;
+  public Class<FieldDefinition<Object>> getConfigurationClass() {
+    return (Class) FieldDefinition.class;
   }
 
   @Override
-  public Object merge(List<LabeledSource<?>> sources, FieldDefinition fieldDef, String fieldName) {
+  public Object merge(List<LabeledSource<?>> sources, FieldDefinition<Object> fieldDef, String fieldName) {
     String delimiter = getDelimiter(fieldDef);
     Map<String, Integer> priority = null;
     if (fieldDef instanceof PriorityFieldDefinition priorityDef) {
       priority = priorityDef.getPriority();
     }
 
-    List<String> values =
-        sources.stream()
-            .sorted(getComparator(priority))
-            .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
-            .filter(Objects::nonNull)
-            .map(this::validateAndConvertToString)
-            .collect(Collectors.toList());
+    List<String> values = sources.stream()
+        .sorted(getComparator(priority))
+        .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
+        .filter(Objects::nonNull)
+        .map(this::validateAndConvertToString)
+        .collect(Collectors.toList());
 
     if (values.isEmpty()) {
       return fieldDef.getDefaultValue();
@@ -49,7 +49,7 @@ public class ConcatenateStrategy implements MergeStrategy<Object, FieldDefinitio
     return String.join(delimiter, values);
   }
 
-  private String getDelimiter(FieldDefinition fieldDef) {
+  private String getDelimiter(FieldDefinition<?> fieldDef) {
     // Try to get delimiter from a custom field or property
     // For now, return default - can be extended to read from metadata
     return DEFAULT_DELIMITER;

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class FieldDefinition implements Defaultable<Object> {
+public abstract class FieldDefinition<T> implements Defaultable<T> {
   private String strategy;
-  private Object defaultValue;
+  private T defaultValue;
 }

@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ItemMergeDefinition {
   private String targetClass;
-  private Map<String, FieldDefinition> definitions;
+  private Map<String, FieldDefinition<?>> definitions;
 }

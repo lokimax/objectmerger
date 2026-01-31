@@ -7,7 +7,7 @@ import de.x132.objectmerger.strategy.MergeStrategy;
 import java.util.List;
 import java.util.Objects;
 
-public class MaximumValueStrategy implements MergeStrategy<Object, FieldDefinition> {
+public class MaximumValueStrategy implements MergeStrategy<Object, FieldDefinition<Object>> {
 
   public static final String NAME = "maximum";
 
@@ -16,14 +16,15 @@ public class MaximumValueStrategy implements MergeStrategy<Object, FieldDefiniti
     return NAME;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Class<FieldDefinition> getConfigurationClass() {
-    return FieldDefinition.class;
+  public Class<FieldDefinition<Object>> getConfigurationClass() {
+    return (Class) FieldDefinition.class;
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
-  public Object merge(List<LabeledSource<?>> sources, FieldDefinition fieldDef, String fieldName) {
+  public Object merge(List<LabeledSource<?>> sources, FieldDefinition<Object> fieldDef, String fieldName) {
     return sources.stream()
         .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
         .filter(Objects::nonNull)

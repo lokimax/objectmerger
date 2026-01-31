@@ -22,7 +22,7 @@ public class SingleSourcePriorityPhoneTest {
     phoneDef.setDefaultValue(null);
 
     MergeDefinition def = new MergeDefinition();
-    Map<String, FieldDefinition> defs = new HashMap<>();
+    Map<String, FieldDefinition<?>> defs = new HashMap<>();
     defs.put("phone", phoneDef);
     def.setDefinitions(defs);
     return def;
@@ -43,13 +43,12 @@ public class SingleSourcePriorityPhoneTest {
     MergeDefinition def = phonePriorityCrmOnlyDefinition();
 
     // When
-    Person merged =
-        ObjectMerger.merge(
-            Person.class,
-            def,
-            new LabeledSource<>("analytics", analytics),
-            new LabeledSource<>("crm", crm),
-            new LabeledSource<>("database", database));
+    Person merged = ObjectMerger.merge(
+        Person.class,
+        def,
+        new LabeledSource<>("analytics", analytics),
+        new LabeledSource<>("crm", crm),
+        new LabeledSource<>("database", database));
 
     // Then
     assertEquals("030-123456", merged.getPhone());
@@ -70,13 +69,12 @@ public class SingleSourcePriorityPhoneTest {
     MergeDefinition def = phonePriorityCrmOnlyDefinition();
 
     // When
-    Person merged =
-        ObjectMerger.merge(
-            Person.class,
-            def,
-            new LabeledSource<>("analytics", analytics),
-            new LabeledSource<>("crm", crm),
-            new LabeledSource<>("database", database));
+    Person merged = ObjectMerger.merge(
+        Person.class,
+        def,
+        new LabeledSource<>("analytics", analytics),
+        new LabeledSource<>("crm", crm),
+        new LabeledSource<>("database", database));
 
     // Then
     assertEquals(null, merged.getPhone());
@@ -94,12 +92,11 @@ public class SingleSourcePriorityPhoneTest {
     MergeDefinition def = phonePriorityCrmOnlyDefinition();
 
     // When: no CRM source is provided
-    Person merged =
-        ObjectMerger.merge(
-            Person.class,
-            def,
-            new LabeledSource<>("analytics", analytics),
-            new LabeledSource<>("database", database));
+    Person merged = ObjectMerger.merge(
+        Person.class,
+        def,
+        new LabeledSource<>("analytics", analytics),
+        new LabeledSource<>("database", database));
 
     // Then
     assertEquals(null, merged.getPhone());

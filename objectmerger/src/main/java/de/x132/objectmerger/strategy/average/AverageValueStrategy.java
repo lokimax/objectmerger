@@ -7,7 +7,7 @@ import de.x132.objectmerger.strategy.MergeStrategy;
 import java.util.List;
 import java.util.Objects;
 
-public class AverageValueStrategy implements MergeStrategy<Object, FieldDefinition> {
+public class AverageValueStrategy implements MergeStrategy<Object, FieldDefinition<Object>> {
 
   public static final String NAME = "average";
 
@@ -16,32 +16,31 @@ public class AverageValueStrategy implements MergeStrategy<Object, FieldDefiniti
     return NAME;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Class<FieldDefinition> getConfigurationClass() {
-    return FieldDefinition.class;
+  public Class<FieldDefinition<Object>> getConfigurationClass() {
+    return (Class) FieldDefinition.class;
   }
 
   @Override
-  public Object merge(List<LabeledSource<?>> sources, FieldDefinition fieldDef, String fieldName) {
-    double sum =
-        sources.stream()
-            .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
-            .filter(Objects::nonNull)
-            .mapToDouble(
-                value -> {
-                  if (value instanceof Number) {
-                    return ((Number) value).doubleValue();
-                  }
-                  throw new IllegalArgumentException(
-                      "Field " + fieldName + " must be a number for average strategy");
-                })
-            .sum();
+  public Object merge(List<LabeledSource<?>> sources, FieldDefinition<Object> fieldDef, String fieldName) {
+    double sum = sources.stream()
+        .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
+        .filter(Objects::nonNull)
+        .mapToDouble(
+            value -> {
+              if (value instanceof Number) {
+                return ((Number) value).doubleValue();
+              }
+              throw new IllegalArgumentException(
+                  "Field " + fieldName + " must be a number for average strategy");
+            })
+        .sum();
 
-    long count =
-        sources.stream()
-            .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
-            .filter(Objects::nonNull)
-            .count();
+    long count = sources.stream()
+        .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
+        .filter(Objects::nonNull)
+        .count();
     if (count == 0) {
       return fieldDef.getDefaultValue();
     }

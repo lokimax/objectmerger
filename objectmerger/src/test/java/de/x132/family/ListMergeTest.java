@@ -36,13 +36,12 @@ class ListMergeTest {
   private final Gson gson;
 
   public ListMergeTest() {
-    this.gson =
-        new GsonBuilder()
-            .registerTypeAdapter(FieldDefinition.class, new TestFieldDefinitionDeserializer())
-            .registerTypeAdapter(MergeDefinition.class, new TestMergeDefinitionDeserializer())
-            .registerTypeAdapter(
-                ItemMergeDefinition.class, new TestItemMergeDefinitionDeserializer())
-            .create();
+    this.gson = new GsonBuilder()
+        .registerTypeAdapter(FieldDefinition.class, new TestFieldDefinitionDeserializer())
+        .registerTypeAdapter(MergeDefinition.class, new TestMergeDefinitionDeserializer())
+        .registerTypeAdapter(
+            ItemMergeDefinition.class, new TestItemMergeDefinitionDeserializer())
+        .create();
   }
 
   @Test
@@ -93,15 +92,18 @@ class ListMergeTest {
   @SuppressWarnings("unchecked")
   private Map<String, Object> loadJson(String path) throws IOException {
     try (InputStream is = getClass().getClassLoader().getResourceAsStream(path)) {
-      if (is == null) throw new IOException("Resource not found: " + path);
+      if (is == null)
+        throw new IOException("Resource not found: " + path);
       return gson.fromJson(
-          new InputStreamReader(is), new TypeToken<Map<String, Object>>() {}.getType());
+          new InputStreamReader(is), new TypeToken<Map<String, Object>>() {
+          }.getType());
     }
   }
 
   private MergeDefinition loadDefinition(String path) throws IOException {
     try (InputStream is = getClass().getClassLoader().getResourceAsStream(path)) {
-      if (is == null) throw new IOException("Resource not found: " + path);
+      if (is == null)
+        throw new IOException("Resource not found: " + path);
       return gson.fromJson(new InputStreamReader(is), MergeDefinition.class);
     }
   }
@@ -114,15 +116,14 @@ class ListMergeTest {
   }
 
   // Inner Deserializer class
-  public static class TestFieldDefinitionDeserializer implements JsonDeserializer<FieldDefinition> {
+  public static class TestFieldDefinitionDeserializer implements JsonDeserializer<FieldDefinition<?>> {
     @Override
-    public FieldDefinition deserialize(
+    public FieldDefinition<?> deserialize(
         JsonElement json, Type typeOfT, JsonDeserializationContext context)
         throws JsonParseException {
 
       JsonObject jsonObject = json.getAsJsonObject();
-      String strategyName =
-          jsonObject.has("strategy") ? jsonObject.get("strategy").getAsString() : "standard";
+      String strategyName = jsonObject.has("strategy") ? jsonObject.get("strategy").getAsString() : "standard";
 
       MergeStrategy<?, ?> strategy = StrategyRegistry.getInstance().getStrategy(strategyName);
       if (strategy == null) {
@@ -155,10 +156,10 @@ class ListMergeTest {
         throws JsonParseException {
 
       JsonObject jsonObject = json.getAsJsonObject();
-      Map<String, FieldDefinition> map = new HashMap<>();
+      Map<String, FieldDefinition<?>> map = new HashMap<>();
 
       for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-        FieldDefinition def = context.deserialize(entry.getValue(), FieldDefinition.class);
+        FieldDefinition<?> def = context.deserialize(entry.getValue(), FieldDefinition.class);
         map.put(entry.getKey(), def);
       }
 
@@ -175,7 +176,7 @@ class ListMergeTest {
         throws JsonParseException {
 
       JsonObject jsonObject = json.getAsJsonObject();
-      Map<String, FieldDefinition> map = new HashMap<>();
+      Map<String, FieldDefinition<?>> map = new HashMap<>();
       String targetClass = null;
 
       if (jsonObject.has("targetClass")) {
@@ -187,7 +188,7 @@ class ListMergeTest {
         if ("targetClass".equals(entry.getKey())) {
           continue; // Handled above
         }
-        FieldDefinition def = context.deserialize(entry.getValue(), FieldDefinition.class);
+        FieldDefinition<?> def = context.deserialize(entry.getValue(), FieldDefinition.class);
         map.put(entry.getKey(), def);
       }
 

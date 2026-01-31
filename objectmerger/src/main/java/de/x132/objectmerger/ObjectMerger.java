@@ -12,39 +12,47 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Utility class for merging objects based on a definition and strategies.
  *
- * <p>This class uses reflection to iterate over fields and apply specific merge strategies. It
- * supports different strategies for resolving conflicts or combining values from multiple sources.
+ * <p>
+ * This class uses reflection to iterate over fields and apply specific merge
+ * strategies. It
+ * supports different strategies for resolving conflicts or combining values
+ * from multiple sources.
  *
  * <h2>Strategy Loading</h2>
  *
- * Strategies are loaded via Java SPI (Service Provider Interface). The system looks for
+ * Strategies are loaded via Java SPI (Service Provider Interface). The system
+ * looks for
  * implementations of {@link MergeStrategy} registered in {@code
- * META-INF/services/de.x132.objectmerger.strategy.MergeStrategy}. If a strategy specified in the
- * {@link MergeDefinition} is not found, the "standard" strategy is used as a fallback.
+ * META-INF/services/de.x132.objectmerger.strategy.MergeStrategy}. If a strategy
+ * specified in the
+ * {@link MergeDefinition} is not found, the "standard" strategy is used as a
+ * fallback.
  */
 @Slf4j
 public class ObjectMerger {
 
   /**
-   * Merges multiple sources into a target object based on the provided definition.
+   * Merges multiple sources into a target object based on the provided
+   * definition.
    *
-   * @param targetClass The class of the result object.
+   * @param targetClass     The class of the result object.
    * @param mergeDefinition The definition of how fields should be merged.
-   * @param sources The sources to merge.
-   * @param <T> The type of the result object.
+   * @param sources         The sources to merge.
+   * @param <T>             The type of the result object.
    * @return A new instance of T with merged values.
-   * @throws RuntimeException If merging fails (e.g. instantiation or field access errors).
+   * @throws RuntimeException If merging fails (e.g. instantiation or field access
+   *                          errors).
    */
   @SafeVarargs
   public static <T> T merge(
       Class<T> targetClass, MergeDefinition mergeDefinition, LabeledSource<T>... sources) {
     try {
       T result = targetClass.getDeclaredConstructor().newInstance();
-      Map<String, FieldDefinition> definitions = mergeDefinition.getDefinitions();
+      Map<String, FieldDefinition<?>> definitions = mergeDefinition.getDefinitions();
       List<LabeledSource<T>> sourceList = Arrays.asList(sources);
       MergeContext<T> context = new MergeContext<>(targetClass, result, sourceList);
 
-      for (Map.Entry<String, FieldDefinition> entry : definitions.entrySet()) {
+      for (Map.Entry<String, FieldDefinition<?>> entry : definitions.entrySet()) {
         processField(context, entry.getKey(), entry.getValue());
       }
       return result;
@@ -58,19 +66,19 @@ public class ObjectMerger {
    * Merges multiple sources into a target map based on the provided definition.
    *
    * @param mergeDefinition The definition of how fields should be merged.
-   * @param sources The sources to merge (Maps).
+   * @param sources         The sources to merge (Maps).
    * @return A new Map with merged values.
    */
   @SafeVarargs
   public static Map<String, Object> merge(
       MergeDefinition mergeDefinition, LabeledSource<Map<String, Object>>... sources) {
     Map<String, Object> result = new java.util.HashMap<>();
-    Map<String, FieldDefinition> definitions = mergeDefinition.getDefinitions();
+    Map<String, FieldDefinition<?>> definitions = mergeDefinition.getDefinitions();
     List<LabeledSource<Map<String, Object>>> sourceList = Arrays.asList(sources);
 
-    for (Map.Entry<String, FieldDefinition> entry : definitions.entrySet()) {
+    for (Map.Entry<String, FieldDefinition<?>> entry : definitions.entrySet()) {
       String fieldName = entry.getKey();
-      FieldDefinition fieldDef = entry.getValue();
+      FieldDefinition<?> fieldDef = entry.getValue();
 
       MergeStrategy<?, ?> strategy = resolveStrategy(fieldDef);
       if (strategy != null) {
@@ -85,7 +93,7 @@ public class ObjectMerger {
   }
 
   private static <T> void processField(
-      MergeContext<T> context, String fieldName, FieldDefinition fieldDef) {
+      MergeContext<T> context, String fieldName, FieldDefinition<?> fieldDef) {
     try {
       Field field = context.targetClass().getDeclaredField(fieldName);
       field.setAccessible(true);
@@ -108,15 +116,15 @@ public class ObjectMerger {
     }
   }
 
-  private static MergeStrategy<?, ?> resolveStrategy(FieldDefinition fieldDef) {
+  private static MergeStrategy<?, ?> resolveStrategy(FieldDefinition<?> fieldDef) {
     String strategyName = fieldDef.getStrategy() != null ? fieldDef.getStrategy() : "standard";
     return StrategyRegistry.getInstance().getStrategy(strategyName);
   }
 
-  private static <T, C extends FieldDefinition> void applyStrategy(
+  private static <T, C extends FieldDefinition<T>> void applyStrategy(
       MergeStrategy<T, C> strategy,
       List<? extends LabeledSource<?>> sources,
-      FieldDefinition fieldDef,
+      FieldDefinition<?> fieldDef,
       String fieldName,
       Field field,
       Object result)
@@ -127,10 +135,10 @@ public class ObjectMerger {
   }
 
   @SuppressWarnings("unchecked")
-  private static <T, C extends FieldDefinition> T executeStrategy(
+  private static <T, C extends FieldDefinition<T>> T executeStrategy(
       MergeStrategy<T, C> strategy,
       List<? extends LabeledSource<?>> sources,
-      FieldDefinition fieldDef,
+      FieldDefinition<?> fieldDef,
       String fieldName) {
 
     if (!strategy.getConfigurationClass().isInstance(fieldDef)) {
@@ -148,7 +156,8 @@ public class ObjectMerger {
   }
 
   public static Object getFieldValue(Object obj, String fieldName) {
-    if (obj == null) return null;
+    if (obj == null)
+      return null;
     if (obj instanceof Map) {
       return ((Map<?, ?>) obj).get(fieldName);
     }

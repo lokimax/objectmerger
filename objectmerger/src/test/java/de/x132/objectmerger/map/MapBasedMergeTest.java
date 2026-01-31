@@ -18,7 +18,7 @@ class MapBasedMergeTest {
   void testMapMerge() {
     // 1. Define Strategy
     MergeDefinition definition = new MergeDefinition();
-    Map<String, FieldDefinition> fields = new HashMap<>();
+    Map<String, FieldDefinition<?>> fields = new HashMap<>();
 
     // "name" uses Priority (source1 > source2)
     PriorityFieldDefinition nameDef = new PriorityFieldDefinition();

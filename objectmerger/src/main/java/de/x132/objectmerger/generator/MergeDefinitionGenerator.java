@@ -19,7 +19,7 @@ import java.util.Map;
 public class MergeDefinitionGenerator {
 
   public static MergeDefinition generate(Class<?> clazz) {
-    Map<String, FieldDefinition> definitions = new HashMap<>();
+    Map<String, FieldDefinition<?>> definitions = new HashMap<>();
 
     for (Field field : clazz.getDeclaredFields()) {
       if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
@@ -32,7 +32,7 @@ public class MergeDefinitionGenerator {
   }
 
   public static MergeDefinition generate(Map<String, Object> data) {
-    Map<String, FieldDefinition> definitions = new HashMap<>();
+    Map<String, FieldDefinition<?>> definitions = new HashMap<>();
 
     for (Map.Entry<String, Object> entry : data.entrySet()) {
       definitions.put(entry.getKey(), generateFieldDefinition(entry.getValue()));
@@ -41,11 +41,11 @@ public class MergeDefinitionGenerator {
     return new MergeDefinition(definitions);
   }
 
-  private static FieldDefinition generateFieldDefinition(Object value) {
+  private static FieldDefinition<?> generateFieldDefinition(Object value) {
     if (value instanceof List) {
       List<?> list = (List<?>) value;
       String identifyBy = null;
-      de.x132.objectmerger.ItemMergeDefinition itemDef = null;
+      ItemMergeDefinition itemDef = null;
 
       if (!list.isEmpty()) {
         Object firstObj = list.get(0);
@@ -92,7 +92,7 @@ public class MergeDefinitionGenerator {
     }
   }
 
-  private static FieldDefinition createDefaultPriorityDefinition() {
+  private static FieldDefinition<?> createDefaultPriorityDefinition() {
     PriorityFieldDefinition def = new PriorityFieldDefinition();
     def.setStrategy(PriorityMergeStrategy.NAME);
     def.setPriority(Map.of("source_1", 1, "source_2", 2));

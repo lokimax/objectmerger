@@ -3,6 +3,7 @@ package de.x132.objectmerger.map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import de.x132.objectmerger.ItemMergeDefinition;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.MergeDefinition;
 import de.x132.objectmerger.ObjectMerger;
@@ -24,7 +25,7 @@ class MapCompatibilityTest {
   void testSalesMerge() {
     // Definition
     MergeDefinition def = new MergeDefinition();
-    Map<String, FieldDefinition> fields = new HashMap<>();
+    Map<String, FieldDefinition<?>> fields = new HashMap<>();
 
     StandardFieldDefinition sumDef = new StandardFieldDefinition();
     sumDef.setStrategy("sum");
@@ -39,13 +40,12 @@ class MapCompatibilityTest {
     Map<String, Object> woocommerce = Map.of("totalSales", 1200);
 
     // Merge
-    Map<String, Object> result =
-        ObjectMerger.merge(
-            def,
-            new LabeledSource<>("amazon", amazon),
-            new LabeledSource<>("shopify", shopify),
-            new LabeledSource<>("ebay", ebay),
-            new LabeledSource<>("woocommerce", woocommerce));
+    Map<String, Object> result = ObjectMerger.merge(
+        def,
+        new LabeledSource<>("amazon", amazon),
+        new LabeledSource<>("shopify", shopify),
+        new LabeledSource<>("ebay", ebay),
+        new LabeledSource<>("woocommerce", woocommerce));
 
     // Verify (Expected: 5800)
     assertEquals(5800, ((Number) result.get("totalSales")).intValue());
@@ -56,7 +56,7 @@ class MapCompatibilityTest {
   void testPersonMerge() {
     // Definition
     MergeDefinition def = new MergeDefinition();
-    Map<String, FieldDefinition> fields = new HashMap<>();
+    Map<String, FieldDefinition<?>> fields = new HashMap<>();
 
     PriorityFieldDefinition nameDef = new PriorityFieldDefinition();
     nameDef.setPriority(Map.of("db", 1, "crm", 2)); // db wins
@@ -78,8 +78,8 @@ class MapCompatibilityTest {
     crm.put("age", 40);
 
     // Merge
-    Map<String, Object> result =
-        ObjectMerger.merge(def, new LabeledSource<>("db", db), new LabeledSource<>("crm", crm));
+    Map<String, Object> result = ObjectMerger.merge(def, new LabeledSource<>("db", db),
+        new LabeledSource<>("crm", crm));
 
     // Verify
     assertEquals("Max DB", result.get("name"));
@@ -92,17 +92,18 @@ class MapCompatibilityTest {
   void testFamilyMerge() {
     // Definition
     MergeDefinition def = new MergeDefinition();
-    Map<String, FieldDefinition> fields = new HashMap<>();
+    Map<String, FieldDefinition<?>> fields = new HashMap<>();
 
     // "members" is a List of objects, merged by "name"
     ListFieldDefinition membersDef = new ListFieldDefinition();
     membersDef.setStrategy("mergeList");
     membersDef.setIdentifyBy("name");
 
+    // ...
+
     // Define how to merge list items (Map based)
-    de.x132.objectmerger.ItemMergeDefinition itemDef =
-        new de.x132.objectmerger.ItemMergeDefinition();
-    Map<String, FieldDefinition> childFields = new HashMap<>();
+    ItemMergeDefinition itemDef = new ItemMergeDefinition();
+    Map<String, FieldDefinition<?>> childFields = new HashMap<>();
 
     // Child name
     PriorityFieldDefinition childNameDef = new PriorityFieldDefinition();
@@ -133,9 +134,8 @@ class MapCompatibilityTest {
     source2.put("members", Arrays.asList(member1Update));
 
     // Merge
-    Map<String, Object> result =
-        ObjectMerger.merge(
-            def, new LabeledSource<>("s1", source1), new LabeledSource<>("s2", source2));
+    Map<String, Object> result = ObjectMerger.merge(
+        def, new LabeledSource<>("s1", source1), new LabeledSource<>("s2", source2));
 
     // Verify
     List<Object> mergedMembers = (List<Object>) result.get("members");
