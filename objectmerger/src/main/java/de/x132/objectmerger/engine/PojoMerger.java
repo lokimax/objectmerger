@@ -4,7 +4,10 @@ import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.MergeContext;
 import de.x132.objectmerger.MergeDefinition;
 import de.x132.objectmerger.exception.ConfigurationException;
+import de.x132.objectmerger.exception.InvalidSourceException;
 import de.x132.objectmerger.exception.MergeExecutionException;
+import de.x132.objectmerger.exception.ObjectMergerException;
+import de.x132.objectmerger.generator.MergeDefinitionGenerator;
 import de.x132.objectmerger.helper.ReflectionHelper;
 import de.x132.objectmerger.registry.StrategyRegistry;
 import de.x132.objectmerger.strategy.FieldDefinition;
@@ -40,8 +43,8 @@ public class PojoMerger {
       return result;
     } catch (Exception e) {
       log.error("Failed to merge objects of type {}", targetClass.getName(), e);
-      if (e instanceof de.x132.objectmerger.exception.ObjectMergerException) {
-        throw (de.x132.objectmerger.exception.ObjectMergerException) e;
+      if (e instanceof ObjectMergerException) {
+        throw (ObjectMergerException) e;
       }
       throw new MergeExecutionException(
           "Failed to merge objects of type " + targetClass.getName(), e);
@@ -121,14 +124,13 @@ public class PojoMerger {
         findTemplateSource(mergeDefinition.getTemplateSourceLabel(), sources);
 
     if (templateSource == null) {
-      throw new de.x132.objectmerger.exception.InvalidSourceException(
+      throw new InvalidSourceException(
           "Template source '"
               + mergeDefinition.getTemplateSourceLabel()
               + "' not found among provided sources.");
     }
 
-    MergeDefinition generatedDef =
-        de.x132.objectmerger.generator.MergeDefinitionGenerator.generate(targetClass);
+    MergeDefinition generatedDef = MergeDefinitionGenerator.generate(targetClass);
     Map<String, FieldDefinition<?>> definitions = generatedDef.getDefinitions();
 
     if (mergeDefinition.getDefinitions() != null) {

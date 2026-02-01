@@ -1,5 +1,7 @@
 package de.x132.objectmerger;
 
+import de.x132.objectmerger.exception.InvalidSourceException;
+import de.x132.objectmerger.strategy.FieldDefinition;
 import de.x132.objectmerger.strategy.standard.StandardFieldDefinition;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,7 +46,7 @@ public class TemplateModeTest {
   void testTemplateModeWithOverride() {
     MergeDefinition def = new MergeDefinition();
     def.setTemplateSourceLabel("source1");
-    Map<String, de.x132.objectmerger.strategy.FieldDefinition<?>> explicit = new HashMap<>();
+    Map<String, FieldDefinition<?>> explicit = new HashMap<>();
 
     StandardFieldDefinition<String> roleDef = new StandardFieldDefinition<>();
     roleDef.setDefaultValue("SUPERUSER");
@@ -74,7 +76,7 @@ public class TemplateModeTest {
     User u1 = new User("Alice", 30, "Admin");
 
     Assertions.assertThrows(
-        de.x132.objectmerger.exception.InvalidSourceException.class,
+        InvalidSourceException.class,
         () -> {
           ObjectMerger.merge(User.class, def, new LabeledSource<>("source1", u1));
         });
