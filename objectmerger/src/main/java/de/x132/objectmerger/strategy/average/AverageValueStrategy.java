@@ -2,6 +2,7 @@ package de.x132.objectmerger.strategy.average;
 
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.ObjectMerger;
+import de.x132.objectmerger.exception.InvalidSourceException;
 import de.x132.objectmerger.strategy.FieldDefinition;
 import de.x132.objectmerger.strategy.MergeStrategy;
 import java.util.List;
@@ -34,7 +35,7 @@ public class AverageValueStrategy implements MergeStrategy<Number, FieldDefiniti
                   if (value instanceof Number) {
                     return ((Number) value).doubleValue();
                   }
-                  throw new IllegalArgumentException(
+                  throw new InvalidSourceException(
                       "Field " + fieldName + " must be a number for average strategy");
                 })
             .sum();

@@ -3,6 +3,8 @@ package de.x132.objectmerger.strategy.list;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.MergeDefinition;
 import de.x132.objectmerger.ObjectMerger;
+import de.x132.objectmerger.exception.ConfigurationException;
+import de.x132.objectmerger.exception.MergeExecutionException;
 import de.x132.objectmerger.strategy.MergeStrategy;
 import de.x132.objectmerger.strategy.config.ListConfig;
 import java.util.Collection;
@@ -91,11 +93,11 @@ public class ListMergeStrategy
                 } else if (items.stream().allMatch(i -> i.getSource() instanceof Map)) {
                   return doMapMerge(fieldDef, items);
                 } else {
-                  throw new IllegalArgumentException(
+                  throw new ConfigurationException(
                       "Cannot merge list items: missing target class in definition and items are not Maps.");
                 }
               } catch (ClassNotFoundException e) {
-                throw new RuntimeException("Failed to merge list items", e);
+                throw new MergeExecutionException("Failed to merge list items", e);
               }
             })
         .collect(Collectors.toList());

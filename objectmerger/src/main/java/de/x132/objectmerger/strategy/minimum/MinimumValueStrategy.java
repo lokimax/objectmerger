@@ -2,6 +2,7 @@ package de.x132.objectmerger.strategy.minimum;
 
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.ObjectMerger;
+import de.x132.objectmerger.exception.InvalidSourceException;
 import de.x132.objectmerger.strategy.FieldDefinition;
 import de.x132.objectmerger.strategy.MergeStrategy;
 import java.util.List;
@@ -37,7 +38,7 @@ public class MinimumValueStrategy<T> implements MergeStrategy<T, FieldDefinition
                   if (o1 instanceof Comparable && o2 instanceof Comparable) {
                     return ((Comparable) o1).compareTo(o2);
                   }
-                  throw new IllegalArgumentException(
+                  throw new InvalidSourceException(
                       "Field "
                           + fieldName
                           + " values must be Numbers or Comparable for minimum strategy, but found: "

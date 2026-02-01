@@ -2,6 +2,7 @@ package de.x132.objectmerger.strategy.concatenate;
 
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.ObjectMerger;
+import de.x132.objectmerger.exception.InvalidSourceException;
 import de.x132.objectmerger.strategy.FieldDefinition;
 import de.x132.objectmerger.strategy.MergeStrategy;
 import de.x132.objectmerger.strategy.priority.PriorityFieldDefinition;
@@ -70,7 +71,7 @@ public class ConcatenateStrategy implements MergeStrategy<String, FieldDefinitio
     if (value instanceof String) {
       return (String) value;
     }
-    throw new IllegalArgumentException(
+    throw new InvalidSourceException(
         "Field must be a String for concatenate strategy, but was: "
             + value.getClass().getSimpleName());
   }

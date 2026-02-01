@@ -17,6 +17,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("rawtypes")
 class ComparableMergeStrategyTest {
 
   private final MaximumValueStrategy maxStrategy = new MaximumValueStrategy();

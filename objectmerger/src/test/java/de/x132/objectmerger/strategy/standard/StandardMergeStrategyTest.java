@@ -15,6 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
+@SuppressWarnings("rawtypes")
 @DisplayName("StandardMergeStrategy Tests")
 class StandardMergeStrategyTest {
 

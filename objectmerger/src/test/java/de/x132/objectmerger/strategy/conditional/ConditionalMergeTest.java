@@ -15,11 +15,11 @@ import org.junit.jupiter.api.Test;
 @DisplayName("Conditional Merge Strategy Tests")
 class ConditionalMergeTest {
 
-  private ConditionalMergeStrategy strategy;
+  private ConditionalMergeStrategy<Object> strategy;
 
   @BeforeEach
   void setUp() {
-    strategy = new ConditionalMergeStrategy();
+    strategy = new ConditionalMergeStrategy<>();
   }
 
   @Test
