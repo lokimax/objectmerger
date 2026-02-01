@@ -49,7 +49,9 @@ class MapMergeStrategyTest {
 
     @SuppressWarnings("unchecked")
     Map<Object, Object> result =
-        (Map<Object, Object>) strategy.merge(sources, new MapFieldDefinition(), "mapField");
+        (Map<Object, Object>)
+            strategy.merge(
+                sources, MapFieldDefinition.<Map<Object, Object>>builder().build(), "mapField");
     assertNotNull(result);
     assertTrue(result.containsKey("key1"));
   }
@@ -73,7 +75,9 @@ class MapMergeStrategyTest {
 
     @SuppressWarnings("unchecked")
     Map<Object, Object> result =
-        (Map<Object, Object>) strategy.merge(sources, new MapFieldDefinition(), "mapField");
+        (Map<Object, Object>)
+            strategy.merge(
+                sources, MapFieldDefinition.<Map<Object, Object>>builder().build(), "mapField");
     assertNotNull(result);
   }
 
@@ -84,7 +88,9 @@ class MapMergeStrategyTest {
 
     List<LabeledSource<?>> sources = List.of(new LabeledSource<>("db", obj));
 
-    Object result = strategy.merge(sources, new MapFieldDefinition(), "mapField");
+    Object result =
+        strategy.merge(
+            sources, MapFieldDefinition.<Map<Object, Object>>builder().build(), "mapField");
     assertNotNull(result);
   }
 
@@ -105,7 +111,9 @@ class MapMergeStrategyTest {
 
     @SuppressWarnings("unchecked")
     Map<Object, Object> result =
-        (Map<Object, Object>) strategy.merge(sources, new MapFieldDefinition(), "mapField");
+        (Map<Object, Object>)
+            strategy.merge(
+                sources, MapFieldDefinition.<Map<Object, Object>>builder().build(), "mapField");
     assertNotNull(result);
     // Union behavior: Both keys should be present
     assertTrue(result.containsKey("key1"));
@@ -130,8 +138,10 @@ class MapMergeStrategyTest {
         List.of(new LabeledSource<>("leader", obj1), new LabeledSource<>("follower", obj2));
 
     // Configure strictly using "leader" as template
-    MapFieldDefinition def = new MapFieldDefinition();
-    def.setKeyTemplateSources(List.of("leader"));
+    MapFieldDefinition<Map<Object, Object>> def =
+        MapFieldDefinition.<Map<Object, Object>>builder()
+            .keyTemplateSources(List.of("leader"))
+            .build();
 
     @SuppressWarnings("unchecked")
     Map<Object, Object> result = (Map<Object, Object>) strategy.merge(sources, def, "mapField");
@@ -163,7 +173,9 @@ class MapMergeStrategyTest {
 
     @SuppressWarnings("unchecked")
     Map<Object, Object> result =
-        (Map<Object, Object>) strategy.merge(sources, new MapFieldDefinition(), "mapField");
+        (Map<Object, Object>)
+            strategy.merge(
+                sources, MapFieldDefinition.<Map<Object, Object>>builder().build(), "mapField");
     assertNotNull(result);
     assertTrue(result.containsKey("key1"));
   }
@@ -195,20 +207,22 @@ class MapMergeStrategyTest {
     List<LabeledSource<?>> mergeSources =
         List.of(new LabeledSource<>("s1", wrapper1), new LabeledSource<>("s2", wrapper2));
 
-    MapFieldDefinition def = new MapFieldDefinition();
+    MapFieldDefinition<Map<Object, Object>> def =
+        MapFieldDefinition.<Map<Object, Object>>builder().build();
 
     // Define how to merge the VALUES of the outer map (which are inner maps)
     ItemMergeDefinition itemDef = new ItemMergeDefinition();
     itemDef.setTargetClass(HashMap.class.getName());
 
     // We must define the keys of the inner map we want to merge
-    StandardFieldDefinition stdDef = new StandardFieldDefinition();
+    StandardFieldDefinition<Object> stdDef = StandardFieldDefinition.builder().build();
     itemDef.setDefinitions(Map.of("v1", stdDef, "v2", stdDef));
 
-    def.setItemMergeDefinition(itemDef);
+    def = MapFieldDefinition.<Map<Object, Object>>builder().itemMergeDefinition(itemDef).build();
 
     @SuppressWarnings("unchecked")
-    Map<String, Object> result = (Map<String, Object>) strategy.merge(mergeSources, def, "root");
+    Map<String, Object> result =
+        (Map<String, Object>) (Map) strategy.merge(mergeSources, def, "root");
     // Result should be the merged outer map
     assertNotNull(result);
     assertTrue(result.containsKey("key1"), "Result should have key1");

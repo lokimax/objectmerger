@@ -27,8 +27,8 @@ class MapCompatibilityTest {
     MergeDefinition def = new MergeDefinition();
     Map<String, FieldDefinition<?>> fields = new HashMap<>();
 
-    StandardFieldDefinition sumDef = new StandardFieldDefinition();
-    sumDef.setStrategy("sum");
+    StandardFieldDefinition<Object> sumDef =
+        StandardFieldDefinition.builder().strategy("sum").build();
     fields.put("totalSales", sumDef);
 
     def.setDefinitions(fields);
@@ -59,12 +59,14 @@ class MapCompatibilityTest {
     MergeDefinition def = new MergeDefinition();
     Map<String, FieldDefinition<?>> fields = new HashMap<>();
 
-    PriorityFieldDefinition nameDef = new PriorityFieldDefinition();
-    nameDef.setPriority(Map.of("db", 1, "crm", 2)); // db wins
+    PriorityFieldDefinition<Object> nameDef =
+        PriorityFieldDefinition.builder()
+            .priority(Map.of("db", 1, "crm", 2)) // db wins
+            .build();
     fields.put("name", nameDef);
 
-    StandardFieldDefinition ageDef = new StandardFieldDefinition();
-    ageDef.setStrategy("maximum");
+    StandardFieldDefinition<Object> ageDef =
+        StandardFieldDefinition.builder().strategy("maximum").build();
     fields.put("age", ageDef);
 
     def.setDefinitions(fields);
@@ -96,9 +98,8 @@ class MapCompatibilityTest {
     Map<String, FieldDefinition<?>> fields = new HashMap<>();
 
     // "members" is a List of objects, merged by "name"
-    ListFieldDefinition membersDef = new ListFieldDefinition();
-    membersDef.setStrategy("mergeList");
-    membersDef.setIdentifyBy("name");
+    ListFieldDefinition<Object> membersDef =
+        ListFieldDefinition.builder().strategy("mergeList").identifyBy("name").build();
 
     // ...
 
@@ -107,13 +108,13 @@ class MapCompatibilityTest {
     Map<String, FieldDefinition<?>> childFields = new HashMap<>();
 
     // Child name
-    PriorityFieldDefinition childNameDef = new PriorityFieldDefinition();
-    childNameDef.setPriority(Map.of("s1", 1, "s2", 2));
+    PriorityFieldDefinition<Object> childNameDef =
+        PriorityFieldDefinition.builder().priority(Map.of("s1", 1, "s2", 2)).build();
     childFields.put("name", childNameDef);
 
     // Child age
-    StandardFieldDefinition childAgeDef = new StandardFieldDefinition();
-    childAgeDef.setStrategy("maximum");
+    StandardFieldDefinition<Object> childAgeDef =
+        StandardFieldDefinition.builder().strategy("maximum").build();
     childFields.put("age", childAgeDef);
 
     itemDef.setDefinitions(childFields);

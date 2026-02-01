@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 class ListMergeStrategyTest {
 
   private ListMergeStrategy strategy;
-  private ListFieldDefinition fieldDef;
+  private ListFieldDefinition<List<Object>> fieldDef;
   private ItemMergeDefinition itemMergeDefinition;
 
   @BeforeEach
@@ -106,22 +106,21 @@ class ListMergeStrategyTest {
   @DisplayName("Should merge lists by ID")
   void testMergeListsById() {
     // Arrange
-    ListFieldDefinition fieldDef = new ListFieldDefinition();
-    fieldDef.setIdentifyBy("id");
-
     // We need an ItemMergeDefinition to tell how to merge the items
     ItemMergeDefinition itemDef = new ItemMergeDefinition();
-    // For TestItem, we can use Standard strategy implicitly or define it.
-    // But TestItem is a POJO. The strategy uses ObjectMerger.merge(itemClass...).
-    // So we need to set the target class name.
     itemDef.setTargetClass(TestItem.class.getName());
+
     // Let's add a definition for 'name' to use priority
-    PriorityFieldDefinition nameDef = new PriorityFieldDefinition();
-    nameDef.setStrategy("priority");
-    StandardFieldDefinition idDef = new StandardFieldDefinition();
+    PriorityFieldDefinition<Object> nameDef =
+        PriorityFieldDefinition.builder().strategy("priority").build();
+    StandardFieldDefinition<Object> idDef = StandardFieldDefinition.builder().build();
     itemDef.setDefinitions(Map.of("name", nameDef, "id", idDef));
 
-    fieldDef.setItemMergeDefinition(itemDef);
+    ListFieldDefinition<List<Object>> fieldDef =
+        ListFieldDefinition.<List<Object>>builder()
+            .identifyBy("id")
+            .itemMergeDefinition(itemDef)
+            .build();
 
     TestItem item1a = new TestItem("1", "A");
     TestItem item2a = new TestItem("2", "B"); // Will be merged
@@ -151,7 +150,7 @@ class ListMergeStrategyTest {
 
     // Act
     @SuppressWarnings("unchecked")
-    List<TestItem> result = (List<TestItem>) strategy.merge(sources, fieldDef, "members");
+    List<TestItem> result = (List<TestItem>) (List) strategy.merge(sources, fieldDef, "members");
 
     // Assert
     assertNotNull(result);

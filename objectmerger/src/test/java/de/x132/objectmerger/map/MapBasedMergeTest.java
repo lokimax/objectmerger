@@ -21,13 +21,14 @@ class MapBasedMergeTest {
     Map<String, FieldDefinition<?>> fields = new HashMap<>();
 
     // "name" uses Priority (source1 > source2)
-    PriorityFieldDefinition nameDef = new PriorityFieldDefinition();
-    nameDef.setPriority(Map.of("source1", 1, "source2", 2));
+    // "name" uses Priority (source1 > source2)
+    PriorityFieldDefinition<Object> nameDef =
+        PriorityFieldDefinition.builder().priority(Map.of("source1", 1, "source2", 2)).build();
     fields.put("name", nameDef);
 
     // "age" uses Maximum
-    StandardFieldDefinition ageDef = new StandardFieldDefinition();
-    ageDef.setStrategy("maximum");
+    StandardFieldDefinition<Object> ageDef =
+        StandardFieldDefinition.builder().strategy("maximum").build();
     fields.put("age", ageDef);
 
     definition.setDefinitions(fields);

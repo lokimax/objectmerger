@@ -20,7 +20,7 @@ public class MergeDefinitionConverter {
     GsonBuilder builder = new GsonBuilder();
     builder.registerTypeAdapter(
         de.x132.objectmerger.strategy.FieldDefinition.class,
-        (com.google.gson.JsonDeserializer<de.x132.objectmerger.strategy.FieldDefinition>)
+        (com.google.gson.JsonDeserializer<de.x132.objectmerger.strategy.FieldDefinition<?>>)
             (json, typeOfT, context) -> {
               com.google.gson.JsonObject jsonObject = json.getAsJsonObject();
               String strategy =

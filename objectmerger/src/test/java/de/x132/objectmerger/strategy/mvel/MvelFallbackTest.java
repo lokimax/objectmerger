@@ -14,8 +14,7 @@ class MvelFallbackTest {
   @Test
   @DisplayName("Should return default value when expression is empty")
   void emptyExpressionReturnsDefault() {
-    MvelFieldDefinition fieldDef = new MvelFieldDefinition();
-    fieldDef.setDefaultValue("fallback");
+    MvelFieldDefinition fieldDef = MvelFieldDefinition.builder().defaultValue("fallback").build();
 
     // Test null expression (default)
     assertEquals("fallback", strategy.merge(List.of(), fieldDef, "test"));
@@ -28,10 +27,12 @@ class MvelFallbackTest {
   @Test
   @DisplayName("Should return deafult value when expression fails")
   void exceptionReturnsDefault() {
-    MvelFieldDefinition fieldDef = new MvelFieldDefinition();
-    fieldDef.setExpression(
-        "undefinedVar.callMethod()"); // This will throw PropertyAccessException or similar
-    fieldDef.setDefaultValue("fallback_on_error");
+    MvelFieldDefinition fieldDef =
+        MvelFieldDefinition.builder()
+            .expression(
+                "undefinedVar.callMethod()") // This will throw PropertyAccessException or similar
+            .defaultValue("fallback_on_error")
+            .build();
 
     assertEquals("fallback_on_error", strategy.merge(List.of(), fieldDef, "test"));
   }
@@ -39,8 +40,8 @@ class MvelFallbackTest {
   @Test
   @DisplayName("Should return null if no default value is set and error occurs")
   void noDefaultValueReturnsNullOnError() {
-    MvelFieldDefinition fieldDef = new MvelFieldDefinition();
-    fieldDef.setExpression("some_undefined_variable");
+    MvelFieldDefinition fieldDef =
+        MvelFieldDefinition.builder().expression("some_undefined_variable").build();
     // No defaultValue set (null by default)
 
     assertNull(strategy.merge(List.of(), fieldDef, "test"));

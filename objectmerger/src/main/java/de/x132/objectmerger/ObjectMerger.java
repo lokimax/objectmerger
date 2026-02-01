@@ -132,7 +132,6 @@ public class ObjectMerger {
       List<? extends LabeledSource<?>> sources,
       FieldDefinition<?> fieldDef,
       String fieldName) {
-
     if (!strategy.getConfigurationClass().isInstance(fieldDef)) {
       throw new IllegalArgumentException(
           String.format(
@@ -152,7 +151,6 @@ public class ObjectMerger {
     if (obj instanceof Map) {
       return ((Map<?, ?>) obj).get(fieldName);
     }
-
     try {
       Field field = obj.getClass().getDeclaredField(fieldName);
       field.setAccessible(true);

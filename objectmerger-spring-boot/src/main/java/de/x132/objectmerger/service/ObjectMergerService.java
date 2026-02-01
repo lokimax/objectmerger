@@ -37,7 +37,6 @@ public class ObjectMergerService {
       }
 
       // Handle Map target class using the Map-specific merge method
-      @SuppressWarnings("unchecked")
       List<LabeledSource<java.util.Map<String, Object>>> mapSources = new ArrayList<>();
       for (LabeledSource<?> source : sources) {
         Object sourceData = source.getSource();
@@ -52,7 +51,9 @@ public class ObjectMergerService {
           mapSources.add(new LabeledSource<>(source.getLabel(), map));
         }
       }
-      return ObjectMerger.merge(definition, mapSources.toArray(new LabeledSource[0]));
+      @SuppressWarnings("unchecked")
+      Object mergedMap = ObjectMerger.merge(definition, mapSources.toArray(new LabeledSource[0]));
+      return mergedMap;
     }
 
     // Convert sources from Maps to POJOs if necessary
@@ -70,6 +71,9 @@ public class ObjectMergerService {
       }
     }
 
-    return ObjectMerger.merge(clazz, definition, convertedSources.toArray(new LabeledSource[0]));
+    @SuppressWarnings("unchecked")
+    Object merged =
+        ObjectMerger.merge(clazz, definition, convertedSources.toArray(new LabeledSource[0]));
+    return merged;
   }
 }

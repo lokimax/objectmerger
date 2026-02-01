@@ -11,10 +11,10 @@ import de.x132.objectmerger.strategy.MergeStrategy;
 import de.x132.objectmerger.strategy.standard.StandardFieldDefinition;
 import java.lang.reflect.Type;
 
-public class FieldDefinitionDeserializer implements JsonDeserializer<FieldDefinition> {
+public class FieldDefinitionDeserializer implements JsonDeserializer<FieldDefinition<?>> {
 
   @Override
-  public FieldDefinition deserialize(
+  public FieldDefinition<?> deserialize(
       JsonElement json, Type typeOfT, JsonDeserializationContext context)
       throws JsonParseException {
 
