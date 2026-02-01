@@ -2,6 +2,7 @@ package de.x132.objectmerger.engine;
 
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.MergeDefinition;
+import de.x132.objectmerger.exception.ConfigurationException;
 import de.x132.objectmerger.registry.StrategyRegistry;
 import de.x132.objectmerger.strategy.FieldDefinition;
 import de.x132.objectmerger.strategy.MergeStrategy;
@@ -53,7 +54,7 @@ public class MapMerger {
       FieldDefinition<?> fieldDef,
       String fieldName) {
     if (!strategy.getConfigurationClass().isInstance(fieldDef)) {
-      throw new IllegalArgumentException(
+      throw new ConfigurationException(
           String.format(
               "Field '%s' requires configuration of type '%s' but got '%s' for strategy '%s'",
               fieldName,

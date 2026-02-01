@@ -2,6 +2,7 @@ package de.x132.objectmerger.helper;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.x132.objectmerger.exception.MergeExecutionException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +33,9 @@ class ReflectionHelperTest {
   @Test
   void testGetFieldValue_MissingField() {
     TestObject obj = new TestObject("testValue");
-    assertThrows(RuntimeException.class, () -> ReflectionHelper.getFieldValue(obj, "missingField"));
+
+    assertThrows(
+        MergeExecutionException.class, () -> ReflectionHelper.getFieldValue(obj, "missingField"));
   }
 
   @Test

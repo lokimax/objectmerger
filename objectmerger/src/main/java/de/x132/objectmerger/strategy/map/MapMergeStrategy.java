@@ -2,6 +2,7 @@ package de.x132.objectmerger.strategy.map;
 
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.ObjectMerger;
+import de.x132.objectmerger.exception.MergeExecutionException;
 import de.x132.objectmerger.strategy.MergeStrategy;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,7 +95,7 @@ public class MapMergeStrategy
           Object mergedValue = doMerge(valueClass, fieldDef, valuesForKey);
           mergedMap.put(key, mergedValue);
         } catch (ClassNotFoundException e) {
-          throw new RuntimeException("Failed to merge map values", e);
+          throw new MergeExecutionException("Failed to merge map values", e);
         }
       } else {
         // If no itemMergeDefinition, just use the first value (priority)
@@ -109,7 +110,7 @@ public class MapMergeStrategy
 
   @SuppressWarnings("unchecked")
   private <T> T doMerge(
-      Class<T> valueClass, MapFieldDefinition fieldDef, List<LabeledSource<?>> values) {
+      Class<T> valueClass, MapFieldDefinition<?> fieldDef, List<LabeledSource<?>> values) {
     if (Map.class.isAssignableFrom(valueClass)) {
       LabeledSource<Map<String, Object>>[] sources =
           values.stream()
