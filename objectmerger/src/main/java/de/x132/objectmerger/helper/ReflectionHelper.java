@@ -15,7 +15,7 @@ public class ReflectionHelper {
 
   private static final ConcurrentHashMap<String, Field> fieldCache = new ConcurrentHashMap<>();
 
-  /** sets a field value safely. */
+  /** Sets a field value safely. */
   public static void setFieldValue(Field field, Object target, Object value) {
     try {
       field.setAccessible(true);
@@ -26,9 +26,11 @@ public class ReflectionHelper {
     }
   }
 
-  /** gets a field value safely from an object or Map. */
+  /** Gets a field value safely from an object or Map. */
   public static Object getFieldValue(Object obj, String fieldName) {
-    if (obj == null) return null;
+    if (obj == null) {
+      return null;
+    }
     if (obj instanceof Map) {
       return ((Map<?, ?>) obj).get(fieldName);
     }

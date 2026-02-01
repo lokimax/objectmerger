@@ -21,6 +21,7 @@ This library is particularly useful in environments where data is distributed ac
 *   **String Manipulation**: Concatenation of values.
 *   **Complex Types**: Deep merging of Lists and Maps.
 *   **Map Template Logic**: Leading map determines keys (controlled merges).
+*   **High Performance**: Uses caching for Reflection operations to minimize overhead.
 
 ## 2. Constraints
 
