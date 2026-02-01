@@ -28,50 +28,8 @@ public class PojoMerger {
     try {
       T result = targetClass.getDeclaredConstructor().newInstance();
 
-      // Template Mode Logic
-      Map<String, FieldDefinition<?>> definitions;
-
-      if (mergeDefinition.getTemplateSourceLabel() != null) {
-        // 1. Find template source
-        LabeledSource<T> templateSource =
-            findTemplateSource(mergeDefinition.getTemplateSourceLabel(), sources);
-        if (templateSource == null) {
-          throw new de.x132.objectmerger.exception.InvalidSourceException(
-              "Template source '"
-                  + mergeDefinition.getTemplateSourceLabel()
-                  + "' not found among provided sources.");
-        }
-
-        // 2. Generate base definition
-        // We need to support Pojo generation in Generator first, assuming it exists or
-        // needs update
-        MergeDefinition generatedDef =
-            de.x132.objectmerger.generator.MergeDefinitionGenerator.generate(targetClass);
-        // Note: Generator uses Class for POJOs currently.
-        // If we want dynamic instance-based generation for POJOs, we might need to
-        // enhance Generator.
-        // For now, let's use the class-based generator which matches what we have.
-        // Wait, the requirement was "dynamic schema from source".
-        // If it's a POJO, the schema IS the class. If it's a Map, the schema IS the
-        // keys.
-
-        // Let's assume for POJO merging, we simply want to ensure we have definitions
-        // for all fields
-        // derived from the class (Standard behavior), but overlay with specific config.
-        // Actually, PojoMerger already iterates over 'definitions.entrySet()'.
-        // If 'definitions' is empty/partial, only those fields are merged.
-        // Template Mode for POJO means: "Fill definitions with all fields from class"
-
-        definitions = generatedDef.getDefinitions();
-
-        // 3. Overlay explicit configuration
-        if (mergeDefinition.getDefinitions() != null) {
-          definitions.putAll(mergeDefinition.getDefinitions());
-        }
-
-      } else {
-        definitions = mergeDefinition.getDefinitions();
-      }
+      Map<String, FieldDefinition<?>> definitions =
+          resolveDefinitions(targetClass, mergeDefinition, sources);
 
       List<LabeledSource<T>> sourceList = Arrays.asList(sources);
       MergeContext<T> context = new MergeContext<>(targetClass, result, sourceList);
@@ -104,7 +62,6 @@ public class PojoMerger {
 
     Field field = ReflectionHelper.getField(context.targetClass(), fieldName);
     if (field == null) {
-      // Field missing in class, already logged by helper
       return;
     }
 
@@ -152,5 +109,31 @@ public class PojoMerger {
 
     C config = (C) fieldDef;
     return strategy.merge(new java.util.ArrayList<>(sources), config, fieldName);
+  }
+
+  private static <T> Map<String, FieldDefinition<?>> resolveDefinitions(
+      Class<T> targetClass, MergeDefinition mergeDefinition, LabeledSource<T>[] sources) {
+    if (mergeDefinition.getTemplateSourceLabel() == null) {
+      return mergeDefinition.getDefinitions();
+    }
+
+    LabeledSource<T> templateSource =
+        findTemplateSource(mergeDefinition.getTemplateSourceLabel(), sources);
+
+    if (templateSource == null) {
+      throw new de.x132.objectmerger.exception.InvalidSourceException(
+          "Template source '"
+              + mergeDefinition.getTemplateSourceLabel()
+              + "' not found among provided sources.");
+    }
+
+    MergeDefinition generatedDef =
+        de.x132.objectmerger.generator.MergeDefinitionGenerator.generate(targetClass);
+    Map<String, FieldDefinition<?>> definitions = generatedDef.getDefinitions();
+
+    if (mergeDefinition.getDefinitions() != null) {
+      definitions.putAll(mergeDefinition.getDefinitions());
+    }
+    return definitions;
   }
 }
