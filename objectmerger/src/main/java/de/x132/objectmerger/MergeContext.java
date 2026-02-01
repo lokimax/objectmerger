@@ -10,4 +10,4 @@ import java.util.List;
  * @param sources The list of sources to merge.
  * @param <T> The type of the object being merged.
  */
-record MergeContext<T>(Class<T> targetClass, T result, List<LabeledSource<T>> sources) {}
+public record MergeContext<T>(Class<T> targetClass, T result, List<LabeledSource<T>> sources) {}
