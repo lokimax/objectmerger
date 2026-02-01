@@ -1,4 +1,4 @@
-package de.x132.objectmerger.strategy.recursive;
+package de.x132.objectmerger.strategy.nested;
 
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.MergeDefinition;
@@ -7,9 +7,9 @@ import de.x132.objectmerger.exception.MergeExecutionException;
 import de.x132.objectmerger.strategy.MergeStrategy;
 import java.util.List;
 
-public class RecursiveMergeStrategy<T> implements MergeStrategy<T, RecursiveFieldDefinition<T>> {
+public class NestedMergeStrategy<T> implements MergeStrategy<T, NestedFieldDefinition<T>> {
 
-  public static final String NAME = "recursive";
+  public static final String NAME = "nested";
 
   @Override
   public String getName() {
@@ -18,35 +18,33 @@ public class RecursiveMergeStrategy<T> implements MergeStrategy<T, RecursiveFiel
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class<RecursiveFieldDefinition<T>> getConfigurationClass() {
-    return (Class) RecursiveFieldDefinition.class;
+  public Class<NestedFieldDefinition<T>> getConfigurationClass() {
+    return (Class) NestedFieldDefinition.class;
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public T merge(
-      List<LabeledSource<?>> sources, RecursiveFieldDefinition<T> fieldDef, String fieldName) {
+      List<LabeledSource<?>> sources, NestedFieldDefinition<T> fieldDef, String fieldName) {
     if (sources.isEmpty()) {
       return fieldDef.getDefaultValue();
     }
 
     // Extract field values from sources
-    List<LabeledSource<Object>> nestedSources =
-        sources.stream()
-            .map(
-                s -> {
-                  Object val = ObjectMerger.getFieldValue(s.getSource(), fieldName);
-                  return new LabeledSource<>(s.getLabel(), val);
-                })
-            .collect(java.util.stream.Collectors.toList());
+    List<LabeledSource<Object>> nestedSources = sources.stream()
+        .map(
+            s -> {
+              Object val = ObjectMerger.getFieldValue(s.getSource(), fieldName);
+              return new LabeledSource<>(s.getLabel(), val);
+            })
+        .collect(java.util.stream.Collectors.toList());
 
     // Determine target class from the first non-null nested source
-    Object firstNonNull =
-        nestedSources.stream()
-            .map(LabeledSource::getSource)
-            .filter(java.util.Objects::nonNull)
-            .findFirst()
-            .orElse(null);
+    Object firstNonNull = nestedSources.stream()
+        .map(LabeledSource::getSource)
+        .filter(java.util.Objects::nonNull)
+        .findFirst()
+        .orElse(null);
 
     if (firstNonNull == null) {
       return fieldDef.getDefaultValue();
@@ -78,15 +76,11 @@ public class RecursiveMergeStrategy<T> implements MergeStrategy<T, RecursiveFiel
     // But 'nestedDef' IS that definition.
 
     // Cast sources to LabeledSource<T>
-    @SuppressWarnings("unchecked")
-    LabeledSource<T>[] castSources =
-        (LabeledSource<T>[])
-            nestedSources.stream()
-                .map(s -> new LabeledSource<>(s.getLabel(), (T) s.getSource()))
-                .toArray(LabeledSource[]::new);
+    LabeledSource<T>[] castSources = (LabeledSource<T>[]) nestedSources.stream()
+        .map(s -> new LabeledSource<>(s.getLabel(), (T) s.getSource()))
+        .toArray(LabeledSource[]::new);
 
     try {
-      @SuppressWarnings("unchecked")
       Class<T> typedClass = (Class<T>) targetClass;
       return ObjectMerger.merge(typedClass, nestedDef, castSources);
     } catch (Exception e) {

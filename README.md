@@ -162,7 +162,7 @@ This builds all modules. The resulting artifacts are located in `target/` of the
 | **concatenate**| Joins strings. | `{"strategy": "concatenate"}` |
 | **mergeList** | Merges lists by ID. Supports Template/Intersection. | `{"strategy": "mergeList", "identifyBy": "id", "keyOriginLabels": ["A"], "requirePresenceInAllKeyOrigins": true}` |
 | **mergeMap** | Vereinigt Maps (Union oder Template) | `{"strategy": "mergeMap"}` |
-| **recursive**| Deep merge of POJOs using nested definition. | `{"strategy": "recursive", "nestedDefinition": {...}}` |
+| **nested**| Deep merge of POJOs using nested definition. | `{"strategy": "nested", "nestedDefinition": {...}}` |
 | **mvel** | Execute custom scripts. | `{"strategy": "mvel", "expression": "return 1;"}` |
 
 ### 8.2 Map Template Logic
@@ -241,18 +241,18 @@ The `conditional` strategy acts as a wrapper that routes to different strategies
 }
 ```
 
-### 8.9 Recursive POJO Merging
+### 8.9 Nested POJO Merging
 Allows deep merging of nested POJO objects instead of replacing them wholesale. This enables granular control over nested fields.
 
 **Configuration:**
-- `strategy`: "recursive"
+- `strategy`: "nested"
 - `nestedDefinition`: A full `MergeDefinition` for the nested object.
 
 **Example:**
 ```json
 {
   "address": {
-    "strategy": "recursive",
+    "strategy": "nested",
     "nestedDefinition": {
       "definitions": {
         "street": { "strategy": "priority", "priority": {"api": 1} },
@@ -263,7 +263,7 @@ Allows deep merging of nested POJO objects instead of replacing them wholesale. 
 }
 ```
 
-### 8.10 Synergy: Conditional + Recursive
+### 8.10 Synergy: Conditional + Nested
 Combine strategies to validate data before deep merging.
 
 **Example:**
@@ -275,7 +275,7 @@ Combine strategies to validate data before deep merging.
       {
         "condition": "values['api'].isValid == true",
         "useStrategy": {
-          "strategy": "recursive",
+          "strategy": "nested",
           "nestedDefinition": {
             "templateSourceLabel": "api",
             "definitions": {

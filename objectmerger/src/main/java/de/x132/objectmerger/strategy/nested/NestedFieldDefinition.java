@@ -1,4 +1,4 @@
-package de.x132.objectmerger.strategy.recursive;
+package de.x132.objectmerger.strategy.nested;
 
 import de.x132.objectmerger.MergeDefinition;
 import de.x132.objectmerger.strategy.FieldDefinition;
@@ -14,6 +14,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class RecursiveFieldDefinition<T> extends FieldDefinition<T> {
-  @Builder.Default private MergeDefinition nestedDefinition = new MergeDefinition();
+public class NestedFieldDefinition<T> extends FieldDefinition<T> {
+  @Builder.Default
+  private MergeDefinition nestedDefinition = new MergeDefinition();
 }

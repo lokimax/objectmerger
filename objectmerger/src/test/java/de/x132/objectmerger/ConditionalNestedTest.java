@@ -5,8 +5,8 @@ import de.x132.objectmerger.strategy.conditional.ConditionalFieldDefinition;
 import de.x132.objectmerger.strategy.conditional.ConditionalMergeStrategy;
 import de.x132.objectmerger.strategy.priority.PriorityFieldDefinition;
 import de.x132.objectmerger.strategy.priority.PriorityMergeStrategy;
-import de.x132.objectmerger.strategy.recursive.RecursiveFieldDefinition;
-import de.x132.objectmerger.strategy.recursive.RecursiveMergeStrategy;
+import de.x132.objectmerger.strategy.nested.NestedFieldDefinition;
+import de.x132.objectmerger.strategy.nested.NestedMergeStrategy;
 import de.x132.objectmerger.strategy.standard.StandardFieldDefinition;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class ConditionalRecursiveTest {
+public class ConditionalNestedTest {
 
   @Data
   @AllArgsConstructor
@@ -29,16 +29,16 @@ public class ConditionalRecursiveTest {
   }
 
   @Test
-  void testConditionalIncludesRecursive() {
+  void testConditionalIncludesNested() {
     // Scenario:
-    // If source2.valid == true, use Recursive merge (Street -> Source2, Zip ->
+    // If source2.valid == true, use Nested merge (Street -> Source2, Zip ->
     // Source1)
     // Else, use Standard merge (Source 1 entirely, ignoring Source 2 invalid data)
 
     Address a1 = new Address("Old St", "12345", true);
     Address a2 = new Address("New St", "99999", true); // Valid API response
 
-    // 1. Define Recursive Strategy (The "Target" behavior)
+    // 1. Define Nested Strategy (The "Target" behavior)
     Map<String, de.x132.objectmerger.strategy.FieldDefinition<?>> nestedFields = new HashMap<>();
     PriorityFieldDefinition<String> streetDef = new PriorityFieldDefinition<>();
     streetDef.setStrategy(PriorityMergeStrategy.NAME);
@@ -51,18 +51,18 @@ public class ConditionalRecursiveTest {
     zipDef.setPriority(Map.of("source1", 1, "source2", 2));
     nestedFields.put("zip", zipDef);
 
-    RecursiveFieldDefinition<Address> recursiveDef = new RecursiveFieldDefinition<>();
-    recursiveDef.setStrategy(RecursiveMergeStrategy.NAME);
-    recursiveDef.setNestedDefinition(new MergeDefinition(nestedFields));
+    NestedFieldDefinition<Address> nestedDef = new NestedFieldDefinition<>();
+    nestedDef.setStrategy(NestedMergeStrategy.NAME);
+    nestedDef.setNestedDefinition(new MergeDefinition(nestedFields));
 
     // 2. Define Conditional Strategy
     ConditionalFieldDefinition<Address> conditionalDef = new ConditionalFieldDefinition<>();
     conditionalDef.setStrategy(ConditionalMergeStrategy.NAME);
 
-    // Case 1: source2 is valid -> Use Recursive
+    // Case 1: source2 is valid -> Use Nested
     ConditionCase<Address> validCase = new ConditionCase<>();
     validCase.setCondition("values['source2'].valid == true");
-    validCase.setUseStrategy(recursiveDef);
+    validCase.setUseStrategy(nestedDef);
 
     conditionalDef.setCases(List.of(validCase));
 
@@ -89,14 +89,13 @@ public class ConditionalRecursiveTest {
     wrapperDef.setDefinitions(Map.of("address", conditionalDef));
 
     // Test 1: Valid API
-    Wrapper result1 =
-        ObjectMerger.merge(
-            Wrapper.class,
-            wrapperDef,
-            new LabeledSource<>("source1", w1),
-            new LabeledSource<>("source2", w2));
+    Wrapper result1 = ObjectMerger.merge(
+        Wrapper.class,
+        wrapperDef,
+        new LabeledSource<>("source1", w1),
+        new LabeledSource<>("source2", w2));
 
-    // Expect: Recursive merge (Street=New, Zip=12345)
+    // Expect: Nested merge (Street=New, Zip=12345)
     Assertions.assertEquals("New St", result1.getAddress().getStreet());
     Assertions.assertEquals("12345", result1.getAddress().getZip());
 
@@ -104,12 +103,11 @@ public class ConditionalRecursiveTest {
     a2.setValid(false);
     // a2.setStreet("Bad St");
 
-    Wrapper result2 =
-        ObjectMerger.merge(
-            Wrapper.class,
-            wrapperDef,
-            new LabeledSource<>("source1", w1),
-            new LabeledSource<>("source2", w2));
+    Wrapper result2 = ObjectMerger.merge(
+        Wrapper.class,
+        wrapperDef,
+        new LabeledSource<>("source1", w1),
+        new LabeledSource<>("source2", w2));
 
     // Expect: Fallback to Standard (Source 1)
     Assertions.assertEquals("Old St", result2.getAddress().getStreet());

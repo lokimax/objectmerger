@@ -15,7 +15,7 @@ This document describes the available merge strategies in ObjectMerger. Each sec
 - [MVEL Strategy](#mvel-strategy)
 - [List Strategy](#list-strategy)
 - [Map Strategy](#map-strategy)
-- [Recursive Strategy](#recursive-strategy)
+- [Nested Strategy](#nested-strategy)
 
 ---
 
@@ -615,8 +615,8 @@ itemsDef.setItemMergeDefinition(itemDef);
 MapFieldDefinition<Map<Object, Object>> transDef = MapFieldDefinition.<Map<Object, Object>>builder()
 ---
 
-### Recursive Strategy
-**Strategy Name:** `recursive`  
+### Nested Strategy
+**Strategy Name:** `nested`  
 **Description:** Recursively merges nested POJO objects based on a nested definition. This allows for granular control over sub-field merging.
 
 **Example Scenario:** Merging an address where the street comes from an API source (json2) and the zip code from a database source (json1).
@@ -646,7 +646,7 @@ MapFieldDefinition<Map<Object, Object>> transDef = MapFieldDefinition.<Map<Objec
 {
   "definitions": {
     "address": {
-      "strategy": "recursive",
+      "strategy": "nested",
       "nestedDefinition": {
         "definitions": {
           "street": {
@@ -676,7 +676,7 @@ MapFieldDefinition<Map<Object, Object>> transDef = MapFieldDefinition.<Map<Objec
 
 #### Java Code Example
 ```java
-RecursiveFieldDefinition<Address> addressDef = RecursiveFieldDefinition.<Address>builder()
+NestedFieldDefinition<Address> addressDef = NestedFieldDefinition.<Address>builder()
     .nestedDefinition(nestedMergeDefinition)
     .build();
 ```
