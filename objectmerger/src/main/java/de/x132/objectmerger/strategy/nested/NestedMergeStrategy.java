@@ -31,20 +31,22 @@ public class NestedMergeStrategy<T> implements MergeStrategy<T, NestedFieldDefin
     }
 
     // Extract field values from sources
-    List<LabeledSource<Object>> nestedSources = sources.stream()
-        .map(
-            s -> {
-              Object val = ObjectMerger.getFieldValue(s.getSource(), fieldName);
-              return new LabeledSource<>(s.getLabel(), val);
-            })
-        .collect(java.util.stream.Collectors.toList());
+    List<LabeledSource<Object>> nestedSources =
+        sources.stream()
+            .map(
+                s -> {
+                  Object val = ObjectMerger.getFieldValue(s.getSource(), fieldName);
+                  return new LabeledSource<>(s.getLabel(), val);
+                })
+            .collect(java.util.stream.Collectors.toList());
 
     // Determine target class from the first non-null nested source
-    Object firstNonNull = nestedSources.stream()
-        .map(LabeledSource::getSource)
-        .filter(java.util.Objects::nonNull)
-        .findFirst()
-        .orElse(null);
+    Object firstNonNull =
+        nestedSources.stream()
+            .map(LabeledSource::getSource)
+            .filter(java.util.Objects::nonNull)
+            .findFirst()
+            .orElse(null);
 
     if (firstNonNull == null) {
       return fieldDef.getDefaultValue();
@@ -76,9 +78,11 @@ public class NestedMergeStrategy<T> implements MergeStrategy<T, NestedFieldDefin
     // But 'nestedDef' IS that definition.
 
     // Cast sources to LabeledSource<T>
-    LabeledSource<T>[] castSources = (LabeledSource<T>[]) nestedSources.stream()
-        .map(s -> new LabeledSource<>(s.getLabel(), (T) s.getSource()))
-        .toArray(LabeledSource[]::new);
+    LabeledSource<T>[] castSources =
+        (LabeledSource<T>[])
+            nestedSources.stream()
+                .map(s -> new LabeledSource<>(s.getLabel(), (T) s.getSource()))
+                .toArray(LabeledSource[]::new);
 
     try {
       Class<T> typedClass = (Class<T>) targetClass;

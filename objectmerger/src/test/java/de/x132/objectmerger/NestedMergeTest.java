@@ -1,9 +1,9 @@
 package de.x132.objectmerger;
 
-import de.x132.objectmerger.strategy.priority.PriorityFieldDefinition;
-import de.x132.objectmerger.strategy.priority.PriorityMergeStrategy;
 import de.x132.objectmerger.strategy.nested.NestedFieldDefinition;
 import de.x132.objectmerger.strategy.nested.NestedMergeStrategy;
+import de.x132.objectmerger.strategy.priority.PriorityFieldDefinition;
+import de.x132.objectmerger.strategy.priority.PriorityMergeStrategy;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -73,11 +73,12 @@ public class NestedMergeTest {
     MergeDefinition mainMergeDef = new MergeDefinition(mainFields);
 
     // 3. Execution
-    Person result = ObjectMerger.merge(
-        Person.class,
-        mainMergeDef,
-        new LabeledSource<>("source1", p1),
-        new LabeledSource<>("source2", p2));
+    Person result =
+        ObjectMerger.merge(
+            Person.class,
+            mainMergeDef,
+            new LabeledSource<>("source1", p1),
+            new LabeledSource<>("source2", p2));
 
     // 4. Verification
     Assertions.assertNotNull(result.getAddress());
@@ -124,15 +125,15 @@ public class NestedMergeTest {
 
     MergeDefinition mainMergeDef = new MergeDefinition(mainFields);
 
-    Person result = ObjectMerger.merge(
-        Person.class,
-        mainMergeDef,
-        new LabeledSource<>("source1", p1),
-        new LabeledSource<>("source2", p2));
+    Person result =
+        ObjectMerger.merge(
+            Person.class,
+            mainMergeDef,
+            new LabeledSource<>("source1", p1),
+            new LabeledSource<>("source2", p2));
 
     Assertions.assertEquals("New St", result.getAddress().getStreet());
-    Assertions.assertEquals(
-        "12345", result.getAddress().getZip());
+    Assertions.assertEquals("12345", result.getAddress().getZip());
 
     Assertions.assertEquals(
         "HomeCity", result.getAddress().getCity(), "City should be included via Template Mode");

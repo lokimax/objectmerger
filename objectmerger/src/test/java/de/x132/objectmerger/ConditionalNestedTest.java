@@ -3,10 +3,10 @@ package de.x132.objectmerger;
 import de.x132.objectmerger.strategy.conditional.ConditionCase;
 import de.x132.objectmerger.strategy.conditional.ConditionalFieldDefinition;
 import de.x132.objectmerger.strategy.conditional.ConditionalMergeStrategy;
-import de.x132.objectmerger.strategy.priority.PriorityFieldDefinition;
-import de.x132.objectmerger.strategy.priority.PriorityMergeStrategy;
 import de.x132.objectmerger.strategy.nested.NestedFieldDefinition;
 import de.x132.objectmerger.strategy.nested.NestedMergeStrategy;
+import de.x132.objectmerger.strategy.priority.PriorityFieldDefinition;
+import de.x132.objectmerger.strategy.priority.PriorityMergeStrategy;
 import de.x132.objectmerger.strategy.standard.StandardFieldDefinition;
 import java.util.HashMap;
 import java.util.List;
@@ -89,11 +89,12 @@ public class ConditionalNestedTest {
     wrapperDef.setDefinitions(Map.of("address", conditionalDef));
 
     // Test 1: Valid API
-    Wrapper result1 = ObjectMerger.merge(
-        Wrapper.class,
-        wrapperDef,
-        new LabeledSource<>("source1", w1),
-        new LabeledSource<>("source2", w2));
+    Wrapper result1 =
+        ObjectMerger.merge(
+            Wrapper.class,
+            wrapperDef,
+            new LabeledSource<>("source1", w1),
+            new LabeledSource<>("source2", w2));
 
     // Expect: Nested merge (Street=New, Zip=12345)
     Assertions.assertEquals("New St", result1.getAddress().getStreet());
@@ -103,11 +104,12 @@ public class ConditionalNestedTest {
     a2.setValid(false);
     // a2.setStreet("Bad St");
 
-    Wrapper result2 = ObjectMerger.merge(
-        Wrapper.class,
-        wrapperDef,
-        new LabeledSource<>("source1", w1),
-        new LabeledSource<>("source2", w2));
+    Wrapper result2 =
+        ObjectMerger.merge(
+            Wrapper.class,
+            wrapperDef,
+            new LabeledSource<>("source1", w1),
+            new LabeledSource<>("source2", w2));
 
     // Expect: Fallback to Standard (Source 1)
     Assertions.assertEquals("Old St", result2.getAddress().getStreet());
