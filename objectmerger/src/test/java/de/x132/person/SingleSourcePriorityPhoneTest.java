@@ -14,12 +14,12 @@ import org.junit.jupiter.api.Test;
 public class SingleSourcePriorityPhoneTest {
 
   private MergeDefinition phonePriorityCrmOnlyDefinition() {
-    PriorityFieldDefinition phoneDef = new PriorityFieldDefinition();
-    Map<String, Integer> prio = new HashMap<>();
-    prio.put("crm", 1);
-    phoneDef.setPriority(prio);
-    phoneDef.setStrategy("priority");
-    phoneDef.setDefaultValue(null);
+    PriorityFieldDefinition<Object> phoneDef =
+        PriorityFieldDefinition.builder()
+            .priority(Map.of("crm", 1))
+            .strategy("priority")
+            .defaultValue(null)
+            .build();
 
     MergeDefinition def = new MergeDefinition();
     Map<String, FieldDefinition<?>> defs = new HashMap<>();

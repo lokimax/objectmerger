@@ -16,8 +16,8 @@ class MvelMergeStrategyTest {
   @Test
   @DisplayName("Should execute simple arithmetic expression")
   void arithmeticExpression() {
-    MvelFieldDefinition fieldDef = new MvelFieldDefinition();
-    fieldDef.setExpression("sources['a'] + sources['b']");
+    MvelFieldDefinition fieldDef =
+        MvelFieldDefinition.builder().expression("sources['a'] + sources['b']").build();
 
     List<LabeledSource<?>> sources =
         Arrays.asList(new LabeledSource<>("a", 10), new LabeledSource<>("b", 20));
@@ -29,9 +29,11 @@ class MvelMergeStrategyTest {
   @Test
   @DisplayName("Should execute conditional logic")
   void conditionalLogic() {
-    MvelFieldDefinition fieldDef = new MvelFieldDefinition();
-    fieldDef.setExpression(
-        "if (sources['prio'] > 100) { return sources['prio']; } else { return sources['backup']; }");
+    MvelFieldDefinition fieldDef =
+        MvelFieldDefinition.builder()
+            .expression(
+                "if (sources['prio'] > 100) { return sources['prio']; } else { return sources['backup']; }")
+            .build();
 
     // Case 1: Prio > 100
     List<LabeledSource<?>> sourcesHigh =
@@ -47,7 +49,7 @@ class MvelMergeStrategyTest {
   @Test
   @DisplayName("Should return null for null/empty expression")
   void emptyExpression() {
-    MvelFieldDefinition fieldDef = new MvelFieldDefinition();
+    MvelFieldDefinition fieldDef = MvelFieldDefinition.builder().build();
     assertNull(strategy.merge(List.of(), fieldDef, "testField"));
 
     fieldDef.setExpression("");
@@ -57,9 +59,10 @@ class MvelMergeStrategyTest {
   @Test
   @DisplayName("Should handle missing sources gracefully (MVEL behavior)")
   void missingSources() {
-    MvelFieldDefinition fieldDef = new MvelFieldDefinition();
-    // Accessing a missing key in a map in MVEL usually returns null
-    fieldDef.setExpression("sources['missing'] == null ? 'not found' : 'found'");
+    MvelFieldDefinition fieldDef =
+        MvelFieldDefinition.builder()
+            .expression("sources['missing'] == null ? 'not found' : 'found'")
+            .build();
 
     List<LabeledSource<?>> sources = List.of(new LabeledSource<>("existing", 1));
     assertEquals("not found", strategy.merge(sources, fieldDef, "testField"));

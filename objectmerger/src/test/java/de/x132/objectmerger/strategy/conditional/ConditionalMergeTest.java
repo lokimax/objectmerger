@@ -26,23 +26,23 @@ class ConditionalMergeTest {
   @DisplayName("Should use case strategy when condition matches")
   void shouldUseCaseStrategyWhenConditionMatches() {
     // Arrange
-    ConditionalFieldDefinition fieldDef = new ConditionalFieldDefinition();
 
     // Case 1: If 'master' is present, use Priority
-    ConditionCase case1 = new ConditionCase();
+    ConditionCase<Object> case1 = new ConditionCase<>();
     case1.setCondition("values.containsKey('master')");
 
-    PriorityFieldDefinition priorityDef = new PriorityFieldDefinition();
-    priorityDef.setStrategy("priority");
-    priorityDef.setPriority(Map.of("master", 1));
+    PriorityFieldDefinition<Object> priorityDef =
+        PriorityFieldDefinition.<Object>builder()
+            .strategy("priority")
+            .priority(Map.of("master", 1))
+            .build();
     case1.setUseStrategy(priorityDef);
 
-    fieldDef.setCases(List.of(case1));
-
-    // Default: Standard
-    StandardFieldDefinition defaultDef = new StandardFieldDefinition();
-    defaultDef.setStrategy("standard");
-    fieldDef.setDefaultStrategy(defaultDef);
+    ConditionalFieldDefinition<Object> fieldDef =
+        ConditionalFieldDefinition.<Object>builder()
+            .cases(List.of(case1))
+            .defaultStrategy(StandardFieldDefinition.<Object>builder().strategy("standard").build())
+            .build();
 
     // Sources
     LabeledSource<Map<String, Object>> src1 = new LabeledSource<>("master", Map.of("field", "A"));
@@ -61,17 +61,15 @@ class ConditionalMergeTest {
   @DisplayName("Should use default strategy when no condition matches")
   void shouldUseDefaultStrategyWhenNoConditionMatches() {
     // Arrange
-    ConditionalFieldDefinition fieldDef = new ConditionalFieldDefinition();
-
     // Case 1: If 'special' source present (it's not)
-    ConditionCase case1 = new ConditionCase();
+    ConditionCase<Object> case1 = new ConditionCase<>();
     case1.setCondition("values.containsKey('special')");
-    fieldDef.setCases(List.of(case1));
 
-    // Default: Standard (Standard strategy picks non-null, usually first)
-    StandardFieldDefinition defaultDef = new StandardFieldDefinition();
-    defaultDef.setStrategy("standard");
-    fieldDef.setDefaultStrategy(defaultDef);
+    ConditionalFieldDefinition<Object> fieldDef =
+        ConditionalFieldDefinition.<Object>builder()
+            .cases(List.of(case1))
+            .defaultStrategy(StandardFieldDefinition.<Object>builder().strategy("standard").build())
+            .build();
 
     // Sources
     LabeledSource<Map<String, Object>> src1 = new LabeledSource<>("master", Map.of("field", "A"));
@@ -88,9 +86,8 @@ class ConditionalMergeTest {
   @Test
   @DisplayName("Should return null if no condition matches and no default strategy")
   void shouldReturnNullIfNoMatchAndNoDefault() {
-    ConditionalFieldDefinition fieldDef = new ConditionalFieldDefinition();
-    fieldDef.setCases(List.of()); // Empty cases
-    fieldDef.setDefaultStrategy(null); // No default
+    ConditionalFieldDefinition<Object> fieldDef =
+        ConditionalFieldDefinition.<Object>builder().cases(List.of()).defaultStrategy(null).build();
 
     List<LabeledSource<?>> sources = List.of(new LabeledSource<>("s1", Map.of("f", "v")));
 

@@ -68,6 +68,7 @@ public class MergeCommand implements Callable<Integer> {
         }
       }
 
+      @SuppressWarnings("unchecked")
       Map<String, Object> merged =
           ObjectMerger.merge(mergeDefinition, labeledSources.toArray(LabeledSource[]::new));
 

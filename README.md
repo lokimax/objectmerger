@@ -78,7 +78,9 @@ The project is structured as a multi-module Maven project.
 
 The `objectmerger` module contains the business logic.
 
-*   `ObjectMerger`: Main entry point. Static `merge()` method.
+*   `ObjectMerger`: Main entry point (Facade). Delegates to engines.
+*   `engine.PojoMerger`: Core logic for merging generic Java Objects.
+*   `engine.MapMerger`: Core logic for merging Maps.
 *   `MergeStrategy<T>`: Interface for all strategies.
 *   `FieldDefinition`: POJO holding the configuration for a field.
 *   `de.x132.objectmerger.strategy.*`: Implementation of strategies (Priority, Min, Max, etc.).

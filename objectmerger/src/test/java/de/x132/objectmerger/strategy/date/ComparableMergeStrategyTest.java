@@ -7,6 +7,7 @@ import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.strategy.FieldDefinition;
 import de.x132.objectmerger.strategy.maximum.MaximumValueStrategy;
 import de.x132.objectmerger.strategy.minimum.MinimumValueStrategy;
+import de.x132.objectmerger.strategy.standard.StandardFieldDefinition;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -20,7 +21,7 @@ class ComparableMergeStrategyTest {
 
   private final MaximumValueStrategy maxStrategy = new MaximumValueStrategy();
   private final MinimumValueStrategy minStrategy = new MinimumValueStrategy();
-  private final FieldDefinition fieldDef = new FieldDefinition() {}; // Anonymous concrete subclass
+  private final FieldDefinition<Object> fieldDef = StandardFieldDefinition.builder().build();
 
   @Test
   @DisplayName("MaximumValueStrategy picks the latest java.util.Date")

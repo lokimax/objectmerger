@@ -34,16 +34,17 @@ class DateAsIdentifierTest {
     List<Map<String, Object>> listA = List.of(itemA);
     List<Map<String, Object>> listB = List.of(itemB);
 
-    ListFieldDefinition listDef = new ListFieldDefinition();
-    listDef.setStrategy("mergeList");
-    listDef.setIdentifyBy("date");
+    ListFieldDefinition<Object> listDef =
+        ListFieldDefinition.builder().strategy("mergeList").identifyBy("date").build();
 
-    PriorityFieldDefinition dateDef = new PriorityFieldDefinition();
-    dateDef.setStrategy("priority");
-    dateDef.setPriority(java.util.Map.of("A", 1, "B", 2));
+    PriorityFieldDefinition<Object> dateDef =
+        PriorityFieldDefinition.builder()
+            .strategy("priority")
+            .priority(java.util.Map.of("A", 1, "B", 2))
+            .build();
 
-    PriorityFieldDefinition valDef = new PriorityFieldDefinition();
-    valDef.setStrategy("concatenate");
+    PriorityFieldDefinition<Object> valDef =
+        PriorityFieldDefinition.builder().strategy("concatenate").build();
 
     // Construct item definition
     Map<String, FieldDefinition<?>> itemFields = new HashMap<>();

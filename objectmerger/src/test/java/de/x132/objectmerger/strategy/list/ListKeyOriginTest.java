@@ -22,12 +22,13 @@ class ListKeyOriginTest {
   @BeforeEach
   void setUp() {
     strategy = new ListMergeStrategy();
-    fieldDef = new ListFieldDefinition();
-    fieldDef.setIdentifyBy("id");
+    strategy = new ListMergeStrategy();
+    StandardFieldDefinition<Object> idDef = StandardFieldDefinition.builder().build();
+
     ItemMergeDefinition itemDef = new ItemMergeDefinition();
-    StandardFieldDefinition idDef = new StandardFieldDefinition();
     itemDef.setDefinitions(Map.of("id", idDef));
-    fieldDef.setItemMergeDefinition(itemDef);
+
+    fieldDef = ListFieldDefinition.builder().identifyBy("id").itemMergeDefinition(itemDef).build();
   }
 
   @Test
@@ -59,11 +60,12 @@ class ListKeyOriginTest {
 
     List<LabeledSource<?>> sources =
         createSources(
-            "A", List.of(Map.of("id", "1"), Map.of("id", "2"), Map.of("id", "4")),
-            "B", List.of(Map.of("id", "2"), Map.of("id", "3"), Map.of("id", "4")),
+            "A",
+            List.of(Map.of("id", "1"), Map.of("id", "2"), Map.of("id", "4")),
+            "B",
+            List.of(Map.of("id", "2"), Map.of("id", "3"), Map.of("id", "4")),
             "C",
-                List.of(
-                    Map.of("id", "1"), Map.of("id", "2"), Map.of("id", "3"), Map.of("id", "4")));
+            List.of(Map.of("id", "1"), Map.of("id", "2"), Map.of("id", "3"), Map.of("id", "4")));
 
     @SuppressWarnings("unchecked")
     List<Map<String, Object>> result =
