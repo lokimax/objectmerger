@@ -56,3 +56,17 @@ This command will:
 
 ## Verification
 Login to [central.sonatype.com](https://central.sonatype.com) to check the status of your deployment.
+
+## CI/CD (GitHub Actions)
+You can automate deployment by creating a **Release** on GitHub. The workflow `.github/workflows/maven-publish.yml` is already set up.
+
+### Required Secrets
+Go to your GitHub Repository -> Settings -> Secrets and variables -> Actions -> **New repository secret** and add:
+
+1.  `OSSRH_USERNAME`: Your Sonatype Token Username.
+2.  `OSSRH_TOKEN`: Your Sonatype Token Password.
+3.  `GPG_PRIVATE_KEY`: Your ASCII-armored private key (`gpg --armor --export-secret-keys <ID>`).
+4.  `GPG_PASSPHRASE`: Passphrase for your GPG key.
+
+### Triggers
+The workflow runs automatically when you **create a new Release** in the GitHub UI.
