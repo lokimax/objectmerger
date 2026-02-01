@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.ObjectMerger;
+import de.x132.objectmerger.exception.InvalidSourceException;
 import de.x132.objectmerger.strategy.MergeStrategy;
 import de.x132.objectmerger.strategy.priority.PriorityFieldDefinition;
 import java.util.Arrays;
@@ -222,7 +223,7 @@ class ConcatenateStrategyTest {
 
       // Act & Assert
       assertThrows(
-          IllegalArgumentException.class, () -> strategy.merge(sources, fieldDef, fieldName));
+          InvalidSourceException.class, () -> strategy.merge(sources, fieldDef, fieldName));
     }
   }
 

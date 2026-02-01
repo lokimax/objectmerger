@@ -38,9 +38,10 @@ class PojoMergerTest {
     @SuppressWarnings("unchecked")
     LabeledSource<PrivatePojo>[] sources = new LabeledSource[] {};
 
-    RuntimeException ex =
+    de.x132.objectmerger.exception.MergeExecutionException ex =
         assertThrows(
-            RuntimeException.class, () -> PojoMerger.merge(PrivatePojo.class, def, sources));
+            de.x132.objectmerger.exception.MergeExecutionException.class,
+            () -> PojoMerger.merge(PrivatePojo.class, def, sources));
     assertTrue(ex.getMessage().contains("Failed to merge objects"));
   }
 

@@ -2,6 +2,7 @@ package de.x132.objectmerger.strategy.conditional;
 
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.ObjectMerger;
+import de.x132.objectmerger.exception.ConfigurationException;
 import de.x132.objectmerger.registry.StrategyRegistry;
 import de.x132.objectmerger.strategy.FieldDefinition;
 import de.x132.objectmerger.strategy.MergeStrategy;
@@ -80,7 +81,7 @@ public class ConditionalMergeStrategy<T>
     MergeStrategy strategy = StrategyRegistry.getInstance().getStrategy(strategyName);
 
     if (strategy == null) {
-      throw new IllegalArgumentException("Unknown strategy in conditional case: " + strategyName);
+      throw new ConfigurationException("Unknown strategy in conditional case: " + strategyName);
     }
 
     return strategy.merge(sources, def, fieldName);

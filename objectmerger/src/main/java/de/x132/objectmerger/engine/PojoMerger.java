@@ -3,6 +3,8 @@ package de.x132.objectmerger.engine;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.MergeContext;
 import de.x132.objectmerger.MergeDefinition;
+import de.x132.objectmerger.exception.ConfigurationException;
+import de.x132.objectmerger.exception.MergeExecutionException;
 import de.x132.objectmerger.helper.ReflectionHelper;
 import de.x132.objectmerger.registry.StrategyRegistry;
 import de.x132.objectmerger.strategy.FieldDefinition;
@@ -35,7 +37,8 @@ public class PojoMerger {
       return result;
     } catch (Exception e) {
       log.error("Failed to merge objects of type {}", targetClass.getName(), e);
-      throw new RuntimeException("Failed to merge objects of type " + targetClass.getName(), e);
+      throw new MergeExecutionException(
+          "Failed to merge objects of type " + targetClass.getName(), e);
     }
   }
 
@@ -81,7 +84,7 @@ public class PojoMerger {
       FieldDefinition<?> fieldDef,
       String fieldName) {
     if (!strategy.getConfigurationClass().isInstance(fieldDef)) {
-      throw new IllegalArgumentException(
+      throw new ConfigurationException(
           String.format(
               "Field '%s' requires configuration of type '%s' but got '%s' for strategy '%s'",
               fieldName,

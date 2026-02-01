@@ -1,7 +1,9 @@
 package de.x132.objectmerger.helper;
 
+import de.x132.objectmerger.exception.MergeExecutionException;
 import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReflectionHelper {
 
+  private static final ConcurrentHashMap<String, Field> fieldCache = new ConcurrentHashMap<>();
+
   /** sets a field value safely. */
   public static void setFieldValue(Field field, Object target, Object value) {
     try {
@@ -18,7 +22,7 @@ public class ReflectionHelper {
       field.set(target, value);
     } catch (IllegalAccessException e) {
       log.error("Access denied for field '{}'", field.getName(), e);
-      throw new RuntimeException("Access denied for field: " + field.getName(), e);
+      throw new MergeExecutionException("Access denied for field: " + field.getName(), e);
     }
   }
 
@@ -28,34 +32,43 @@ public class ReflectionHelper {
     if (obj instanceof Map) {
       return ((Map<?, ?>) obj).get(fieldName);
     }
-    try {
-      Field field = obj.getClass().getDeclaredField(fieldName);
-      field.setAccessible(true);
-      return field.get(obj);
-    } catch (NoSuchFieldException | IllegalAccessException e) {
+    Field field = getField(obj.getClass(), fieldName);
+    if (field == null) {
       log.debug(
           "Failed to get field value '{}' from object of type '{}'",
           fieldName,
           obj.getClass().getName());
-      throw new RuntimeException(
+      throw new MergeExecutionException(
           "Failed to get field value: "
               + fieldName
               + " from object of type "
-              + obj.getClass().getName(),
-          e);
+              + obj.getClass().getName());
+    }
+    try {
+      return field.get(obj);
+    } catch (IllegalAccessException e) {
+      log.error("Access denied for field '{}'", fieldName, e);
+      throw new MergeExecutionException("Access denied for field: " + fieldName, e);
     }
   }
 
-  /** Gets a declared field from a class safely. */
+  /** Gets a declared field from a class safely, with caching. */
   public static Field getField(Class<?> clazz, String fieldName) {
-    try {
-      Field field = clazz.getDeclaredField(fieldName);
-      field.setAccessible(true);
-      return field;
-    } catch (NoSuchFieldException e) {
-      log.warn(
-          "Field '{}' defined in mapping but missing in class '{}'", fieldName, clazz.getName());
-      return null;
-    }
+    String cacheKey = clazz.getName() + "." + fieldName;
+    return fieldCache.computeIfAbsent(
+        cacheKey,
+        key -> {
+          try {
+            Field field = clazz.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            return field;
+          } catch (NoSuchFieldException e) {
+            log.warn(
+                "Field '{}' defined in mapping but missing in class '{}'",
+                fieldName,
+                clazz.getName());
+            return null;
+          }
+        });
   }
 }

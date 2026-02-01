@@ -2,6 +2,7 @@ package de.x132.objectmerger.strategy.priority;
 
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.ObjectMerger;
+import de.x132.objectmerger.exception.ConfigurationException;
 import de.x132.objectmerger.strategy.MergeStrategy;
 import de.x132.objectmerger.strategy.config.Prioritizable;
 import java.util.Comparator;
@@ -35,7 +36,7 @@ public class PriorityMergeStrategy<T> implements MergeStrategy<T, PriorityFieldD
     Map<String, Integer> priorityMap = config.getPriority();
 
     if (priorityMap == null || priorityMap.isEmpty()) {
-      throw new IllegalArgumentException("PriorityMergeStrategy requires a non-empty priority map");
+      throw new ConfigurationException("PriorityMergeStrategy requires a non-empty priority map");
     }
 
     // If priority is defined, consider ONLY sources explicitly listed in the
