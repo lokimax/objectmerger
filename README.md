@@ -162,6 +162,7 @@ This builds all modules. The resulting artifacts are located in `target/` of the
 | **concatenate**| Joins strings. | `{"strategy": "concatenate"}` |
 | **mergeList** | Merges lists by ID. Supports Template/Intersection. | `{"strategy": "mergeList", "identifyBy": "id", "keyOriginLabels": ["A"], "requirePresenceInAllKeyOrigins": true}` |
 | **mergeMap** | Vereinigt Maps (Union oder Template) | `{"strategy": "mergeMap"}` |
+| **nested**| Deep merge of POJOs using nested definition. | `{"strategy": "nested", "nestedDefinition": {...}}` |
 | **mvel** | Execute custom scripts. | `{"strategy": "mvel", "expression": "return 1;"}` |
 
 ### 8.2 Map Template Logic
@@ -237,6 +238,55 @@ The `conditional` strategy acts as a wrapper that routes to different strategies
     }
   ],
   "defaultStrategy": { "strategy": "majority" }
+}
+```
+
+### 8.9 Nested POJO Merging
+Allows deep merging of nested POJO objects instead of replacing them wholesale. This enables granular control over nested fields.
+
+**Configuration:**
+- `strategy`: "nested"
+- `nestedDefinition`: A full `MergeDefinition` for the nested object.
+
+**Example:**
+```json
+{
+  "address": {
+    "strategy": "nested",
+    "nestedDefinition": {
+      "definitions": {
+        "street": { "strategy": "priority", "priority": {"api": 1} },
+        "zip": { "strategy": "priority", "priority": {"db": 1} }
+      }
+    }
+  }
+}
+```
+
+### 8.10 Synergy: Conditional + Nested
+Combine strategies to validate data before deep merging.
+
+**Example:**
+```json
+{
+  "address": {
+    "strategy": "conditional",
+    "cases": [
+      {
+        "condition": "values['api'].isValid == true",
+        "useStrategy": {
+          "strategy": "nested",
+          "nestedDefinition": {
+            "templateSourceLabel": "api",
+            "definitions": {
+               "street": { "strategy": "priority", "priority": {"api": 1} }
+            }
+          }
+        }
+      }
+    ],
+    "defaultStrategy": { "strategy": "priority", "priority": {"db": 1} }
+  }
 }
 ```
 

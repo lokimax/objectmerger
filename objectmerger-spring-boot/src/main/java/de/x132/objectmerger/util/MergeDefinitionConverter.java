@@ -43,6 +43,13 @@ public class MergeDefinitionConverter {
                 case "mvel":
                   targetClass = de.x132.objectmerger.strategy.mvel.MvelFieldDefinition.class;
                   break;
+                case "nested":
+                  targetClass = de.x132.objectmerger.strategy.nested.NestedFieldDefinition.class;
+                  break;
+                case "conditional":
+                  targetClass =
+                      de.x132.objectmerger.strategy.conditional.ConditionalFieldDefinition.class;
+                  break;
                 default:
                   targetClass =
                       de.x132.objectmerger.strategy.standard.StandardFieldDefinition.class;
