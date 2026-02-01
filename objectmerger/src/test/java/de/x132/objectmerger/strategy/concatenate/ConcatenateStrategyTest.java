@@ -25,7 +25,7 @@ import org.mockito.MockedStatic;
 class ConcatenateStrategyTest {
 
   private ConcatenateStrategy strategy;
-  private PriorityFieldDefinition fieldDef;
+  private PriorityFieldDefinition<String> fieldDef;
 
   @BeforeEach
   void setUp() {

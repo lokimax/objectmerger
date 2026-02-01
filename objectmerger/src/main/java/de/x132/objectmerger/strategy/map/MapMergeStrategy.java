@@ -110,7 +110,7 @@ public class MapMergeStrategy
 
   @SuppressWarnings("unchecked")
   private <T> T doMerge(
-      Class<T> valueClass, MapFieldDefinition fieldDef, List<LabeledSource<?>> values) {
+      Class<T> valueClass, MapFieldDefinition<?> fieldDef, List<LabeledSource<?>> values) {
     if (Map.class.isAssignableFrom(valueClass)) {
       LabeledSource<Map<String, Object>>[] sources =
           values.stream()
