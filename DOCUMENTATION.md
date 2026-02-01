@@ -15,6 +15,7 @@ This document describes the available merge strategies in ObjectMerger. Each sec
 - [MVEL Strategy](#mvel-strategy)
 - [List Strategy](#list-strategy)
 - [Map Strategy](#map-strategy)
+- [Recursive Strategy](#recursive-strategy)
 
 ---
 
@@ -612,5 +613,71 @@ itemsDef.setItemMergeDefinition(itemDef);
 #### Java Code Example
 ```java
 MapFieldDefinition<Map<Object, Object>> transDef = MapFieldDefinition.<Map<Object, Object>>builder()
+---
+
+### Recursive Strategy
+**Strategy Name:** `recursive`  
+**Description:** Recursively merges nested POJO objects based on a nested definition. This allows for granular control over sub-field merging.
+
+**Example Scenario:** Merging an address where the street comes from an API source (json2) and the zip code from a database source (json1).
+
+#### Input Data
+**json1 (db)**
+```json
+{
+  "address": {
+    "street": "Old St",
+    "zip": "12345"
+  }
+}
+```
+**json2 (api)**
+```json
+{
+  "address": {
+    "street": "New St",
+    "zip": "99999"
+  }
+}
+```
+
+#### Merge Definition
+```json
+{
+  "definitions": {
+    "address": {
+      "strategy": "recursive",
+      "nestedDefinition": {
+        "definitions": {
+          "street": {
+            "strategy": "priority",
+            "priority": {"json2": 1, "json1": 2}
+          },
+          "zip": {
+            "strategy": "priority",
+            "priority": {"json1": 1, "json2": 2}
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+#### Result
+```json
+{
+  "address": {
+    "street": "New St",
+    "zip": "12345"
+  }
+}
+```
+
+#### Java Code Example
+```java
+RecursiveFieldDefinition<Address> addressDef = RecursiveFieldDefinition.<Address>builder()
+    .nestedDefinition(nestedMergeDefinition)
     .build();
 ```
+
