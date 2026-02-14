@@ -56,10 +56,11 @@ public class ConditionalMergeStrategy<T>
         try {
           MvelSandbox.validateExpression(c.getCondition());
 
-          Object result = MVEL.executeExpression(
-              MVEL.compileExpression(
-                  c.getCondition(), MvelSandbox.createSandboxedParserContext()),
-              context);
+          Object result =
+              MVEL.executeExpression(
+                  MVEL.compileExpression(
+                      c.getCondition(), MvelSandbox.createSandboxedParserContext()),
+                  context);
           if (Boolean.TRUE.equals(result)) {
             log.debug("Condition '{}' matched for field '{}'", c.getCondition(), fieldName);
             return executeSubStrategy(c.getUseStrategy(), sources, fieldName);
@@ -84,7 +85,7 @@ public class ConditionalMergeStrategy<T>
     return null;
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings({"rawtypes", "unchecked"})
   private Object executeSubStrategy(
       FieldDefinition def, List<LabeledSource<?>> sources, String fieldName) {
     String strategyName = def.getStrategy() != null ? def.getStrategy() : "standard";

@@ -43,8 +43,9 @@ public class MvelMergeStrategy implements MergeStrategy<Object, MvelFieldDefinit
     try {
       MvelSandbox.validateExpression(fieldDef.getExpression());
 
-      Serializable compiledExpression = MVEL.compileExpression(
-          fieldDef.getExpression(), MvelSandbox.createSandboxedParserContext());
+      Serializable compiledExpression =
+          MVEL.compileExpression(
+              fieldDef.getExpression(), MvelSandbox.createSandboxedParserContext());
       Map<String, Object> context = prepareContext(sources);
       context.put("labeledSources", sources);
 
