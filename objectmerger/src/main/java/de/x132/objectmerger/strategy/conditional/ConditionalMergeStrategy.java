@@ -7,6 +7,7 @@ import de.x132.objectmerger.registry.StrategyRegistry;
 import de.x132.objectmerger.strategy.FieldDefinition;
 import de.x132.objectmerger.strategy.MergeStrategy;
 import de.x132.objectmerger.strategy.config.ConditionalConfig;
+import de.x132.objectmerger.strategy.mvel.MvelSandbox;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,41 +41,50 @@ public class ConditionalMergeStrategy<T>
   private Object mergeInternal(
       List<LabeledSource<?>> sources, ConditionalConfig<T> fieldDef, String fieldName) {
 
-    // 1. Prepare MVEL Context
     Map<String, Object> context = new HashMap<>();
     context.put("sources", sources);
-    // You might also want a map of field values from all sources for easier access
     Map<String, Object> values = new HashMap<>();
     for (LabeledSource<?> s : sources) {
       values.put(s.getLabel(), ObjectMerger.getFieldValue(s.getSource(), fieldName));
     }
     context.put("values", values);
 
-    // 2. Evaluate Cases
     if (fieldDef.getCases() != null) {
+      MvelSandbox.validateContextVariables(context);
+
       for (ConditionCase<?> c : fieldDef.getCases()) {
         try {
-          Object result = MVEL.eval(c.getCondition(), context);
+          MvelSandbox.validateExpression(c.getCondition());
+
+          Object result = MVEL.executeExpression(
+              MVEL.compileExpression(
+                  c.getCondition(), MvelSandbox.createSandboxedParserContext()),
+              context);
           if (Boolean.TRUE.equals(result)) {
             log.debug("Condition '{}' matched for field '{}'", c.getCondition(), fieldName);
             return executeSubStrategy(c.getUseStrategy(), sources, fieldName);
           }
+        } catch (SecurityException securityException) {
+          log.error(
+              "MVEL sandbox violation for field '{}': {}",
+              fieldName,
+              securityException.getMessage());
+          throw securityException;
         } catch (Exception e) {
           log.warn("Failed to evaluate condition '{}': {}", c.getCondition(), e.getMessage());
         }
       }
     }
 
-    // 3. Fallback to Default
     if (fieldDef.getDefaultStrategy() != null) {
       log.debug("No condition matched for field '{}', using default strategy", fieldName);
       return executeSubStrategy(fieldDef.getDefaultStrategy(), sources, fieldName);
     }
 
-    return null; // or throw exception if default is mandatory?
+    return null;
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   private Object executeSubStrategy(
       FieldDefinition def, List<LabeledSource<?>> sources, String fieldName) {
     String strategyName = def.getStrategy() != null ? def.getStrategy() : "standard";
