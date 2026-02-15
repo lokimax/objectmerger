@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.MergeDefinition;
 import de.x132.objectmerger.model.Person;
+import de.x132.objectmerger.security.ClassLoadingGuard;
 import de.x132.objectmerger.util.MergeDefinitionConverter;
 import java.util.*;
 import org.junit.jupiter.api.DisplayName;
@@ -13,7 +14,13 @@ import org.junit.jupiter.api.Test;
 @DisplayName("ObjectMergerService Phone Priority (CRM-only) Tests")
 class ObjectMergerServicePhonePriorityTest {
 
-  private final ObjectMergerService mergerService = new ObjectMergerService();
+  private final ObjectMergerService mergerService = createService();
+
+  private static ObjectMergerService createService() {
+    ClassLoadingGuard guard = new ClassLoadingGuard();
+    guard.setAllowedPackages(java.util.List.of("de.x132.objectmerger.model."));
+    return new ObjectMergerService(guard);
+  }
 
   private MergeDefinition crmOnlyPhoneDefinition() {
     Map<String, Map<String, Object>> defMap = new LinkedHashMap<>();

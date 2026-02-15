@@ -274,8 +274,8 @@ class MergeControllerIntegrationTest {
   }
 
   @Test
-  @DisplayName("Should return 400 when target class not found")
-  void testMergeWithInvalidTargetClass() throws Exception {
+  @DisplayName("Should return 403 when target class is not in allowed packages")
+  void testMergeWithBlockedTargetClass() throws Exception {
     MergeRequest request = new MergeRequest();
     request.setTargetClass("com.invalid.NonExistentClass");
 
@@ -295,8 +295,8 @@ class MergeControllerIntegrationTest {
             post("/api/v1/merge")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.error").value(containsString("Target class not found")));
+        .andExpect(status().isForbidden())
+        .andExpect(jsonPath("$.error").exists());
   }
 
   @Test

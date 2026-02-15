@@ -51,8 +51,8 @@ class ObjectMergerServiceIntegrationTest {
   }
 
   @Test
-  @DisplayName("Should throw ClassNotFoundException for invalid class")
-  void testMergeWithInvalidClass() {
+  @DisplayName("Should throw SecurityException for unlisted class")
+  void testMergeWithUnlistedClass() {
     Map<String, Map<String, Object>> defMap = new LinkedHashMap<>();
     defMap.put("name", Map.of("priority", Map.of("source1", 1)));
     MergeDefinition definition = MergeDefinitionConverter.fromMap(defMap);
@@ -64,7 +64,7 @@ class ObjectMergerServiceIntegrationTest {
         Collections.singletonList(new LabeledSource<>("source1", person));
 
     assertThrows(
-        ClassNotFoundException.class,
+        SecurityException.class,
         () -> mergerService.merge("com.invalid.NonExistentClass", definition, sources));
   }
 

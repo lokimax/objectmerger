@@ -4,6 +4,7 @@ import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.MergeDefinition;
 import de.x132.objectmerger.dto.MergeRequest;
 import de.x132.objectmerger.generator.MergeDefinitionGenerator;
+import de.x132.objectmerger.security.ClassLoadingGuard;
 import de.x132.objectmerger.service.ObjectMergerService;
 import de.x132.objectmerger.util.MergeDefinitionConverter;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/merge")
 @Tag(
@@ -27,9 +30,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class MergeController {
 
   private final ObjectMergerService mergerService;
+  private final ClassLoadingGuard classLoadingGuard;
 
-  public MergeController(ObjectMergerService mergerService) {
+  public MergeController(ObjectMergerService mergerService, ClassLoadingGuard classLoadingGuard) {
     this.mergerService = mergerService;
+    this.classLoadingGuard = classLoadingGuard;
   }
 
   @PostMapping(consumes = "application/json", produces = "application/json")
@@ -41,10 +46,8 @@ public class MergeController {
   @ApiResponse(responseCode = "400", description = "Invalid request or merge failed")
   public ResponseEntity<?> merge(@RequestBody MergeRequest request) {
     try {
-      // Convert definition map to MergeDefinition using Gson
       MergeDefinition definition = MergeDefinitionConverter.fromMap(request.getDefinition());
 
-      // Convert DTOs to LabeledSources
       @SuppressWarnings("unchecked")
       List<LabeledSource<?>> sources =
           (List)
@@ -52,15 +55,17 @@ public class MergeController {
                   .map(dto -> new LabeledSource<>(dto.getLabel(), dto.getData()))
                   .toList();
 
-      // Perform merge
       Object result = mergerService.merge(request.getTargetClass(), definition, sources);
 
       return ResponseEntity.ok(result);
-    } catch (ClassNotFoundException e) {
-      return ResponseEntity.badRequest()
-          .body(Map.of("error", "Target class not found: " + request.getTargetClass()));
+    } catch (SecurityException securityException) {
+      log.warn("Blocked merge request: {}", securityException.getMessage());
+      return ResponseEntity.status(403).body(Map.of("error", securityException.getMessage()));
+    } catch (ClassNotFoundException classNotFoundException) {
+      return ResponseEntity.badRequest().body(Map.of("error", "Target class not found"));
     } catch (Exception e) {
-      return ResponseEntity.badRequest().body(Map.of("error", "Merge failed: " + e.getMessage()));
+      log.error("Merge failed", e);
+      return ResponseEntity.badRequest().body(Map.of("error", "Merge failed"));
     }
   }
 
@@ -73,10 +78,8 @@ public class MergeController {
   @ApiResponse(responseCode = "400", description = "Invalid request or merge failed")
   public ResponseEntity<?> mergeYaml(@RequestBody MergeRequest request) {
     try {
-      // Convert definition map to MergeDefinition using Gson
       MergeDefinition definition = MergeDefinitionConverter.fromMap(request.getDefinition());
 
-      // Convert DTOs to LabeledSources
       @SuppressWarnings("unchecked")
       List<LabeledSource<?>> sources =
           (List)
@@ -84,15 +87,17 @@ public class MergeController {
                   .map(dto -> new LabeledSource<>(dto.getLabel(), dto.getData()))
                   .toList();
 
-      // Perform merge
       Object result = mergerService.merge(request.getTargetClass(), definition, sources);
 
       return ResponseEntity.ok(result);
-    } catch (ClassNotFoundException e) {
-      return ResponseEntity.badRequest()
-          .body(Map.of("error", "Target class not found: " + request.getTargetClass()));
+    } catch (SecurityException securityException) {
+      log.warn("Blocked YAML merge request: {}", securityException.getMessage());
+      return ResponseEntity.status(403).body(Map.of("error", securityException.getMessage()));
+    } catch (ClassNotFoundException classNotFoundException) {
+      return ResponseEntity.badRequest().body(Map.of("error", "Target class not found"));
     } catch (Exception e) {
-      return ResponseEntity.badRequest().body(Map.of("error", "Merge failed: " + e.getMessage()));
+      log.error("YAML merge failed", e);
+      return ResponseEntity.badRequest().body(Map.of("error", "Merge failed"));
     }
   }
 
@@ -109,25 +114,20 @@ public class MergeController {
           "Example merge of a Person object from three sources (database, crm, analytics)")
   public ResponseEntity<?> mergePersonExample() {
     try {
-      // Create merge definition using converter
       Map<String, Map<String, Object>> defMap = new LinkedHashMap<>();
 
-      // name: priority based
       defMap.put(
           "name",
           Map.of(
               "strategy", "priority", "priority", Map.of("database", 1, "crm", 2, "analytics", 3)));
 
-      // age: maximum
       defMap.put("age", Map.of("strategy", "maximum", "defaultValue", 0));
 
-      // email: priority based
       defMap.put(
           "email",
           Map.of(
               "strategy", "priority", "priority", Map.of("database", 1, "crm", 2, "analytics", 3)));
 
-      // phone: priority based (different order)
       defMap.put(
           "phone",
           Map.of(
@@ -135,7 +135,6 @@ public class MergeController {
 
       MergeDefinition definition = MergeDefinitionConverter.fromMap(defMap);
 
-      // Create sources with LinkedHashMap to allow null values
       Map<String, Object> dbData = new LinkedHashMap<>();
       dbData.put("name", "Max Müller");
       dbData.put("age", 30);
@@ -162,19 +161,12 @@ public class MergeController {
                   new LabeledSource<>("crm", crmData),
                   new LabeledSource<>("analytics", analyticsData));
 
-      // Merge using the service
       Object result = mergerService.merge("de.x132.objectmerger.model.Person", definition, sources);
 
       return ResponseEntity.ok(result);
     } catch (Exception e) {
-      e.printStackTrace();
-      return ResponseEntity.badRequest()
-          .body(
-              Map.of(
-                  "error",
-                  "Example merge failed: " + e.getMessage(),
-                  "type",
-                  e.getClass().getSimpleName()));
+      log.error("Example merge failed", e);
+      return ResponseEntity.badRequest().body(Map.of("error", "Example merge failed"));
     }
   }
 
@@ -185,17 +177,19 @@ public class MergeController {
   public ResponseEntity<?> generateFromClass(@RequestBody Map<String, String> request) {
     String className = request.get("className");
 
-    // Legacy support: map "Person" to full qualified class name
     if ("Person".equalsIgnoreCase(className)) {
       className = "de.x132.objectmerger.model.Person";
     }
 
     try {
-      Class<?> clazz = Class.forName(className);
+      Class<?> clazz = classLoadingGuard.loadClassSafely(className);
       MergeDefinition definition = MergeDefinitionGenerator.generate(clazz);
       return ResponseEntity.ok(definition);
-    } catch (ClassNotFoundException e) {
-      return ResponseEntity.badRequest().body(Map.of("error", "Class not found: " + className));
+    } catch (SecurityException securityException) {
+      log.warn("Blocked class generation request: {}", securityException.getMessage());
+      return ResponseEntity.status(403).body(Map.of("error", securityException.getMessage()));
+    } catch (ClassNotFoundException classNotFoundException) {
+      return ResponseEntity.badRequest().body(Map.of("error", "Class not found"));
     }
   }
 

@@ -5,27 +5,29 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.x132.objectmerger.security.ClassLoadingGuard;
 import de.x132.objectmerger.service.ObjectMergerService;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(MergeController.class)
+@Import(ClassLoadingGuard.class)
 class MergeControllerTest {
 
   @Autowired private MockMvc mockMvc;
 
-  @MockBean private ObjectMergerService objectMergerService; // Mock needed for context loading
+  @MockBean private ObjectMergerService objectMergerService;
 
   @Test
   void testGenerateFromClass() throws Exception {
     Map<String, String> request = Map.of("className", "Person");
 
-    // We expect 200 OK because "Person" is supported (simple check in controller)
     mockMvc
         .perform(
             post("/api/v1/merge/generator/class")
@@ -44,7 +46,20 @@ class MergeControllerTest {
             post("/api/v1/merge/generator/class")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(request)))
-        .andExpect(status().isBadRequest());
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  void testGenerateFromClass_DangerousClassIsBlocked() throws Exception {
+    Map<String, String> request = Map.of("className", "java.lang.Runtime");
+
+    mockMvc
+        .perform(
+            post("/api/v1/merge/generator/class")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(request)))
+        .andExpect(status().isForbidden())
+        .andExpect(jsonPath("$.error").exists());
   }
 
   @Test
