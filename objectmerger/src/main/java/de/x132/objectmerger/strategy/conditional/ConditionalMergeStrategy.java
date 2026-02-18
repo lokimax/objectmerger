@@ -52,7 +52,8 @@ public class ConditionalMergeStrategy<T>
 
     if (fieldDef.getCases() != null) {
       // Get ExpressionEvaluator (might be null if no extension loaded)
-      Optional<ExpressionEvaluator> evaluatorOpt = ExpressionEvaluatorRegistry.getInstance().getEvaluator();
+      Optional<ExpressionEvaluator> evaluatorOpt =
+          ExpressionEvaluatorRegistry.getInstance().getEvaluator();
 
       if (evaluatorOpt.isEmpty()) {
         log.warn(
@@ -68,7 +69,10 @@ public class ConditionalMergeStrategy<T>
               return executeSubStrategy(c.getUseStrategy(), sources, fieldName);
             }
           } catch (Exception e) {
-            log.warn("Failed to evaluate condition '{}' for field '{}': {}", c.getCondition(), fieldName,
+            log.warn(
+                "Failed to evaluate condition '{}' for field '{}': {}",
+                c.getCondition(),
+                fieldName,
                 e.getMessage());
             // Continue to next case or default
           }
@@ -84,7 +88,7 @@ public class ConditionalMergeStrategy<T>
     return null;
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings({"rawtypes", "unchecked"})
   private Object executeSubStrategy(
       FieldDefinition def, List<LabeledSource<?>> sources, String fieldName) {
     String strategyName = def.getStrategy() != null ? def.getStrategy() : "standard";

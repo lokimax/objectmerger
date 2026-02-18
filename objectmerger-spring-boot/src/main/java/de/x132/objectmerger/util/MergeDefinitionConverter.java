@@ -9,8 +9,7 @@ import de.x132.objectmerger.strategy.priority.PriorityFieldDefinition;
 import java.util.Map;
 
 /**
- * Converts JSON/Map-based merge definitions to proper MergeDefinition objects
- * using Gson for
+ * Converts JSON/Map-based merge definitions to proper MergeDefinition objects using Gson for
  * serialization.
  */
 public class MergeDefinitionConverter {
@@ -21,48 +20,52 @@ public class MergeDefinitionConverter {
     GsonBuilder builder = new GsonBuilder();
     builder.registerTypeAdapter(
         de.x132.objectmerger.strategy.FieldDefinition.class,
-        (com.google.gson.JsonDeserializer<de.x132.objectmerger.strategy.FieldDefinition<?>>) (json, typeOfT,
-            context) -> {
-          com.google.gson.JsonObject jsonObject = json.getAsJsonObject();
-          String strategy = jsonObject.has("strategy")
-              ? jsonObject.get("strategy").getAsString()
-              : "standard";
+        (com.google.gson.JsonDeserializer<de.x132.objectmerger.strategy.FieldDefinition<?>>)
+            (json, typeOfT, context) -> {
+              com.google.gson.JsonObject jsonObject = json.getAsJsonObject();
+              String strategy =
+                  jsonObject.has("strategy")
+                      ? jsonObject.get("strategy").getAsString()
+                      : "standard";
 
-          Class<? extends de.x132.objectmerger.strategy.FieldDefinition> targetClass;
+              Class<? extends de.x132.objectmerger.strategy.FieldDefinition> targetClass;
 
-          switch (strategy) {
-            case "priority":
-              targetClass = PriorityFieldDefinition.class;
-              break;
-            case "mergeMap":
-              targetClass = MapFieldDefinition.class;
-              break;
-            case "mergeList":
-              targetClass = ListFieldDefinition.class;
-              break;
-            case "mvel":
-              try {
-                targetClass = (Class<? extends de.x132.objectmerger.strategy.FieldDefinition>) Class
-                    .forName("de.x132.objectmerger.strategy.mvel.MvelFieldDefinition");
-              } catch (ClassNotFoundException e) {
-                // Fallback or throw? If user requested 'mvel', throw.
-                throw new IllegalArgumentException(
-                    "MVEL strategy requested but 'objectmerger-mvel' dependency is missing.");
+              switch (strategy) {
+                case "priority":
+                  targetClass = PriorityFieldDefinition.class;
+                  break;
+                case "mergeMap":
+                  targetClass = MapFieldDefinition.class;
+                  break;
+                case "mergeList":
+                  targetClass = ListFieldDefinition.class;
+                  break;
+                case "mvel":
+                  try {
+                    targetClass =
+                        (Class<? extends de.x132.objectmerger.strategy.FieldDefinition>)
+                            Class.forName("de.x132.objectmerger.strategy.mvel.MvelFieldDefinition");
+                  } catch (ClassNotFoundException e) {
+                    // Fallback or throw? If user requested 'mvel', throw.
+                    throw new IllegalArgumentException(
+                        "MVEL strategy requested but 'objectmerger-mvel' dependency is missing.");
+                  }
+                  break;
+                case "nested":
+                  targetClass = de.x132.objectmerger.strategy.nested.NestedFieldDefinition.class;
+                  break;
+                case "conditional":
+                  targetClass =
+                      de.x132.objectmerger.strategy.conditional.ConditionalFieldDefinition.class;
+                  break;
+                default:
+                  targetClass =
+                      de.x132.objectmerger.strategy.standard.StandardFieldDefinition.class;
+                  break;
               }
-              break;
-            case "nested":
-              targetClass = de.x132.objectmerger.strategy.nested.NestedFieldDefinition.class;
-              break;
-            case "conditional":
-              targetClass = de.x132.objectmerger.strategy.conditional.ConditionalFieldDefinition.class;
-              break;
-            default:
-              targetClass = de.x132.objectmerger.strategy.standard.StandardFieldDefinition.class;
-              break;
-          }
 
-          return context.deserialize(json, targetClass);
-        });
+              return context.deserialize(json, targetClass);
+            });
     gson = builder.create();
   }
 

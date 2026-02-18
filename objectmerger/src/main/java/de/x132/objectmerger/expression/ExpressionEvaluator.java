@@ -1,14 +1,13 @@
 package de.x132.objectmerger.expression;
 
-import java.io.Serializable;
 import java.util.Map;
 
 public interface ExpressionEvaluator {
-    boolean evaluateBoolean(String expression, Map<String, Object> context);
+  boolean evaluateBoolean(String expression, Map<String, Object> context);
 
-    Object evaluate(String expression, Map<String, Object> context);
+  Object evaluate(String expression, Map<String, Object> context);
 
-    void validate(String expression);
+  void validate(String expression);
 
-    String getName();
+  String getName();
 }

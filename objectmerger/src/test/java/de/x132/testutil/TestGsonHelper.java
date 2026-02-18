@@ -10,7 +10,6 @@ import com.google.gson.JsonParseException;
 import de.x132.objectmerger.strategy.FieldDefinition;
 import de.x132.objectmerger.strategy.list.ListFieldDefinition;
 import de.x132.objectmerger.strategy.map.MapFieldDefinition;
-
 import de.x132.objectmerger.strategy.priority.PriorityFieldDefinition;
 import de.x132.objectmerger.strategy.standard.StandardFieldDefinition;
 import java.lang.reflect.Type;

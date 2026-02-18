@@ -48,9 +48,9 @@ public class MvelTestGsonHelper {
           || "concatenate".equals(strategy)) {
         return context.deserialize(json, PriorityFieldDefinition.class);
       }
-      
+
       if ("mvel".equals(strategy)) {
-         return context.deserialize(json, MvelFieldDefinition.class);
+        return context.deserialize(json, MvelFieldDefinition.class);
       }
 
       return context.deserialize(json, StandardFieldDefinition.class);
