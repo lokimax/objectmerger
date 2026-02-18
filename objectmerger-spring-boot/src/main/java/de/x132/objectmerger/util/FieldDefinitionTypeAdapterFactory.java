@@ -1,0 +1,59 @@
+package de.x132.objectmerger.util;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.TypeAdapter;
+import com.google.gson.TypeAdapterFactory;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+import de.x132.objectmerger.registry.StrategyRegistry;
+import de.x132.objectmerger.strategy.FieldDefinition;
+import de.x132.objectmerger.strategy.MergeStrategy;
+import de.x132.objectmerger.strategy.standard.StandardFieldDefinition;
+import java.io.IOException;
+
+public class FieldDefinitionTypeAdapterFactory implements TypeAdapterFactory {
+
+  @Override
+  public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
+    if (type.getRawType() != FieldDefinition.class) {
+      return null;
+    }
+
+    final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
+
+    return (TypeAdapter<T>)
+        new TypeAdapter<FieldDefinition<?>>() {
+          @Override
+          public void write(JsonWriter out, FieldDefinition<?> value) {
+            throw new UnsupportedOperationException(
+                "Serialization to FieldDefinition not supported");
+          }
+
+          @Override
+          public FieldDefinition<?> read(JsonReader in) throws IOException {
+            JsonElement jsonElement = elementAdapter.read(in);
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
+
+            String strategy =
+                jsonObject.has("strategy") ? jsonObject.get("strategy").getAsString() : "standard";
+
+            Class<? extends FieldDefinition> targetClass = StandardFieldDefinition.class;
+
+            MergeStrategy<?, ?> mergeStrategy =
+                StrategyRegistry.getInstance().getStrategy(strategy);
+
+            if (mergeStrategy != null) {
+              Class<? extends FieldDefinition> configClass = mergeStrategy.getConfigurationClass();
+              if (configClass != FieldDefinition.class) {
+                targetClass = configClass;
+              }
+            }
+
+            return gson.getAdapter(targetClass).fromJsonTree(jsonElement);
+          }
+        }.nullSafe();
+  }
+}
