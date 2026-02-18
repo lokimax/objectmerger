@@ -10,8 +10,7 @@ import de.x132.objectmerger.strategy.standard.StandardFieldDefinition;
 import java.util.Map;
 
 /**
- * Converts JSON/Map-based merge definitions to proper MergeDefinition objects
- * using Gson for
+ * Converts JSON/Map-based merge definitions to proper MergeDefinition objects using Gson for
  * serialization.
  */
 public class MergeDefinitionConverter {
@@ -22,27 +21,29 @@ public class MergeDefinitionConverter {
     GsonBuilder builder = new GsonBuilder();
     builder.registerTypeAdapter(
         FieldDefinition.class,
-        (JsonDeserializer<FieldDefinition<?>>) (json, typeOfT, context) -> {
-          JsonObject jsonObject = json.getAsJsonObject();
-          String strategy = jsonObject.has("strategy")
-              ? jsonObject.get("strategy").getAsString()
-              : "standard";
+        (JsonDeserializer<FieldDefinition<?>>)
+            (json, typeOfT, context) -> {
+              JsonObject jsonObject = json.getAsJsonObject();
+              String strategy =
+                  jsonObject.has("strategy")
+                      ? jsonObject.get("strategy").getAsString()
+                      : "standard";
 
-          Class<? extends FieldDefinition> targetClass;
+              Class<? extends FieldDefinition> targetClass;
 
-          // Dynamic lookup via StrategyRegistry (OCP compliant)
-          de.x132.objectmerger.strategy.MergeStrategy<?, ?> mergeStrategy = de.x132.objectmerger.registry.StrategyRegistry
-              .getInstance()
-              .getStrategy(strategy);
+              // Dynamic lookup via StrategyRegistry (OCP compliant)
+              de.x132.objectmerger.strategy.MergeStrategy<?, ?> mergeStrategy =
+                  de.x132.objectmerger.registry.StrategyRegistry.getInstance()
+                      .getStrategy(strategy);
 
-          if (mergeStrategy != null) {
-            targetClass = mergeStrategy.getConfigurationClass();
-          } else {
-            targetClass = StandardFieldDefinition.class;
-          }
+              if (mergeStrategy != null) {
+                targetClass = mergeStrategy.getConfigurationClass();
+              } else {
+                targetClass = StandardFieldDefinition.class;
+              }
 
-          return context.deserialize(json, targetClass);
-        });
+              return context.deserialize(json, targetClass);
+            });
     gson = builder.create();
   }
 

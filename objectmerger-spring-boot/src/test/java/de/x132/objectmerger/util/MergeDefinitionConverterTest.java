@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.x132.objectmerger.MergeDefinition;
 import de.x132.objectmerger.strategy.FieldDefinition;
-import de.x132.objectmerger.strategy.mvel.MvelFieldDefinition;
 import de.x132.objectmerger.strategy.priority.PriorityFieldDefinition;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -28,8 +27,7 @@ class MergeDefinitionConverterTest {
     assertNotNull(result.getDefinitions());
     assertTrue(result.getDefinitions().containsKey("name"));
 
-    PriorityFieldDefinition nameField =
-        (PriorityFieldDefinition) result.getDefinitions().get("name");
+    PriorityFieldDefinition nameField = (PriorityFieldDefinition) result.getDefinitions().get("name");
     assertNotNull(nameField);
     assertNotNull(nameField.getPriority());
     assertEquals(1, nameField.getPriority().get("source1"));
@@ -153,8 +151,17 @@ class MergeDefinitionConverterTest {
     Map<String, Map<String, Object>> input = Map.of("testField", fieldMap);
     MergeDefinition definition = MergeDefinitionConverter.fromMap(input);
 
+    // Use reflection to avoid direct dependency on MVEL module classes in imports
     FieldDefinition fieldDef = definition.getDefinitions().get("testField");
-    assertInstanceOf(MvelFieldDefinition.class, fieldDef);
-    assertEquals("sources['a'] + sources['b']", ((MvelFieldDefinition) fieldDef).getExpression());
+    try {
+      Class<?> mvelClass = Class.forName("de.x132.objectmerger.strategy.mvel.MvelFieldDefinition");
+      assertInstanceOf(mvelClass, fieldDef);
+
+      java.lang.reflect.Method getExpression = mvelClass.getMethod("getExpression");
+      String expression = (String) getExpression.invoke(fieldDef);
+      assertEquals("sources['a'] + sources['b']", expression);
+    } catch (Exception e) {
+      fail("Failed to verify MvelFieldDefinition via reflection: " + e.getMessage());
+    }
   }
 }
