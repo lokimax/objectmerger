@@ -3,8 +3,7 @@ package de.x132.objectmerger.strategy.conditional;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.ObjectMerger;
 import de.x132.objectmerger.exception.ConfigurationException;
-import de.x132.objectmerger.expression.ExpressionEvaluator;
-import de.x132.objectmerger.registry.ExpressionEvaluatorRegistry;
+
 import de.x132.objectmerger.registry.StrategyRegistry;
 import de.x132.objectmerger.strategy.FieldDefinition;
 import de.x132.objectmerger.strategy.MergeStrategy;
@@ -12,7 +11,7 @@ import de.x132.objectmerger.strategy.config.ConditionalConfig;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -48,34 +47,26 @@ public class ConditionalMergeStrategy<T>
     for (LabeledSource<?> s : sources) {
       values.put(s.getLabel(), ObjectMerger.getFieldValue(s.getSource(), fieldName));
     }
-    context.put("values", values);
-
     if (fieldDef.getCases() != null) {
-      // Get ExpressionEvaluator (might be null if no extension loaded)
-      Optional<ExpressionEvaluator> evaluatorOpt =
-          ExpressionEvaluatorRegistry.getInstance().getEvaluator();
+      for (ConditionCase<?> c : fieldDef.getCases()) {
+        try {
+          // Add values to context for easier access (e.g. values['source1'])
+          // MVEL expression example: "values['source1'] == 'admin'"
+          context.put("values", values);
 
-      if (evaluatorOpt.isEmpty()) {
-        log.warn(
-            "Conditional strategy used but no expression evaluator found (e.g. objectmerger-mvel). Skipping conditions for field '{}'",
-            fieldName);
-      } else {
-        ExpressionEvaluator evaluator = evaluatorOpt.get();
+          Object result = de.x132.objectmerger.strategy.mvel.MvelSandbox.evaluate(c.getCondition(), context);
 
-        for (ConditionCase<?> c : fieldDef.getCases()) {
-          try {
-            if (evaluator.evaluateBoolean(c.getCondition(), context)) {
-              log.debug("Condition '{}' matched for field '{}'", c.getCondition(), fieldName);
-              return executeSubStrategy(c.getUseStrategy(), sources, fieldName);
-            }
-          } catch (Exception e) {
-            log.warn(
-                "Failed to evaluate condition '{}' for field '{}': {}",
-                c.getCondition(),
-                fieldName,
-                e.getMessage());
-            // Continue to next case or default
+          if (result instanceof Boolean && (Boolean) result) {
+            log.debug("Condition '{}' matched for field '{}'", c.getCondition(), fieldName);
+            return executeSubStrategy(c.getUseStrategy(), sources, fieldName);
           }
+        } catch (Exception e) {
+          log.warn(
+              "Failed to evaluate condition '{}' for field '{}': {}",
+              c.getCondition(),
+              fieldName,
+              e.getMessage());
+          // Continue to next case or default
         }
       }
     }
