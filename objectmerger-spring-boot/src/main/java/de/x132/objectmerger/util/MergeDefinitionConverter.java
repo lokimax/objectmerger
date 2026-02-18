@@ -5,7 +5,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonObject;
 import de.x132.objectmerger.MergeDefinition;
+import de.x132.objectmerger.registry.StrategyRegistry;
 import de.x132.objectmerger.strategy.FieldDefinition;
+import de.x132.objectmerger.strategy.MergeStrategy;
 import de.x132.objectmerger.strategy.standard.StandardFieldDefinition;
 import java.util.Map;
 
@@ -32,9 +34,8 @@ public class MergeDefinitionConverter {
               Class<? extends FieldDefinition> targetClass;
 
               // Dynamic lookup via StrategyRegistry (OCP compliant)
-              de.x132.objectmerger.strategy.MergeStrategy<?, ?> mergeStrategy =
-                  de.x132.objectmerger.registry.StrategyRegistry.getInstance()
-                      .getStrategy(strategy);
+              MergeStrategy<?, ?> mergeStrategy =
+                  StrategyRegistry.getInstance().getStrategy(strategy);
 
               if (mergeStrategy != null) {
                 targetClass = mergeStrategy.getConfigurationClass();
