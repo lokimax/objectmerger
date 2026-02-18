@@ -78,6 +78,12 @@ public final class MvelSandbox {
     }
   }
 
+  public static Object evaluate(String expression, Map<String, Object> context) {
+    validateExpression(expression);
+    validateContextVariables(context);
+    return org.mvel2.MVEL.eval(expression, context);
+  }
+
   private static void rejectBlockedPatterns(String expression) {
     for (Pattern pattern : BLOCKED_EXPRESSION_PATTERNS) {
       if (pattern.matcher(expression).find()) {
