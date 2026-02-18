@@ -6,16 +6,12 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonObject;
 import de.x132.objectmerger.MergeDefinition;
 import de.x132.objectmerger.strategy.FieldDefinition;
-import de.x132.objectmerger.strategy.conditional.ConditionalFieldDefinition;
-import de.x132.objectmerger.strategy.list.ListFieldDefinition;
-import de.x132.objectmerger.strategy.map.MapFieldDefinition;
-import de.x132.objectmerger.strategy.nested.NestedFieldDefinition;
-import de.x132.objectmerger.strategy.priority.PriorityFieldDefinition;
 import de.x132.objectmerger.strategy.standard.StandardFieldDefinition;
 import java.util.Map;
 
 /**
- * Converts JSON/Map-based merge definitions to proper MergeDefinition objects using Gson for
+ * Converts JSON/Map-based merge definitions to proper MergeDefinition objects
+ * using Gson for
  * serialization.
  */
 public class MergeDefinitionConverter {
@@ -26,50 +22,27 @@ public class MergeDefinitionConverter {
     GsonBuilder builder = new GsonBuilder();
     builder.registerTypeAdapter(
         FieldDefinition.class,
-        (JsonDeserializer<FieldDefinition<?>>)
-            (json, typeOfT, context) -> {
-              JsonObject jsonObject = json.getAsJsonObject();
-              String strategy =
-                  jsonObject.has("strategy")
-                      ? jsonObject.get("strategy").getAsString()
-                      : "standard";
+        (JsonDeserializer<FieldDefinition<?>>) (json, typeOfT, context) -> {
+          JsonObject jsonObject = json.getAsJsonObject();
+          String strategy = jsonObject.has("strategy")
+              ? jsonObject.get("strategy").getAsString()
+              : "standard";
 
-              Class<? extends FieldDefinition> targetClass;
+          Class<? extends FieldDefinition> targetClass;
 
-              switch (strategy) {
-                case "priority":
-                  targetClass = PriorityFieldDefinition.class;
-                  break;
-                case "mergeMap":
-                  targetClass = MapFieldDefinition.class;
-                  break;
-                case "mergeList":
-                  targetClass = ListFieldDefinition.class;
-                  break;
-                case "mvel":
-                  try {
-                    targetClass =
-                        (Class<? extends FieldDefinition>)
-                            Class.forName("de.x132.objectmerger.strategy.mvel.MvelFieldDefinition");
-                  } catch (ClassNotFoundException e) {
-                    // Fallback or throw? If user requested 'mvel', throw.
-                    throw new IllegalArgumentException(
-                        "MVEL strategy requested but 'objectmerger-mvel' dependency is missing.");
-                  }
-                  break;
-                case "nested":
-                  targetClass = NestedFieldDefinition.class;
-                  break;
-                case "conditional":
-                  targetClass = ConditionalFieldDefinition.class;
-                  break;
-                default:
-                  targetClass = StandardFieldDefinition.class;
-                  break;
-              }
+          // Dynamic lookup via StrategyRegistry (OCP compliant)
+          de.x132.objectmerger.strategy.MergeStrategy<?, ?> mergeStrategy = de.x132.objectmerger.registry.StrategyRegistry
+              .getInstance()
+              .getStrategy(strategy);
 
-              return context.deserialize(json, targetClass);
-            });
+          if (mergeStrategy != null) {
+            targetClass = mergeStrategy.getConfigurationClass();
+          } else {
+            targetClass = StandardFieldDefinition.class;
+          }
+
+          return context.deserialize(json, targetClass);
+        });
     gson = builder.create();
   }
 
