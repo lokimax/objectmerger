@@ -6,7 +6,7 @@ import com.google.gson.Gson;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.MergeDefinition;
 import de.x132.objectmerger.ObjectMerger;
-import de.x132.testutil.TestGsonHelper;
+import de.x132.testutil.MvelTestGsonHelper;
 import java.io.FileReader;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 class MapPersonMergeTest {
 
-  private static final Gson gson = TestGsonHelper.createGson();
+  private static final Gson gson = MvelTestGsonHelper.createGson();
 
   @Test
   @DisplayName("Should merge person data using MVEL rules identically to standard rules")

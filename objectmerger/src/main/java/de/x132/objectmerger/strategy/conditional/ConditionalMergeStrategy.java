@@ -3,16 +3,17 @@ package de.x132.objectmerger.strategy.conditional;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.ObjectMerger;
 import de.x132.objectmerger.exception.ConfigurationException;
+import de.x132.objectmerger.expression.ExpressionEvaluator;
+import de.x132.objectmerger.registry.ExpressionEvaluatorRegistry;
 import de.x132.objectmerger.registry.StrategyRegistry;
 import de.x132.objectmerger.strategy.FieldDefinition;
 import de.x132.objectmerger.strategy.MergeStrategy;
 import de.x132.objectmerger.strategy.config.ConditionalConfig;
-import de.x132.objectmerger.strategy.mvel.MvelSandbox;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.mvel2.MVEL;
 
 @Slf4j
 public class ConditionalMergeStrategy<T>
@@ -50,29 +51,27 @@ public class ConditionalMergeStrategy<T>
     context.put("values", values);
 
     if (fieldDef.getCases() != null) {
-      MvelSandbox.validateContextVariables(context);
+      // Get ExpressionEvaluator (might be null if no extension loaded)
+      Optional<ExpressionEvaluator> evaluatorOpt = ExpressionEvaluatorRegistry.getInstance().getEvaluator();
 
-      for (ConditionCase<?> c : fieldDef.getCases()) {
-        try {
-          MvelSandbox.validateExpression(c.getCondition());
+      if (evaluatorOpt.isEmpty()) {
+        log.warn(
+            "Conditional strategy used but no expression evaluator found (e.g. objectmerger-mvel). Skipping conditions for field '{}'",
+            fieldName);
+      } else {
+        ExpressionEvaluator evaluator = evaluatorOpt.get();
 
-          Object result =
-              MVEL.executeExpression(
-                  MVEL.compileExpression(
-                      c.getCondition(), MvelSandbox.createSandboxedParserContext()),
-                  context);
-          if (Boolean.TRUE.equals(result)) {
-            log.debug("Condition '{}' matched for field '{}'", c.getCondition(), fieldName);
-            return executeSubStrategy(c.getUseStrategy(), sources, fieldName);
+        for (ConditionCase<?> c : fieldDef.getCases()) {
+          try {
+            if (evaluator.evaluateBoolean(c.getCondition(), context)) {
+              log.debug("Condition '{}' matched for field '{}'", c.getCondition(), fieldName);
+              return executeSubStrategy(c.getUseStrategy(), sources, fieldName);
+            }
+          } catch (Exception e) {
+            log.warn("Failed to evaluate condition '{}' for field '{}': {}", c.getCondition(), fieldName,
+                e.getMessage());
+            // Continue to next case or default
           }
-        } catch (SecurityException securityException) {
-          log.error(
-              "MVEL sandbox violation for field '{}': {}",
-              fieldName,
-              securityException.getMessage());
-          throw securityException;
-        } catch (Exception e) {
-          log.warn("Failed to evaluate condition '{}': {}", c.getCondition(), e.getMessage());
         }
       }
     }
@@ -85,7 +84,7 @@ public class ConditionalMergeStrategy<T>
     return null;
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   private Object executeSubStrategy(
       FieldDefinition def, List<LabeledSource<?>> sources, String fieldName) {
     String strategyName = def.getStrategy() != null ? def.getStrategy() : "standard";

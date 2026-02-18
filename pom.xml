@@ -38,6 +38,7 @@
         <module>objectmerger</module>
         <module>objectmerger-cli</module>
         <module>objectmerger-spring-boot</module>
+        <module>objectmerger-mvel</module>
     </modules>
 
     <properties>
