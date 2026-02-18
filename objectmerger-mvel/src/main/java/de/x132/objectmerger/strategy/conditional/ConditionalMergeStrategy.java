@@ -3,14 +3,12 @@ package de.x132.objectmerger.strategy.conditional;
 import de.x132.objectmerger.LabeledSource;
 import de.x132.objectmerger.ObjectMerger;
 import de.x132.objectmerger.exception.ConfigurationException;
-
 import de.x132.objectmerger.registry.StrategyRegistry;
 import de.x132.objectmerger.strategy.FieldDefinition;
 import de.x132.objectmerger.strategy.MergeStrategy;
 import de.x132.objectmerger.strategy.config.ConditionalConfig;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 
@@ -54,7 +52,8 @@ public class ConditionalMergeStrategy<T>
           // MVEL expression example: "values['source1'] == 'admin'"
           context.put("values", values);
 
-          Object result = de.x132.objectmerger.strategy.mvel.MvelSandbox.evaluate(c.getCondition(), context);
+          Object result =
+              de.x132.objectmerger.strategy.mvel.MvelSandbox.evaluate(c.getCondition(), context);
 
           if (result instanceof Boolean && (Boolean) result) {
             log.debug("Condition '{}' matched for field '{}'", c.getCondition(), fieldName);

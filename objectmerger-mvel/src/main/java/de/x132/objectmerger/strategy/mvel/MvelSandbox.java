@@ -2,6 +2,7 @@ package de.x132.objectmerger.strategy.mvel;
 
 import java.util.Map;
 import java.util.regex.Pattern;
+import org.mvel2.MVEL;
 import org.mvel2.ParserContext;
 
 public final class MvelSandbox {
@@ -81,7 +82,7 @@ public final class MvelSandbox {
   public static Object evaluate(String expression, Map<String, Object> context) {
     validateExpression(expression);
     validateContextVariables(context);
-    return org.mvel2.MVEL.eval(expression, context);
+    return MVEL.eval(expression, context);
   }
 
   private static void rejectBlockedPatterns(String expression) {

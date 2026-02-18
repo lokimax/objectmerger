@@ -2,10 +2,16 @@ package de.x132.objectmerger.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonObject;
 import de.x132.objectmerger.MergeDefinition;
+import de.x132.objectmerger.strategy.FieldDefinition;
+import de.x132.objectmerger.strategy.conditional.ConditionalFieldDefinition;
 import de.x132.objectmerger.strategy.list.ListFieldDefinition;
 import de.x132.objectmerger.strategy.map.MapFieldDefinition;
+import de.x132.objectmerger.strategy.nested.NestedFieldDefinition;
 import de.x132.objectmerger.strategy.priority.PriorityFieldDefinition;
+import de.x132.objectmerger.strategy.standard.StandardFieldDefinition;
 import java.util.Map;
 
 /**
@@ -19,16 +25,16 @@ public class MergeDefinitionConverter {
   static {
     GsonBuilder builder = new GsonBuilder();
     builder.registerTypeAdapter(
-        de.x132.objectmerger.strategy.FieldDefinition.class,
-        (com.google.gson.JsonDeserializer<de.x132.objectmerger.strategy.FieldDefinition<?>>)
+        FieldDefinition.class,
+        (JsonDeserializer<FieldDefinition<?>>)
             (json, typeOfT, context) -> {
-              com.google.gson.JsonObject jsonObject = json.getAsJsonObject();
+              JsonObject jsonObject = json.getAsJsonObject();
               String strategy =
                   jsonObject.has("strategy")
                       ? jsonObject.get("strategy").getAsString()
                       : "standard";
 
-              Class<? extends de.x132.objectmerger.strategy.FieldDefinition> targetClass;
+              Class<? extends FieldDefinition> targetClass;
 
               switch (strategy) {
                 case "priority":
@@ -43,7 +49,7 @@ public class MergeDefinitionConverter {
                 case "mvel":
                   try {
                     targetClass =
-                        (Class<? extends de.x132.objectmerger.strategy.FieldDefinition>)
+                        (Class<? extends FieldDefinition>)
                             Class.forName("de.x132.objectmerger.strategy.mvel.MvelFieldDefinition");
                   } catch (ClassNotFoundException e) {
                     // Fallback or throw? If user requested 'mvel', throw.
@@ -52,15 +58,13 @@ public class MergeDefinitionConverter {
                   }
                   break;
                 case "nested":
-                  targetClass = de.x132.objectmerger.strategy.nested.NestedFieldDefinition.class;
+                  targetClass = NestedFieldDefinition.class;
                   break;
                 case "conditional":
-                  targetClass =
-                      de.x132.objectmerger.strategy.conditional.ConditionalFieldDefinition.class;
+                  targetClass = ConditionalFieldDefinition.class;
                   break;
                 default:
-                  targetClass =
-                      de.x132.objectmerger.strategy.standard.StandardFieldDefinition.class;
+                  targetClass = StandardFieldDefinition.class;
                   break;
               }
 
