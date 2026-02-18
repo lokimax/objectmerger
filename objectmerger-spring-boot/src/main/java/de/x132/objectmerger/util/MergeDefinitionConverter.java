@@ -10,7 +10,10 @@ public class MergeDefinitionConverter {
   private static final Gson gson;
 
   static {
-    gson = new GsonBuilder().registerTypeAdapterFactory(new FieldDefinitionTypeAdapterFactory()).create();
+    gson =
+        new GsonBuilder()
+            .registerTypeAdapterFactory(new FieldDefinitionTypeAdapterFactory())
+            .create();
   }
 
   public static MergeDefinition fromMap(Map<String, Map<String, Object>> definitionMap) {
