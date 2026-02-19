@@ -168,6 +168,7 @@
                                 <style>AOSP</style>
                             </googleJavaFormat>
                             <removeUnusedImports/>
+                            <importOrder/>
                         </java>
                     </configuration>
                 </plugin>
