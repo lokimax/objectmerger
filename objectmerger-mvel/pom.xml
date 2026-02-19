@@ -14,6 +14,7 @@
     <description>MVEL integration for ObjectMerger</description>
 
     <dependencies>
+        <!-- Compile dependencies -->
         <dependency>
             <groupId>de.x132</groupId>
             <artifactId>objectmerger</artifactId>
@@ -25,10 +26,18 @@
             <version>2.5.0.Final</version>
         </dependency>
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <!-- Provided dependencies -->
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
+
+        <!-- Test dependencies -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -43,11 +52,6 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <scope>test</scope>
-        </dependency>
-        <!-- Logging -->
-        <dependency>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
         </dependency>
     </dependencies>
 </project>

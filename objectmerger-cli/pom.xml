@@ -16,6 +16,7 @@
     <packaging>jar</packaging>
 
     <dependencies>
+        <!-- Compile dependencies -->
         <dependency>
             <groupId>de.x132</groupId>
             <artifactId>objectmerger</artifactId>
@@ -28,11 +29,15 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>
+
+        <!-- Provided dependencies -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
+
+        <!-- Test dependencies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
