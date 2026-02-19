@@ -24,11 +24,10 @@ class MvelSandboxTest {
     private void assertExpressionIsBlocked(String expression) {
         MvelFieldDefinition fieldDef = MvelFieldDefinition.builder().expression(expression).build();
 
-        SecurityException thrown =
-                assertThrows(
-                        SecurityException.class,
-                        () -> strategy.merge(dummySources(), fieldDef, "sandboxTest"),
-                        "Expression should have been blocked by sandbox: " + expression);
+        SecurityException thrown = assertThrows(
+                SecurityException.class,
+                () -> strategy.merge(dummySources(), fieldDef, "sandboxTest"),
+                "Expression should have been blocked by sandbox: " + expression);
 
         assertTrue(
                 thrown.getMessage().contains("sandbox"),
@@ -42,8 +41,8 @@ class MvelSandboxTest {
         @Test
         @DisplayName("Simple arithmetic should be allowed")
         void arithmeticAllowed() {
-            MvelFieldDefinition fieldDef =
-                    MvelFieldDefinition.builder().expression("sources['a'] + sources['b']").build();
+            MvelFieldDefinition fieldDef = MvelFieldDefinition.builder().expression("sources['a'] + sources['b']")
+                    .build();
             Object result = strategy.merge(dummySources(), fieldDef, "test");
             assertEquals(30, result);
         }
@@ -51,14 +50,12 @@ class MvelSandboxTest {
         @Test
         @DisplayName("String concatenation should be allowed")
         void stringConcatenationAllowed() {
-            List<LabeledSource<?>> sources =
-                    Arrays.asList(
-                            new LabeledSource<>("first", "Hello"),
-                            new LabeledSource<>("second", " World"));
-            MvelFieldDefinition fieldDef =
-                    MvelFieldDefinition.builder()
-                            .expression("sources['first'] + sources['second']")
-                            .build();
+            List<LabeledSource<?>> sources = Arrays.asList(
+                    new LabeledSource<>("first", "Hello"),
+                    new LabeledSource<>("second", " World"));
+            MvelFieldDefinition fieldDef = MvelFieldDefinition.builder()
+                    .expression("sources['first'] + sources['second']")
+                    .build();
             Object result = strategy.merge(sources, fieldDef, "test");
             assertEquals("Hello World", result);
         }
@@ -66,10 +63,9 @@ class MvelSandboxTest {
         @Test
         @DisplayName("Ternary/conditional expressions should be allowed")
         void ternaryExpressionAllowed() {
-            MvelFieldDefinition fieldDef =
-                    MvelFieldDefinition.builder()
-                            .expression("sources['a'] > 5 ? sources['a'] : sources['b']")
-                            .build();
+            MvelFieldDefinition fieldDef = MvelFieldDefinition.builder()
+                    .expression("sources['a'] > 5 ? sources['a'] : sources['b']")
+                    .build();
             Object result = strategy.merge(dummySources(), fieldDef, "test");
             assertEquals(10, result);
         }
@@ -77,10 +73,9 @@ class MvelSandboxTest {
         @Test
         @DisplayName("Null checks should be allowed")
         void nullCheckAllowed() {
-            MvelFieldDefinition fieldDef =
-                    MvelFieldDefinition.builder()
-                            .expression("sources['a'] != null ? sources['a'] : 0")
-                            .build();
+            MvelFieldDefinition fieldDef = MvelFieldDefinition.builder()
+                    .expression("sources['a'] != null ? sources['a'] : 0")
+                    .build();
             Object result = strategy.merge(dummySources(), fieldDef, "test");
             assertEquals(10, result);
         }
@@ -270,6 +265,34 @@ class MvelSandboxTest {
         void blocksScriptEngineCreation() {
             assertExpressionIsBlocked(
                     "new javax.script.ScriptEngineManager().getEngineByName('js')");
+        }
+    }
+
+    @Nested
+    @DisplayName("Advanced bypass attempts must be blocked")
+    class AdvancedBypassAttemptsAreBlocked {
+        @Test
+        @DisplayName("Fully qualified new object creation should be blocked")
+        void blocksFullyQualifiedNew() {
+            assertExpressionIsBlocked("new java.lang.String('test')");
+        }
+
+        @Test
+        @DisplayName("Complex FQN new object creation should be blocked")
+        void blocksComplexFqnNew() {
+            assertExpressionIsBlocked("new org.springframework.web.client.RestTemplate()");
+        }
+
+        @Test
+        @DisplayName("T() type reference should be blocked")
+        void blocksTypeReference() {
+            assertExpressionIsBlocked("T(java.lang.Runtime).getRuntime()");
+        }
+
+        @Test
+        @DisplayName("T() usage in expression should be blocked")
+        void blocksTypeReferenceInExpression() {
+            assertExpressionIsBlocked("1 + T(java.lang.System).exit(0)");
         }
     }
 
