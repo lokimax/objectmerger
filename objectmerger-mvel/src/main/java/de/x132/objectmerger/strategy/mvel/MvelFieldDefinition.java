@@ -14,5 +14,5 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class MvelFieldDefinition extends FieldDefinition<Object> implements MvelConfig {
-  private String expression;
+    private String expression;
 }

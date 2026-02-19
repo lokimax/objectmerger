@@ -14,65 +14,65 @@ import java.util.stream.Collectors;
 
 public class ConcatenateStrategy implements MergeStrategy<String, FieldDefinition<String>> {
 
-  private static final String DEFAULT_DELIMITER = ",";
-  public static final String NAME = "concatenate";
+    private static final String DEFAULT_DELIMITER = ",";
+    public static final String NAME = "concatenate";
 
-  @Override
-  public String getName() {
-    return NAME;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Class<FieldDefinition<String>> getConfigurationClass() {
-    return (Class) FieldDefinition.class;
-  }
-
-  @Override
-  public String merge(
-      List<LabeledSource<?>> sources, FieldDefinition<String> fieldDef, String fieldName) {
-    String delimiter = getDelimiter(fieldDef);
-    Map<String, Integer> priority = null;
-    if (fieldDef instanceof PriorityFieldDefinition priorityDef) {
-      priority = priorityDef.getPriority();
+    @Override
+    public String getName() {
+        return NAME;
     }
 
-    List<String> values =
-        sources.stream()
-            .sorted(getComparator(priority))
-            .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
-            .filter(Objects::nonNull)
-            .map(this::validateAndConvertToString)
-            .collect(Collectors.toList());
-
-    if (values.isEmpty()) {
-      return fieldDef.getDefaultValue();
+    @SuppressWarnings("unchecked")
+    @Override
+    public Class<FieldDefinition<String>> getConfigurationClass() {
+        return (Class) FieldDefinition.class;
     }
 
-    return String.join(delimiter, values);
-  }
+    @Override
+    public String merge(
+            List<LabeledSource<?>> sources, FieldDefinition<String> fieldDef, String fieldName) {
+        String delimiter = getDelimiter(fieldDef);
+        Map<String, Integer> priority = null;
+        if (fieldDef instanceof PriorityFieldDefinition priorityDef) {
+            priority = priorityDef.getPriority();
+        }
 
-  private String getDelimiter(FieldDefinition<?> fieldDef) {
-    // Try to get delimiter from a custom field or property
-    // For now, return default - can be extended to read from metadata
-    return DEFAULT_DELIMITER;
-  }
+        List<String> values =
+                sources.stream()
+                        .sorted(getComparator(priority))
+                        .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
+                        .filter(Objects::nonNull)
+                        .map(this::validateAndConvertToString)
+                        .collect(Collectors.toList());
 
-  private Comparator<LabeledSource<?>> getComparator(Map<String, Integer> priority) {
-    if (priority == null || priority.isEmpty()) {
-      // If no priority, keep original order
-      return (s1, s2) -> 0;
+        if (values.isEmpty()) {
+            return fieldDef.getDefaultValue();
+        }
+
+        return String.join(delimiter, values);
     }
-    // Sort by priority (lower number = higher priority = comes first)
-    return Comparator.comparingInt(s -> priority.getOrDefault(s.getLabel(), Integer.MAX_VALUE));
-  }
 
-  private String validateAndConvertToString(Object value) {
-    if (value instanceof String) {
-      return (String) value;
+    private String getDelimiter(FieldDefinition<?> fieldDef) {
+        // Try to get delimiter from a custom field or property
+        // For now, return default - can be extended to read from metadata
+        return DEFAULT_DELIMITER;
     }
-    throw new InvalidSourceException(
-        "Field must be a String for concatenate strategy, but was: "
-            + value.getClass().getSimpleName());
-  }
+
+    private Comparator<LabeledSource<?>> getComparator(Map<String, Integer> priority) {
+        if (priority == null || priority.isEmpty()) {
+            // If no priority, keep original order
+            return (s1, s2) -> 0;
+        }
+        // Sort by priority (lower number = higher priority = comes first)
+        return Comparator.comparingInt(s -> priority.getOrDefault(s.getLabel(), Integer.MAX_VALUE));
+    }
+
+    private String validateAndConvertToString(Object value) {
+        if (value instanceof String) {
+            return (String) value;
+        }
+        throw new InvalidSourceException(
+                "Field must be a String for concatenate strategy, but was: "
+                        + value.getClass().getSimpleName());
+    }
 }

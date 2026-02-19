@@ -5,11 +5,11 @@ package de.x132.objectmerger.exception;
  * unchecked exception.
  */
 public class ObjectMergerException extends RuntimeException {
-  public ObjectMergerException(String message) {
-    super(message);
-  }
+    public ObjectMergerException(String message) {
+        super(message);
+    }
 
-  public ObjectMergerException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    public ObjectMergerException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

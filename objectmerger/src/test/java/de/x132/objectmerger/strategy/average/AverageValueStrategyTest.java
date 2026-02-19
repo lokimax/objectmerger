@@ -22,278 +22,304 @@ import org.mockito.MockedStatic;
 @DisplayName("AverageValueStrategy Tests")
 class AverageValueStrategyTest {
 
-  private AverageValueStrategy strategy;
-  private FieldDefinition fieldDef;
+    private AverageValueStrategy strategy;
+    private FieldDefinition fieldDef;
 
-  @BeforeEach
-  void setUp() {
-    strategy = new AverageValueStrategy();
-    fieldDef = mock(FieldDefinition.class);
-  }
-
-  @Test
-  @DisplayName("Should calculate average from integer values")
-  void testAverageOfIntegers() {
-    // Arrange
-    String fieldName = "score";
-    Object source1 = new Object();
-    Object source2 = new Object();
-    Object source3 = new Object();
-
-    List<LabeledSource<?>> sources =
-        Arrays.asList(
-            new LabeledSource<>("source1", source1),
-            new LabeledSource<>("source2", source2),
-            new LabeledSource<>("source3", source3));
-
-    when(fieldDef.getDefaultValue()).thenReturn(null);
-
-    try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
-      mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source1, fieldName)).thenReturn(10);
-      mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source2, fieldName)).thenReturn(20);
-      mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source3, fieldName)).thenReturn(30);
-
-      // Act
-      Object result = strategy.merge(sources, fieldDef, fieldName);
-
-      // Assert
-      assertEquals(20, result); // (10 + 20 + 30) / 3 = 20
+    @BeforeEach
+    void setUp() {
+        strategy = new AverageValueStrategy();
+        fieldDef = mock(FieldDefinition.class);
     }
-  }
 
-  @Test
-  @DisplayName("Should calculate average from double values")
-  void testAverageOfDoubles() {
-    // Arrange
-    String fieldName = "rating";
-    Object source1 = new Object();
-    Object source2 = new Object();
+    @Test
+    @DisplayName("Should calculate average from integer values")
+    void testAverageOfIntegers() {
+        // Arrange
+        String fieldName = "score";
+        Object source1 = new Object();
+        Object source2 = new Object();
+        Object source3 = new Object();
 
-    List<LabeledSource<?>> sources =
-        Arrays.asList(
-            new LabeledSource<>("source1", source1), new LabeledSource<>("source2", source2));
+        List<LabeledSource<?>> sources =
+                Arrays.asList(
+                        new LabeledSource<>("source1", source1),
+                        new LabeledSource<>("source2", source2),
+                        new LabeledSource<>("source3", source3));
 
-    when(fieldDef.getDefaultValue()).thenReturn(null);
+        when(fieldDef.getDefaultValue()).thenReturn(null);
 
-    try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
-      mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source1, fieldName)).thenReturn(4.5);
-      mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source2, fieldName)).thenReturn(3.5);
+        try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
+            mockedObjectMerger
+                    .when(() -> ObjectMerger.getFieldValue(source1, fieldName))
+                    .thenReturn(10);
+            mockedObjectMerger
+                    .when(() -> ObjectMerger.getFieldValue(source2, fieldName))
+                    .thenReturn(20);
+            mockedObjectMerger
+                    .when(() -> ObjectMerger.getFieldValue(source3, fieldName))
+                    .thenReturn(30);
 
-      // Act
-      Object result = strategy.merge(sources, fieldDef, fieldName);
+            // Act
+            Object result = strategy.merge(sources, fieldDef, fieldName);
 
-      // Assert
-      assertEquals(4, result); // (4.5 + 3.5) / 2 = 4.0, returned as int
+            // Assert
+            assertEquals(20, result); // (10 + 20 + 30) / 3 = 20
+        }
     }
-  }
 
-  @Test
-  @DisplayName("Should skip null values when calculating average")
-  void testAverageSkipsNullValues() {
-    // Arrange
-    String fieldName = "age";
-    Object source1 = new Object();
-    Object source2 = new Object();
-    Object source3 = new Object();
+    @Test
+    @DisplayName("Should calculate average from double values")
+    void testAverageOfDoubles() {
+        // Arrange
+        String fieldName = "rating";
+        Object source1 = new Object();
+        Object source2 = new Object();
 
-    List<LabeledSource<?>> sources =
-        Arrays.asList(
-            new LabeledSource<>("source1", source1),
-            new LabeledSource<>("source2", source2),
-            new LabeledSource<>("source3", source3));
+        List<LabeledSource<?>> sources =
+                Arrays.asList(
+                        new LabeledSource<>("source1", source1),
+                        new LabeledSource<>("source2", source2));
 
-    when(fieldDef.getDefaultValue()).thenReturn(null);
+        when(fieldDef.getDefaultValue()).thenReturn(null);
 
-    try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
-      mockedObjectMerger
-          .when(() -> ObjectMerger.getFieldValue(source1, fieldName))
-          .thenReturn(null);
-      mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source2, fieldName)).thenReturn(25);
-      mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source3, fieldName)).thenReturn(35);
+        try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
+            mockedObjectMerger
+                    .when(() -> ObjectMerger.getFieldValue(source1, fieldName))
+                    .thenReturn(4.5);
+            mockedObjectMerger
+                    .when(() -> ObjectMerger.getFieldValue(source2, fieldName))
+                    .thenReturn(3.5);
 
-      // Act
-      Object result = strategy.merge(sources, fieldDef, fieldName);
+            // Act
+            Object result = strategy.merge(sources, fieldDef, fieldName);
 
-      // Assert
-      assertEquals(30, result); // (25 + 35) / 2 = 30 (source1 ignored)
+            // Assert
+            assertEquals(4, result); // (4.5 + 3.5) / 2 = 4.0, returned as int
+        }
     }
-  }
 
-  @Test
-  @DisplayName("Should return default value when all values are null")
-  void testAverageReturnsDefaultWhenAllNull() {
-    // Arrange
-    String fieldName = "score";
-    Object source1 = new Object();
-    Object source2 = new Object();
+    @Test
+    @DisplayName("Should skip null values when calculating average")
+    void testAverageSkipsNullValues() {
+        // Arrange
+        String fieldName = "age";
+        Object source1 = new Object();
+        Object source2 = new Object();
+        Object source3 = new Object();
 
-    List<LabeledSource<?>> sources =
-        Arrays.asList(
-            new LabeledSource<>("source1", source1), new LabeledSource<>("source2", source2));
+        List<LabeledSource<?>> sources =
+                Arrays.asList(
+                        new LabeledSource<>("source1", source1),
+                        new LabeledSource<>("source2", source2),
+                        new LabeledSource<>("source3", source3));
 
-    Integer defaultValue = 0;
-    when(fieldDef.getDefaultValue()).thenReturn(defaultValue);
+        when(fieldDef.getDefaultValue()).thenReturn(null);
 
-    try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
-      mockedObjectMerger
-          .when(() -> ObjectMerger.getFieldValue(source1, fieldName))
-          .thenReturn(null);
-      mockedObjectMerger
-          .when(() -> ObjectMerger.getFieldValue(source2, fieldName))
-          .thenReturn(null);
+        try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
+            mockedObjectMerger
+                    .when(() -> ObjectMerger.getFieldValue(source1, fieldName))
+                    .thenReturn(null);
+            mockedObjectMerger
+                    .when(() -> ObjectMerger.getFieldValue(source2, fieldName))
+                    .thenReturn(25);
+            mockedObjectMerger
+                    .when(() -> ObjectMerger.getFieldValue(source3, fieldName))
+                    .thenReturn(35);
 
-      // Act
-      Object result = strategy.merge(sources, fieldDef, fieldName);
+            // Act
+            Object result = strategy.merge(sources, fieldDef, fieldName);
 
-      // Assert
-      assertEquals(0, result);
+            // Assert
+            assertEquals(30, result); // (25 + 35) / 2 = 30 (source1 ignored)
+        }
     }
-  }
 
-  @Test
-  @DisplayName("Should handle single value")
-  void testAverageWithSingleValue() {
-    // Arrange
-    String fieldName = "value";
-    Object source1 = new Object();
+    @Test
+    @DisplayName("Should return default value when all values are null")
+    void testAverageReturnsDefaultWhenAllNull() {
+        // Arrange
+        String fieldName = "score";
+        Object source1 = new Object();
+        Object source2 = new Object();
 
-    List<LabeledSource<?>> sources = Arrays.asList(new LabeledSource<>("source1", source1));
+        List<LabeledSource<?>> sources =
+                Arrays.asList(
+                        new LabeledSource<>("source1", source1),
+                        new LabeledSource<>("source2", source2));
 
-    when(fieldDef.getDefaultValue()).thenReturn(null);
+        Integer defaultValue = 0;
+        when(fieldDef.getDefaultValue()).thenReturn(defaultValue);
 
-    try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
-      mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source1, fieldName)).thenReturn(42);
+        try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
+            mockedObjectMerger
+                    .when(() -> ObjectMerger.getFieldValue(source1, fieldName))
+                    .thenReturn(null);
+            mockedObjectMerger
+                    .when(() -> ObjectMerger.getFieldValue(source2, fieldName))
+                    .thenReturn(null);
 
-      // Act
-      Object result = strategy.merge(sources, fieldDef, fieldName);
+            // Act
+            Object result = strategy.merge(sources, fieldDef, fieldName);
 
-      // Assert
-      assertEquals(42, result); // Average of single value is the value itself
+            // Assert
+            assertEquals(0, result);
+        }
     }
-  }
 
-  @Test
-  @DisplayName("Should return double when result has decimal places")
-  void testAverageReturnsDoubleForNonWholeNumbers() {
-    // Arrange
-    String fieldName = "temperature";
-    Object source1 = new Object();
-    Object source2 = new Object();
-    Object source3 = new Object();
+    @Test
+    @DisplayName("Should handle single value")
+    void testAverageWithSingleValue() {
+        // Arrange
+        String fieldName = "value";
+        Object source1 = new Object();
 
-    List<LabeledSource<?>> sources =
-        Arrays.asList(
-            new LabeledSource<>("source1", source1),
-            new LabeledSource<>("source2", source2),
-            new LabeledSource<>("source3", source3));
+        List<LabeledSource<?>> sources = Arrays.asList(new LabeledSource<>("source1", source1));
 
-    when(fieldDef.getDefaultValue()).thenReturn(null);
+        when(fieldDef.getDefaultValue()).thenReturn(null);
 
-    try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
-      mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source1, fieldName)).thenReturn(20);
-      mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source2, fieldName)).thenReturn(21);
-      mockedObjectMerger.when(() -> ObjectMerger.getFieldValue(source3, fieldName)).thenReturn(22);
+        try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
+            mockedObjectMerger
+                    .when(() -> ObjectMerger.getFieldValue(source1, fieldName))
+                    .thenReturn(42);
 
-      // Act
-      Object result = strategy.merge(sources, fieldDef, fieldName);
+            // Act
+            Object result = strategy.merge(sources, fieldDef, fieldName);
 
-      // Assert
-      assertEquals(21, result); // (20 + 21 + 22) / 3 = 21.0, returned as int
+            // Assert
+            assertEquals(42, result); // Average of single value is the value itself
+        }
     }
-  }
 
-  @Test
-  @DisplayName("Should handle Long values")
-  void testAverageWithLongValues() {
-    // Arrange
-    String fieldName = "count";
-    Object source1 = new Object();
-    Object source2 = new Object();
+    @Test
+    @DisplayName("Should return double when result has decimal places")
+    void testAverageReturnsDoubleForNonWholeNumbers() {
+        // Arrange
+        String fieldName = "temperature";
+        Object source1 = new Object();
+        Object source2 = new Object();
+        Object source3 = new Object();
 
-    List<LabeledSource<?>> sources =
-        Arrays.asList(
-            new LabeledSource<>("source1", source1), new LabeledSource<>("source2", source2));
+        List<LabeledSource<?>> sources =
+                Arrays.asList(
+                        new LabeledSource<>("source1", source1),
+                        new LabeledSource<>("source2", source2),
+                        new LabeledSource<>("source3", source3));
 
-    when(fieldDef.getDefaultValue()).thenReturn(null);
+        when(fieldDef.getDefaultValue()).thenReturn(null);
 
-    try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
-      mockedObjectMerger
-          .when(() -> ObjectMerger.getFieldValue(source1, fieldName))
-          .thenReturn(1000L);
-      mockedObjectMerger
-          .when(() -> ObjectMerger.getFieldValue(source2, fieldName))
-          .thenReturn(2000L);
+        try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
+            mockedObjectMerger
+                    .when(() -> ObjectMerger.getFieldValue(source1, fieldName))
+                    .thenReturn(20);
+            mockedObjectMerger
+                    .when(() -> ObjectMerger.getFieldValue(source2, fieldName))
+                    .thenReturn(21);
+            mockedObjectMerger
+                    .when(() -> ObjectMerger.getFieldValue(source3, fieldName))
+                    .thenReturn(22);
 
-      // Act
-      Object result = strategy.merge(sources, fieldDef, fieldName);
+            // Act
+            Object result = strategy.merge(sources, fieldDef, fieldName);
 
-      // Assert
-      assertEquals(1500, result); // (1000 + 2000) / 2 = 1500
+            // Assert
+            assertEquals(21, result); // (20 + 21 + 22) / 3 = 21.0, returned as int
+        }
     }
-  }
 
-  @Test
-  @DisplayName("Should implement MergeStrategy interface correctly")
-  void testMergeStrategyInterface() {
-    // Arrange & Act & Assert
-    assertTrue(strategy instanceof MergeStrategy);
-  }
+    @Test
+    @DisplayName("Should handle Long values")
+    void testAverageWithLongValues() {
+        // Arrange
+        String fieldName = "count";
+        Object source1 = new Object();
+        Object source2 = new Object();
 
-  @Test
-  @DisplayName("Should throw exception for non-numeric values")
-  void testAverageThrowsExceptionForNonNumeric() {
-    // Arrange
-    String fieldName = "name";
-    Object source1 = new Object();
+        List<LabeledSource<?>> sources =
+                Arrays.asList(
+                        new LabeledSource<>("source1", source1),
+                        new LabeledSource<>("source2", source2));
 
-    List<LabeledSource<?>> sources = Arrays.asList(new LabeledSource<>("source1", source1));
+        when(fieldDef.getDefaultValue()).thenReturn(null);
 
-    when(fieldDef.getDefaultValue()).thenReturn(null);
+        try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
+            mockedObjectMerger
+                    .when(() -> ObjectMerger.getFieldValue(source1, fieldName))
+                    .thenReturn(1000L);
+            mockedObjectMerger
+                    .when(() -> ObjectMerger.getFieldValue(source2, fieldName))
+                    .thenReturn(2000L);
 
-    try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
-      mockedObjectMerger
-          .when(() -> ObjectMerger.getFieldValue(source1, fieldName))
-          .thenReturn("John");
+            // Act
+            Object result = strategy.merge(sources, fieldDef, fieldName);
 
-      // Act & Assert
-      assertThrows(
-          InvalidSourceException.class, () -> strategy.merge(sources, fieldDef, fieldName));
+            // Assert
+            assertEquals(1500, result); // (1000 + 2000) / 2 = 1500
+        }
     }
-  }
 
-  @Test
-  @DisplayName("Should calculate average with mixed numeric types")
-  void testAverageWithMixedNumericTypes() {
-    // Arrange
-    String fieldName = "value";
-    Object source1 = new Object();
-    Object source2 = new Object();
-    Object source3 = new Object();
-
-    List<LabeledSource<?>> sources =
-        Arrays.asList(
-            new LabeledSource<>("source1", source1),
-            new LabeledSource<>("source2", source2),
-            new LabeledSource<>("source3", source3));
-
-    when(fieldDef.getDefaultValue()).thenReturn(null);
-
-    try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
-      mockedObjectMerger
-          .when(() -> ObjectMerger.getFieldValue(source1, fieldName))
-          .thenReturn(10); // Integer
-      mockedObjectMerger
-          .when(() -> ObjectMerger.getFieldValue(source2, fieldName))
-          .thenReturn(20L); // Long
-      mockedObjectMerger
-          .when(() -> ObjectMerger.getFieldValue(source3, fieldName))
-          .thenReturn(30.0); // Double
-
-      // Act
-      Object result = strategy.merge(sources, fieldDef, fieldName);
-
-      // Assert
-      assertEquals(20, result); // (10 + 20 + 30) / 3 = 20.0
+    @Test
+    @DisplayName("Should implement MergeStrategy interface correctly")
+    void testMergeStrategyInterface() {
+        // Arrange & Act & Assert
+        assertTrue(strategy instanceof MergeStrategy);
     }
-  }
+
+    @Test
+    @DisplayName("Should throw exception for non-numeric values")
+    void testAverageThrowsExceptionForNonNumeric() {
+        // Arrange
+        String fieldName = "name";
+        Object source1 = new Object();
+
+        List<LabeledSource<?>> sources = Arrays.asList(new LabeledSource<>("source1", source1));
+
+        when(fieldDef.getDefaultValue()).thenReturn(null);
+
+        try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
+            mockedObjectMerger
+                    .when(() -> ObjectMerger.getFieldValue(source1, fieldName))
+                    .thenReturn("John");
+
+            // Act & Assert
+            assertThrows(
+                    InvalidSourceException.class,
+                    () -> strategy.merge(sources, fieldDef, fieldName));
+        }
+    }
+
+    @Test
+    @DisplayName("Should calculate average with mixed numeric types")
+    void testAverageWithMixedNumericTypes() {
+        // Arrange
+        String fieldName = "value";
+        Object source1 = new Object();
+        Object source2 = new Object();
+        Object source3 = new Object();
+
+        List<LabeledSource<?>> sources =
+                Arrays.asList(
+                        new LabeledSource<>("source1", source1),
+                        new LabeledSource<>("source2", source2),
+                        new LabeledSource<>("source3", source3));
+
+        when(fieldDef.getDefaultValue()).thenReturn(null);
+
+        try (MockedStatic<ObjectMerger> mockedObjectMerger = mockStatic(ObjectMerger.class)) {
+            mockedObjectMerger
+                    .when(() -> ObjectMerger.getFieldValue(source1, fieldName))
+                    .thenReturn(10); // Integer
+            mockedObjectMerger
+                    .when(() -> ObjectMerger.getFieldValue(source2, fieldName))
+                    .thenReturn(20L); // Long
+            mockedObjectMerger
+                    .when(() -> ObjectMerger.getFieldValue(source3, fieldName))
+                    .thenReturn(30.0); // Double
+
+            // Act
+            Object result = strategy.merge(sources, fieldDef, fieldName);
+
+            // Assert
+            assertEquals(20, result); // (10 + 20 + 30) / 3 = 20.0
+        }
+    }
 }

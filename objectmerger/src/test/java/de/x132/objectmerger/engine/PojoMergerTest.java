@@ -12,54 +12,54 @@ import org.junit.jupiter.api.Test;
 
 class PojoMergerTest {
 
-  @Test
-  void testMerge_SimpleSuccess() {
-    MergeDefinition def = new MergeDefinition();
-    Map<String, FieldDefinition<?>> fields = new HashMap<>();
-    fields.put("value", StandardFieldDefinition.<String>builder().build());
-    def.setDefinitions(fields);
+    @Test
+    void testMerge_SimpleSuccess() {
+        MergeDefinition def = new MergeDefinition();
+        Map<String, FieldDefinition<?>> fields = new HashMap<>();
+        fields.put("value", StandardFieldDefinition.<String>builder().build());
+        def.setDefinitions(fields);
 
-    TestPojo source1 = new TestPojo("A");
-    TestPojo source2 = new TestPojo(null);
+        TestPojo source1 = new TestPojo("A");
+        TestPojo source2 = new TestPojo(null);
 
-    @SuppressWarnings("unchecked")
-    LabeledSource<TestPojo>[] sources =
-        new LabeledSource[] {
-          new LabeledSource<>("s1", source1), new LabeledSource<>("s2", source2)
-        };
+        @SuppressWarnings("unchecked")
+        LabeledSource<TestPojo>[] sources =
+                new LabeledSource[] {
+                    new LabeledSource<>("s1", source1), new LabeledSource<>("s2", source2)
+                };
 
-    TestPojo result = PojoMerger.merge(TestPojo.class, def, sources);
-    assertEquals("A", result.getValue());
-  }
-
-  @Test
-  void testMerge_InstantiationError() {
-    MergeDefinition def = new MergeDefinition();
-    @SuppressWarnings("unchecked")
-    LabeledSource<PrivatePojo>[] sources = new LabeledSource[] {};
-
-    de.x132.objectmerger.exception.MergeExecutionException ex =
-        assertThrows(
-            de.x132.objectmerger.exception.MergeExecutionException.class,
-            () -> PojoMerger.merge(PrivatePojo.class, def, sources));
-    assertTrue(ex.getMessage().contains("Failed to merge objects"));
-  }
-
-  public static class TestPojo {
-    private String value;
-
-    public TestPojo() {}
-
-    public TestPojo(String value) {
-      this.value = value;
+        TestPojo result = PojoMerger.merge(TestPojo.class, def, sources);
+        assertEquals("A", result.getValue());
     }
 
-    public String getValue() {
-      return value;
-    }
-  }
+    @Test
+    void testMerge_InstantiationError() {
+        MergeDefinition def = new MergeDefinition();
+        @SuppressWarnings("unchecked")
+        LabeledSource<PrivatePojo>[] sources = new LabeledSource[] {};
 
-  private static class PrivatePojo {
-    private PrivatePojo() {}
-  }
+        de.x132.objectmerger.exception.MergeExecutionException ex =
+                assertThrows(
+                        de.x132.objectmerger.exception.MergeExecutionException.class,
+                        () -> PojoMerger.merge(PrivatePojo.class, def, sources));
+        assertTrue(ex.getMessage().contains("Failed to merge objects"));
+    }
+
+    public static class TestPojo {
+        private String value;
+
+        public TestPojo() {}
+
+        public TestPojo(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    private static class PrivatePojo {
+        private PrivatePojo() {}
+    }
 }

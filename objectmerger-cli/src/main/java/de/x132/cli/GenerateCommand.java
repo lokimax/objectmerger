@@ -17,41 +17,41 @@ import picocli.CommandLine.Parameters;
 @Command(name = "generate", description = "Generate a merge definition from a sample JSON file")
 public class GenerateCommand implements Callable<Integer> {
 
-  @Parameters(index = "0", description = "Path to sample JSON file")
-  private Path samplePath;
+    @Parameters(index = "0", description = "Path to sample JSON file")
+    private Path samplePath;
 
-  @Option(
-      names = {"-o", "--output"},
-      description = "Output JSON file; defaults to stdout")
-  private Path outputPath;
+    @Option(
+            names = {"-o", "--output"},
+            description = "Output JSON file; defaults to stdout")
+    private Path outputPath;
 
-  private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-  @Override
-  public Integer call() throws Exception {
-    try {
-      Map<String, Object> sampleData;
-      try (FileReader reader = new FileReader(samplePath.toFile())) {
-        sampleData = gson.fromJson(reader, Map.class);
-      }
+    @Override
+    public Integer call() throws Exception {
+        try {
+            Map<String, Object> sampleData;
+            try (FileReader reader = new FileReader(samplePath.toFile())) {
+                sampleData = gson.fromJson(reader, Map.class);
+            }
 
-      MergeDefinition definition = MergeDefinitionGenerator.generate(sampleData);
+            MergeDefinition definition = MergeDefinitionGenerator.generate(sampleData);
 
-      String jsonOut = gson.toJson(definition);
-      if (outputPath != null) {
-        Files.createDirectories(outputPath.toAbsolutePath().getParent());
-        try (FileWriter writer = new FileWriter(outputPath.toFile())) {
-          writer.write(jsonOut);
+            String jsonOut = gson.toJson(definition);
+            if (outputPath != null) {
+                Files.createDirectories(outputPath.toAbsolutePath().getParent());
+                try (FileWriter writer = new FileWriter(outputPath.toFile())) {
+                    writer.write(jsonOut);
+                }
+            } else {
+                System.out.println(jsonOut);
+            }
+            return 0;
+
+        } catch (Exception e) {
+            System.err.println("Generation failed: " + e.getMessage());
+            e.printStackTrace();
+            return 1;
         }
-      } else {
-        System.out.println(jsonOut);
-      }
-      return 0;
-
-    } catch (Exception e) {
-      System.err.println("Generation failed: " + e.getMessage());
-      e.printStackTrace();
-      return 1;
     }
-  }
 }

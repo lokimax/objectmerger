@@ -15,5 +15,5 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class NestedFieldDefinition<T> extends FieldDefinition<T> {
-  @Builder.Default private MergeDefinition nestedDefinition = new MergeDefinition();
+    @Builder.Default private MergeDefinition nestedDefinition = new MergeDefinition();
 }
