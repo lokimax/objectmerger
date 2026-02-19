@@ -15,84 +15,96 @@ import org.junit.jupiter.api.Test;
 @DisplayName("Conditional Merge Strategy Tests")
 class ConditionalMergeTest {
 
-  private ConditionalMergeStrategy<Object> strategy;
+    private ConditionalMergeStrategy<Object> strategy;
 
-  @BeforeEach
-  void setUp() {
-    strategy = new ConditionalMergeStrategy<>();
-  }
+    @BeforeEach
+    void setUp() {
+        strategy = new ConditionalMergeStrategy<>();
+    }
 
-  @Test
-  @DisplayName("Should use case strategy when condition matches")
-  void shouldUseCaseStrategyWhenConditionMatches() {
-    // Arrange
+    @Test
+    @DisplayName("Should use case strategy when condition matches")
+    void shouldUseCaseStrategyWhenConditionMatches() {
+        // Arrange
 
-    // Case 1: If 'master' is present, use Priority
-    ConditionCase<Object> case1 = new ConditionCase<>();
-    case1.setCondition("values.containsKey('master')");
+        // Case 1: If 'master' is present, use Priority
+        ConditionCase<Object> case1 = new ConditionCase<>();
+        case1.setCondition("values.containsKey('master')");
 
-    PriorityFieldDefinition<Object> priorityDef =
-        PriorityFieldDefinition.<Object>builder()
-            .strategy("priority")
-            .priority(Map.of("master", 1))
-            .build();
-    case1.setUseStrategy(priorityDef);
+        PriorityFieldDefinition<Object> priorityDef =
+                PriorityFieldDefinition.<Object>builder()
+                        .strategy("priority")
+                        .priority(Map.of("master", 1))
+                        .build();
+        case1.setUseStrategy(priorityDef);
 
-    ConditionalFieldDefinition<Object> fieldDef =
-        ConditionalFieldDefinition.<Object>builder()
-            .cases(List.of(case1))
-            .defaultStrategy(StandardFieldDefinition.<Object>builder().strategy("standard").build())
-            .build();
+        ConditionalFieldDefinition<Object> fieldDef =
+                ConditionalFieldDefinition.<Object>builder()
+                        .cases(List.of(case1))
+                        .defaultStrategy(
+                                StandardFieldDefinition.<Object>builder()
+                                        .strategy("standard")
+                                        .build())
+                        .build();
 
-    // Sources
-    LabeledSource<Map<String, Object>> src1 = new LabeledSource<>("master", Map.of("field", "A"));
-    LabeledSource<Map<String, Object>> src2 = new LabeledSource<>("other", Map.of("field", "B"));
-    List<LabeledSource<?>> sources = List.of(src1, src2);
+        // Sources
+        LabeledSource<Map<String, Object>> src1 =
+                new LabeledSource<>("master", Map.of("field", "A"));
+        LabeledSource<Map<String, Object>> src2 =
+                new LabeledSource<>("other", Map.of("field", "B"));
+        List<LabeledSource<?>> sources = List.of(src1, src2);
 
-    // Act
-    Object result = strategy.merge(sources, fieldDef, "field");
+        // Act
+        Object result = strategy.merge(sources, fieldDef, "field");
 
-    // Assert
-    // Priority logic: master=1 -> should pick "A"
-    assertEquals("A", result);
-  }
+        // Assert
+        // Priority logic: master=1 -> should pick "A"
+        assertEquals("A", result);
+    }
 
-  @Test
-  @DisplayName("Should use default strategy when no condition matches")
-  void shouldUseDefaultStrategyWhenNoConditionMatches() {
-    // Arrange
-    // Case 1: If 'special' source present (it's not)
-    ConditionCase<Object> case1 = new ConditionCase<>();
-    case1.setCondition("values.containsKey('special')");
+    @Test
+    @DisplayName("Should use default strategy when no condition matches")
+    void shouldUseDefaultStrategyWhenNoConditionMatches() {
+        // Arrange
+        // Case 1: If 'special' source present (it's not)
+        ConditionCase<Object> case1 = new ConditionCase<>();
+        case1.setCondition("values.containsKey('special')");
 
-    ConditionalFieldDefinition<Object> fieldDef =
-        ConditionalFieldDefinition.<Object>builder()
-            .cases(List.of(case1))
-            .defaultStrategy(StandardFieldDefinition.<Object>builder().strategy("standard").build())
-            .build();
+        ConditionalFieldDefinition<Object> fieldDef =
+                ConditionalFieldDefinition.<Object>builder()
+                        .cases(List.of(case1))
+                        .defaultStrategy(
+                                StandardFieldDefinition.<Object>builder()
+                                        .strategy("standard")
+                                        .build())
+                        .build();
 
-    // Sources
-    LabeledSource<Map<String, Object>> src1 = new LabeledSource<>("master", Map.of("field", "A"));
-    List<LabeledSource<?>> sources = List.of(src1);
+        // Sources
+        LabeledSource<Map<String, Object>> src1 =
+                new LabeledSource<>("master", Map.of("field", "A"));
+        List<LabeledSource<?>> sources = List.of(src1);
 
-    // Act
-    Object result = strategy.merge(sources, fieldDef, "field");
+        // Act
+        Object result = strategy.merge(sources, fieldDef, "field");
 
-    // Assert
-    // Standard Strategy logic
-    assertEquals("A", result);
-  }
+        // Assert
+        // Standard Strategy logic
+        assertEquals("A", result);
+    }
 
-  @Test
-  @DisplayName("Should return null if no condition matches and no default strategy")
-  void shouldReturnNullIfNoMatchAndNoDefault() {
-    ConditionalFieldDefinition<Object> fieldDef =
-        ConditionalFieldDefinition.<Object>builder().cases(List.of()).defaultStrategy(null).build();
+    @Test
+    @DisplayName("Should return null if no condition matches and no default strategy")
+    void shouldReturnNullIfNoMatchAndNoDefault() {
+        ConditionalFieldDefinition<Object> fieldDef =
+                ConditionalFieldDefinition.<Object>builder()
+                        .cases(List.of())
+                        .defaultStrategy(null)
+                        .build();
 
-    List<LabeledSource<?>> sources = List.of(new LabeledSource<>("s1", Map.of("f", "v")));
+        List<LabeledSource<?>> sources = List.of(new LabeledSource<>("s1", Map.of("f", "v")));
 
-    Object result = strategy.merge(sources, fieldDef, "f");
+        Object result = strategy.merge(sources, fieldDef, "f");
 
-    assertNull(result);
-  }
+        assertNull(result);
+    }
 }

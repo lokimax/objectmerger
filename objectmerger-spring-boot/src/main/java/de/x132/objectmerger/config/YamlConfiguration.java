@@ -12,25 +12,25 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class YamlConfiguration implements WebMvcConfigurer {
 
-  @Override
-  public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-    converters.add(new YamlJackson2HttpMessageConverter());
-  }
-
-  @Override
-  public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
-    configurer
-        .favorParameter(false)
-        .ignoreAcceptHeader(false)
-        .defaultContentType(MediaType.APPLICATION_JSON)
-        .mediaType("yaml", MediaType.parseMediaType("application/x-yaml"))
-        .mediaType("yml", MediaType.parseMediaType("application/x-yaml"));
-  }
-
-  public static class YamlJackson2HttpMessageConverter
-      extends AbstractJackson2HttpMessageConverter {
-    public YamlJackson2HttpMessageConverter() {
-      super(new YAMLMapper(), MediaType.parseMediaType("application/x-yaml"));
+    @Override
+    public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+        converters.add(new YamlJackson2HttpMessageConverter());
     }
-  }
+
+    @Override
+    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+        configurer
+                .favorParameter(false)
+                .ignoreAcceptHeader(false)
+                .defaultContentType(MediaType.APPLICATION_JSON)
+                .mediaType("yaml", MediaType.parseMediaType("application/x-yaml"))
+                .mediaType("yml", MediaType.parseMediaType("application/x-yaml"));
+    }
+
+    public static class YamlJackson2HttpMessageConverter
+            extends AbstractJackson2HttpMessageConverter {
+        public YamlJackson2HttpMessageConverter() {
+            super(new YAMLMapper(), MediaType.parseMediaType("application/x-yaml"));
+        }
+    }
 }

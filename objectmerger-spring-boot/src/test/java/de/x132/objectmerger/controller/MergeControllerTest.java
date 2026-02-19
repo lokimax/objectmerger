@@ -20,59 +20,55 @@ import org.springframework.test.web.servlet.MockMvc;
 @Import(ClassLoadingGuard.class)
 class MergeControllerTest {
 
-  @Autowired private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
-  @MockBean private ObjectMergerService objectMergerService;
+    @MockBean private ObjectMergerService objectMergerService;
 
-  @Test
-  void testGenerateFromClass() throws Exception {
-    Map<String, String> request = Map.of("className", "Person");
+    @Test
+    void testGenerateFromClass() throws Exception {
+        Map<String, String> request = Map.of("className", "Person");
 
-    mockMvc
-        .perform(
-            post("/api/v1/merge/generator/class")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(request)))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.definitions.name").exists());
-  }
+        mockMvc.perform(
+                        post("/api/v1/merge/generator/class")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(new ObjectMapper().writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.definitions.name").exists());
+    }
 
-  @Test
-  void testGenerateFromClass_Invalid() throws Exception {
-    Map<String, String> request = Map.of("className", "UnknownClass");
+    @Test
+    void testGenerateFromClass_Invalid() throws Exception {
+        Map<String, String> request = Map.of("className", "UnknownClass");
 
-    mockMvc
-        .perform(
-            post("/api/v1/merge/generator/class")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(request)))
-        .andExpect(status().isForbidden());
-  }
+        mockMvc.perform(
+                        post("/api/v1/merge/generator/class")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(new ObjectMapper().writeValueAsString(request)))
+                .andExpect(status().isForbidden());
+    }
 
-  @Test
-  void testGenerateFromClass_DangerousClassIsBlocked() throws Exception {
-    Map<String, String> request = Map.of("className", "java.lang.Runtime");
+    @Test
+    void testGenerateFromClass_DangerousClassIsBlocked() throws Exception {
+        Map<String, String> request = Map.of("className", "java.lang.Runtime");
 
-    mockMvc
-        .perform(
-            post("/api/v1/merge/generator/class")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(request)))
-        .andExpect(status().isForbidden())
-        .andExpect(jsonPath("$.error").exists());
-  }
+        mockMvc.perform(
+                        post("/api/v1/merge/generator/class")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(new ObjectMapper().writeValueAsString(request)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error").exists());
+    }
 
-  @Test
-  void testGenerateFromJson() throws Exception {
-    Map<String, Object> request = Map.of("field1", "val1", "field2", 123);
+    @Test
+    void testGenerateFromJson() throws Exception {
+        Map<String, Object> request = Map.of("field1", "val1", "field2", 123);
 
-    mockMvc
-        .perform(
-            post("/api/v1/merge/generator/json")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(request)))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.definitions.field1").exists())
-        .andExpect(jsonPath("$.definitions.field2").exists());
-  }
+        mockMvc.perform(
+                        post("/api/v1/merge/generator/json")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(new ObjectMapper().writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.definitions.field1").exists())
+                .andExpect(jsonPath("$.definitions.field2").exists());
+    }
 }

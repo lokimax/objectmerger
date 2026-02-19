@@ -9,12 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ConditionCase<T> {
-  /**
-   * MVEL expression evaluating to boolean. Available variables: 'sources' (List<LabeledSource>),
-   * 'values' (Map<String, Object>).
-   */
-  private String condition;
+    /**
+     * MVEL expression evaluating to boolean. Available variables: 'sources' (List<LabeledSource>),
+     * 'values' (Map<String, Object>).
+     */
+    private String condition;
 
-  /** The strategy to apply if condition is true. */
-  private FieldDefinition<T> useStrategy;
+    /** The strategy to apply if condition is true. */
+    private FieldDefinition<T> useStrategy;
 }

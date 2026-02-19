@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemMergeDefinition {
-  private String targetClass;
-  private Map<String, FieldDefinition<?>> definitions;
+    private String targetClass;
+    private Map<String, FieldDefinition<?>> definitions;
 }

@@ -10,53 +10,55 @@ import java.util.Objects;
 
 public class AverageValueStrategy implements MergeStrategy<Number, FieldDefinition<Number>> {
 
-  public static final String NAME = "average";
+    public static final String NAME = "average";
 
-  @Override
-  public String getName() {
-    return NAME;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Class<FieldDefinition<Number>> getConfigurationClass() {
-    return (Class) FieldDefinition.class;
-  }
-
-  @Override
-  public Number merge(
-      List<LabeledSource<?>> sources, FieldDefinition<Number> fieldDef, String fieldName) {
-    double sum =
-        sources.stream()
-            .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
-            .filter(Objects::nonNull)
-            .mapToDouble(
-                value -> {
-                  if (value instanceof Number) {
-                    return ((Number) value).doubleValue();
-                  }
-                  throw new InvalidSourceException(
-                      "Field " + fieldName + " must be a number for average strategy");
-                })
-            .sum();
-
-    long count =
-        sources.stream()
-            .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
-            .filter(Objects::nonNull)
-            .count();
-    if (count == 0) {
-      return fieldDef.getDefaultValue();
+    @Override
+    public String getName() {
+        return NAME;
     }
 
-    double average = sum / count;
-
-    // Return as Integer if result is a whole number, otherwise as Double
-    if (average == Math.floor(average)
-        && average <= Integer.MAX_VALUE
-        && average >= Integer.MIN_VALUE) {
-      return (int) average;
+    @SuppressWarnings("unchecked")
+    @Override
+    public Class<FieldDefinition<Number>> getConfigurationClass() {
+        return (Class) FieldDefinition.class;
     }
-    return average;
-  }
+
+    @Override
+    public Number merge(
+            List<LabeledSource<?>> sources, FieldDefinition<Number> fieldDef, String fieldName) {
+        double sum =
+                sources.stream()
+                        .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
+                        .filter(Objects::nonNull)
+                        .mapToDouble(
+                                value -> {
+                                    if (value instanceof Number) {
+                                        return ((Number) value).doubleValue();
+                                    }
+                                    throw new InvalidSourceException(
+                                            "Field "
+                                                    + fieldName
+                                                    + " must be a number for average strategy");
+                                })
+                        .sum();
+
+        long count =
+                sources.stream()
+                        .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
+                        .filter(Objects::nonNull)
+                        .count();
+        if (count == 0) {
+            return fieldDef.getDefaultValue();
+        }
+
+        double average = sum / count;
+
+        // Return as Integer if result is a whole number, otherwise as Double
+        if (average == Math.floor(average)
+                && average <= Integer.MAX_VALUE
+                && average >= Integer.MIN_VALUE) {
+            return (int) average;
+        }
+        return average;
+    }
 }

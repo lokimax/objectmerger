@@ -11,70 +11,70 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "objectmerger.security")
 public class ClassLoadingGuard {
 
-  private static final List<String> DEFAULT_ALLOWED_PACKAGES =
-      List.of("de.x132.objectmerger.model.");
+    private static final List<String> DEFAULT_ALLOWED_PACKAGES =
+            List.of("de.x132.objectmerger.model.");
 
-  private List<String> allowedPackages = DEFAULT_ALLOWED_PACKAGES;
+    private List<String> allowedPackages = DEFAULT_ALLOWED_PACKAGES;
 
-  public void setAllowedPackages(List<String> allowedPackages) {
-    this.allowedPackages = allowedPackages;
-  }
-
-  public List<String> getAllowedPackages() {
-    return allowedPackages;
-  }
-
-  public Class<?> loadClassSafely(String className) throws ClassNotFoundException {
-    if (className == null || className.isBlank()) {
-      throw new SecurityException("Class name must not be null or blank");
+    public void setAllowedPackages(List<String> allowedPackages) {
+        this.allowedPackages = allowedPackages;
     }
 
-    if (isMapClass(className)) {
-      return Map.class;
+    public List<String> getAllowedPackages() {
+        return allowedPackages;
     }
 
-    rejectDangerousPackages(className);
-    rejectUnlistedPackage(className);
+    public Class<?> loadClassSafely(String className) throws ClassNotFoundException {
+        if (className == null || className.isBlank()) {
+            throw new SecurityException("Class name must not be null or blank");
+        }
 
-    return Class.forName(className);
-  }
+        if (isMapClass(className)) {
+            return Map.class;
+        }
 
-  private boolean isMapClass(String className) {
-    return "java.util.Map".equals(className)
-        || "java.util.HashMap".equals(className)
-        || "java.util.LinkedHashMap".equals(className);
-  }
+        rejectDangerousPackages(className);
+        rejectUnlistedPackage(className);
 
-  private void rejectDangerousPackages(String className) {
-    if (className.startsWith("java.lang.")
-        || className.startsWith("java.io.")
-        || className.startsWith("java.net.")
-        || className.startsWith("java.nio.")
-        || className.startsWith("javax.")
-        || className.startsWith("sun.")
-        || className.startsWith("com.sun.")
-        || className.startsWith("java.lang.reflect.")
-        || className.startsWith("java.util.concurrent.")) {
-      log.warn("Blocked attempt to load dangerous class: {}", className);
-      throw new SecurityException(
-          "Loading class '" + className + "' is not allowed for security reasons");
+        return Class.forName(className);
     }
-  }
 
-  private void rejectUnlistedPackage(String className) {
-    for (String allowedPackage : allowedPackages) {
-      if (className.startsWith(allowedPackage)) {
-        return;
-      }
+    private boolean isMapClass(String className) {
+        return "java.util.Map".equals(className)
+                || "java.util.HashMap".equals(className)
+                || "java.util.LinkedHashMap".equals(className);
     }
-    log.warn(
-        "Blocked attempt to load class '{}' - not in allowed packages: {}",
-        className,
-        allowedPackages);
-    throw new SecurityException(
-        "Class '"
-            + className
-            + "' is not in the list of allowed packages. "
-            + "Configure 'objectmerger.security.allowed-packages' to allow it.");
-  }
+
+    private void rejectDangerousPackages(String className) {
+        if (className.startsWith("java.lang.")
+                || className.startsWith("java.io.")
+                || className.startsWith("java.net.")
+                || className.startsWith("java.nio.")
+                || className.startsWith("javax.")
+                || className.startsWith("sun.")
+                || className.startsWith("com.sun.")
+                || className.startsWith("java.lang.reflect.")
+                || className.startsWith("java.util.concurrent.")) {
+            log.warn("Blocked attempt to load dangerous class: {}", className);
+            throw new SecurityException(
+                    "Loading class '" + className + "' is not allowed for security reasons");
+        }
+    }
+
+    private void rejectUnlistedPackage(String className) {
+        for (String allowedPackage : allowedPackages) {
+            if (className.startsWith(allowedPackage)) {
+                return;
+            }
+        }
+        log.warn(
+                "Blocked attempt to load class '{}' - not in allowed packages: {}",
+                className,
+                allowedPackages);
+        throw new SecurityException(
+                "Class '"
+                        + className
+                        + "' is not in the list of allowed packages. "
+                        + "Configure 'objectmerger.security.allowed-packages' to allow it.");
+    }
 }

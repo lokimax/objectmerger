@@ -15,5 +15,5 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class PriorityFieldDefinition<T> extends FieldDefinition<T> implements Prioritizable {
-  private Map<String, Integer> priority;
+    private Map<String, Integer> priority;
 }

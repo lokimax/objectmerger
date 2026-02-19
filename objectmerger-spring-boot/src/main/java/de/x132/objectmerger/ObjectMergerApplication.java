@@ -9,18 +9,18 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 public class ObjectMergerApplication {
 
-  public static void main(String[] args) {
-    SpringApplication.run(ObjectMergerApplication.class, args);
-  }
+    public static void main(String[] args) {
+        SpringApplication.run(ObjectMergerApplication.class, args);
+    }
 
-  @Bean
-  public OpenAPI objectMergerOpenAPI() {
-    return new OpenAPI()
-        .info(
-            new Info()
-                .title("ObjectMerger REST API")
-                .description(
-                    "REST API for merging multiple data sources with configurable strategies")
-                .version("0.1.0"));
-  }
+    @Bean
+    public OpenAPI objectMergerOpenAPI() {
+        return new OpenAPI()
+                .info(
+                        new Info()
+                                .title("ObjectMerger REST API")
+                                .description(
+                                        "REST API for merging multiple data sources with configurable strategies")
+                                .version("0.1.0"));
+    }
 }

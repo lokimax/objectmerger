@@ -18,65 +18,65 @@ import org.junit.jupiter.api.Test;
 
 class DateAsIdentifierTest {
 
-  @Test
-  @DisplayName("Verify identifyBy works with LocalDate fields in Map-based merge")
-  void identifyByDate() {
-    // Scenario: List of Maps, where each map has a "date" field used as ID.
-    // Source A: [{date: 2020-01-01, val: "A"}]
-    // Source B: [{date: 2020-01-01, val: "B"}]
-    // Target: Merge these into one item because date matches.
+    @Test
+    @DisplayName("Verify identifyBy works with LocalDate fields in Map-based merge")
+    void identifyByDate() {
+        // Scenario: List of Maps, where each map has a "date" field used as ID.
+        // Source A: [{date: 2020-01-01, val: "A"}]
+        // Source B: [{date: 2020-01-01, val: "B"}]
+        // Target: Merge these into one item because date matches.
 
-    LocalDate date = LocalDate.of(2020, 1, 1);
+        LocalDate date = LocalDate.of(2020, 1, 1);
 
-    Map<String, Object> itemA = Map.of("date", date, "val", "A");
-    Map<String, Object> itemB = Map.of("date", date, "val", "B");
+        Map<String, Object> itemA = Map.of("date", date, "val", "A");
+        Map<String, Object> itemB = Map.of("date", date, "val", "B");
 
-    List<Map<String, Object>> listA = List.of(itemA);
-    List<Map<String, Object>> listB = List.of(itemB);
+        List<Map<String, Object>> listA = List.of(itemA);
+        List<Map<String, Object>> listB = List.of(itemB);
 
-    ListFieldDefinition<Object> listDef =
-        ListFieldDefinition.builder().strategy("mergeList").identifyBy("date").build();
+        ListFieldDefinition<Object> listDef =
+                ListFieldDefinition.builder().strategy("mergeList").identifyBy("date").build();
 
-    PriorityFieldDefinition<Object> dateDef =
-        PriorityFieldDefinition.builder()
-            .strategy("priority")
-            .priority(java.util.Map.of("A", 1, "B", 2))
-            .build();
+        PriorityFieldDefinition<Object> dateDef =
+                PriorityFieldDefinition.builder()
+                        .strategy("priority")
+                        .priority(java.util.Map.of("A", 1, "B", 2))
+                        .build();
 
-    PriorityFieldDefinition<Object> valDef =
-        PriorityFieldDefinition.builder().strategy("concatenate").build();
+        PriorityFieldDefinition<Object> valDef =
+                PriorityFieldDefinition.builder().strategy("concatenate").build();
 
-    // Construct item definition
-    Map<String, FieldDefinition<?>> itemFields = new HashMap<>();
-    itemFields.put("date", dateDef);
-    itemFields.put("val", valDef);
+        // Construct item definition
+        Map<String, FieldDefinition<?>> itemFields = new HashMap<>();
+        itemFields.put("date", dateDef);
+        itemFields.put("val", valDef);
 
-    ItemMergeDefinition itemDef = new ItemMergeDefinition();
-    itemDef.setDefinitions(itemFields);
-    listDef.setItemMergeDefinition(itemDef);
+        ItemMergeDefinition itemDef = new ItemMergeDefinition();
+        itemDef.setDefinitions(itemFields);
+        listDef.setItemMergeDefinition(itemDef);
 
-    Map<String, FieldDefinition<?>> rootFields = new HashMap<>();
-    rootFields.put("list", listDef);
+        Map<String, FieldDefinition<?>> rootFields = new HashMap<>();
+        rootFields.put("list", listDef);
 
-    MergeDefinition def = new MergeDefinition(rootFields);
+        MergeDefinition def = new MergeDefinition(rootFields);
 
-    Map<String, Object> sourceA = Map.of("list", listA);
-    Map<String, Object> sourceB = Map.of("list", listB);
+        Map<String, Object> sourceA = Map.of("list", listA);
+        Map<String, Object> sourceB = Map.of("list", listB);
 
-    Map<String, Object> result =
-        ObjectMerger.merge(
-            def, new LabeledSource<>("A", sourceA), new LabeledSource<>("B", sourceB));
+        Map<String, Object> result =
+                ObjectMerger.merge(
+                        def, new LabeledSource<>("A", sourceA), new LabeledSource<>("B", sourceB));
 
-    List<Map<String, Object>> resultList = (List<Map<String, Object>>) result.get("list");
-    assertNotNull(resultList);
-    assertEquals(1, resultList.size());
+        List<Map<String, Object>> resultList = (List<Map<String, Object>>) result.get("list");
+        assertNotNull(resultList);
+        assertEquals(1, resultList.size());
 
-    Map<String, Object> mergedItem = resultList.get(0);
-    assertEquals(date, mergedItem.get("date"));
-    // "A,B" or "B,A" depending on priority (default is stable order or priority 0)
-    // Actually Concatenate sorts by priority. Here priority is default (0).
-    String val = (String) mergedItem.get("val");
-    // Just check length or containment as order might vary if priority is equal
-    assertEquals(3, val.length());
-  }
+        Map<String, Object> mergedItem = resultList.get(0);
+        assertEquals(date, mergedItem.get("date"));
+        // "A,B" or "B,A" depending on priority (default is stable order or priority 0)
+        // Actually Concatenate sorts by priority. Here priority is default (0).
+        String val = (String) mergedItem.get("val");
+        // Just check length or containment as order might vary if priority is equal
+        assertEquals(3, val.length());
+    }
 }

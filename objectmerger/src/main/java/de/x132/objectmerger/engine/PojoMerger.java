@@ -25,117 +25,119 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PojoMerger {
 
-  @SafeVarargs
-  public static <T> T merge(
-      Class<T> targetClass, MergeDefinition mergeDefinition, LabeledSource<T>... sources) {
-    try {
-      T result = targetClass.getDeclaredConstructor().newInstance();
+    @SafeVarargs
+    public static <T> T merge(
+            Class<T> targetClass, MergeDefinition mergeDefinition, LabeledSource<T>... sources) {
+        try {
+            T result = targetClass.getDeclaredConstructor().newInstance();
 
-      Map<String, FieldDefinition<?>> definitions =
-          resolveDefinitions(targetClass, mergeDefinition, sources);
+            Map<String, FieldDefinition<?>> definitions =
+                    resolveDefinitions(targetClass, mergeDefinition, sources);
 
-      List<LabeledSource<T>> sourceList = Arrays.asList(sources);
-      MergeContext<T> context = new MergeContext<>(targetClass, result, sourceList);
+            List<LabeledSource<T>> sourceList = Arrays.asList(sources);
+            MergeContext<T> context = new MergeContext<>(targetClass, result, sourceList);
 
-      for (Map.Entry<String, FieldDefinition<?>> entry : definitions.entrySet()) {
-        processField(context, entry.getKey(), entry.getValue());
-      }
-      return result;
-    } catch (Exception e) {
-      log.error("Failed to merge objects of type {}", targetClass.getName(), e);
-      if (e instanceof ObjectMergerException) {
-        throw (ObjectMergerException) e;
-      }
-      throw new MergeExecutionException(
-          "Failed to merge objects of type " + targetClass.getName(), e);
-    }
-  }
-
-  private static <T> LabeledSource<T> findTemplateSource(String label, LabeledSource<T>[] sources) {
-    for (LabeledSource<T> source : sources) {
-      if (source.getLabel().equals(label)) {
-        return source;
-      }
-    }
-    return null;
-  }
-
-  private static <T> void processField(
-      MergeContext<T> context, String fieldName, FieldDefinition<?> fieldDef) {
-
-    Field field = ReflectionHelper.getField(context.targetClass(), fieldName);
-    if (field == null) {
-      return;
+            for (Map.Entry<String, FieldDefinition<?>> entry : definitions.entrySet()) {
+                processField(context, entry.getKey(), entry.getValue());
+            }
+            return result;
+        } catch (Exception e) {
+            log.error("Failed to merge objects of type {}", targetClass.getName(), e);
+            if (e instanceof ObjectMergerException) {
+                throw (ObjectMergerException) e;
+            }
+            throw new MergeExecutionException(
+                    "Failed to merge objects of type " + targetClass.getName(), e);
+        }
     }
 
-    MergeStrategy<?, ?> strategy = resolveStrategy(fieldDef);
-    if (strategy != null) {
-      // Cast to raw type to allow capture in helper
-      @SuppressWarnings("rawtypes")
-      MergeStrategy rawStrategy = strategy;
-      applyStrategy(rawStrategy, context.sources(), fieldDef, fieldName, field, context.result());
-    }
-  }
-
-  private static MergeStrategy<?, ?> resolveStrategy(FieldDefinition<?> fieldDef) {
-    String strategyName = fieldDef.getStrategy() != null ? fieldDef.getStrategy() : "standard";
-    return StrategyRegistry.getInstance().getStrategy(strategyName);
-  }
-
-  private static <T, C extends FieldDefinition<T>> void applyStrategy(
-      MergeStrategy<T, C> strategy,
-      List<? extends LabeledSource<?>> sources,
-      FieldDefinition<?> fieldDef,
-      String fieldName,
-      Field field,
-      Object result) {
-
-    T mergedValue = executeStrategy(strategy, sources, fieldDef, fieldName);
-    ReflectionHelper.setFieldValue(field, result, mergedValue);
-  }
-
-  @SuppressWarnings("unchecked")
-  private static <T, C extends FieldDefinition<T>> T executeStrategy(
-      MergeStrategy<T, C> strategy,
-      List<? extends LabeledSource<?>> sources,
-      FieldDefinition<?> fieldDef,
-      String fieldName) {
-    if (!strategy.getConfigurationClass().isInstance(fieldDef)) {
-      throw new ConfigurationException(
-          String.format(
-              "Field '%s' requires configuration of type '%s' but got '%s' for strategy '%s'",
-              fieldName,
-              strategy.getConfigurationClass().getSimpleName(),
-              fieldDef.getClass().getSimpleName(),
-              strategy.getName()));
+    private static <T> LabeledSource<T> findTemplateSource(
+            String label, LabeledSource<T>[] sources) {
+        for (LabeledSource<T> source : sources) {
+            if (source.getLabel().equals(label)) {
+                return source;
+            }
+        }
+        return null;
     }
 
-    C config = (C) fieldDef;
-    return strategy.merge(new java.util.ArrayList<>(sources), config, fieldName);
-  }
+    private static <T> void processField(
+            MergeContext<T> context, String fieldName, FieldDefinition<?> fieldDef) {
 
-  private static <T> Map<String, FieldDefinition<?>> resolveDefinitions(
-      Class<T> targetClass, MergeDefinition mergeDefinition, LabeledSource<T>[] sources) {
-    if (mergeDefinition.getTemplateSourceLabel() == null) {
-      return mergeDefinition.getDefinitions();
+        Field field = ReflectionHelper.getField(context.targetClass(), fieldName);
+        if (field == null) {
+            return;
+        }
+
+        MergeStrategy<?, ?> strategy = resolveStrategy(fieldDef);
+        if (strategy != null) {
+            // Cast to raw type to allow capture in helper
+            @SuppressWarnings("rawtypes")
+            MergeStrategy rawStrategy = strategy;
+            applyStrategy(
+                    rawStrategy, context.sources(), fieldDef, fieldName, field, context.result());
+        }
     }
 
-    LabeledSource<T> templateSource =
-        findTemplateSource(mergeDefinition.getTemplateSourceLabel(), sources);
-
-    if (templateSource == null) {
-      throw new InvalidSourceException(
-          "Template source '"
-              + mergeDefinition.getTemplateSourceLabel()
-              + "' not found among provided sources.");
+    private static MergeStrategy<?, ?> resolveStrategy(FieldDefinition<?> fieldDef) {
+        String strategyName = fieldDef.getStrategy() != null ? fieldDef.getStrategy() : "standard";
+        return StrategyRegistry.getInstance().getStrategy(strategyName);
     }
 
-    MergeDefinition generatedDef = MergeDefinitionGenerator.generate(targetClass);
-    Map<String, FieldDefinition<?>> definitions = generatedDef.getDefinitions();
+    private static <T, C extends FieldDefinition<T>> void applyStrategy(
+            MergeStrategy<T, C> strategy,
+            List<? extends LabeledSource<?>> sources,
+            FieldDefinition<?> fieldDef,
+            String fieldName,
+            Field field,
+            Object result) {
 
-    if (mergeDefinition.getDefinitions() != null) {
-      definitions.putAll(mergeDefinition.getDefinitions());
+        T mergedValue = executeStrategy(strategy, sources, fieldDef, fieldName);
+        ReflectionHelper.setFieldValue(field, result, mergedValue);
     }
-    return definitions;
-  }
+
+    @SuppressWarnings("unchecked")
+    private static <T, C extends FieldDefinition<T>> T executeStrategy(
+            MergeStrategy<T, C> strategy,
+            List<? extends LabeledSource<?>> sources,
+            FieldDefinition<?> fieldDef,
+            String fieldName) {
+        if (!strategy.getConfigurationClass().isInstance(fieldDef)) {
+            throw new ConfigurationException(
+                    String.format(
+                            "Field '%s' requires configuration of type '%s' but got '%s' for strategy '%s'",
+                            fieldName,
+                            strategy.getConfigurationClass().getSimpleName(),
+                            fieldDef.getClass().getSimpleName(),
+                            strategy.getName()));
+        }
+
+        C config = (C) fieldDef;
+        return strategy.merge(new java.util.ArrayList<>(sources), config, fieldName);
+    }
+
+    private static <T> Map<String, FieldDefinition<?>> resolveDefinitions(
+            Class<T> targetClass, MergeDefinition mergeDefinition, LabeledSource<T>[] sources) {
+        if (mergeDefinition.getTemplateSourceLabel() == null) {
+            return mergeDefinition.getDefinitions();
+        }
+
+        LabeledSource<T> templateSource =
+                findTemplateSource(mergeDefinition.getTemplateSourceLabel(), sources);
+
+        if (templateSource == null) {
+            throw new InvalidSourceException(
+                    "Template source '"
+                            + mergeDefinition.getTemplateSourceLabel()
+                            + "' not found among provided sources.");
+        }
+
+        MergeDefinition generatedDef = MergeDefinitionGenerator.generate(targetClass);
+        Map<String, FieldDefinition<?>> definitions = generatedDef.getDefinitions();
+
+        if (mergeDefinition.getDefinitions() != null) {
+            definitions.putAll(mergeDefinition.getDefinitions());
+        }
+        return definitions;
+    }
 }

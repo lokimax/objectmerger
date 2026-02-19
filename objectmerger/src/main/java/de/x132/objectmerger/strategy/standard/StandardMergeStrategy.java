@@ -9,30 +9,30 @@ import java.util.Objects;
 
 public class StandardMergeStrategy<T> implements MergeStrategy<T, FieldDefinition<T>> {
 
-  public static final String NAME = "standard";
+    public static final String NAME = "standard";
 
-  @Override
-  public String getName() {
-    return NAME;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Class<FieldDefinition<T>> getConfigurationClass() {
-    return (Class) FieldDefinition.class;
-  }
-
-  @Override
-  public T merge(List<LabeledSource<?>> sources, FieldDefinition<T> fieldDef, String fieldName) {
-    if (sources.isEmpty()) {
-      return fieldDef.getDefaultValue();
+    @Override
+    public String getName() {
+        return NAME;
     }
 
-    return (T)
-        sources.stream()
-            .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
-            .filter(Objects::nonNull)
-            .findFirst()
-            .orElse(fieldDef.getDefaultValue());
-  }
+    @SuppressWarnings("unchecked")
+    @Override
+    public Class<FieldDefinition<T>> getConfigurationClass() {
+        return (Class) FieldDefinition.class;
+    }
+
+    @Override
+    public T merge(List<LabeledSource<?>> sources, FieldDefinition<T> fieldDef, String fieldName) {
+        if (sources.isEmpty()) {
+            return fieldDef.getDefaultValue();
+        }
+
+        return (T)
+                sources.stream()
+                        .map(source -> ObjectMerger.getFieldValue(source.getSource(), fieldName))
+                        .filter(Objects::nonNull)
+                        .findFirst()
+                        .orElse(fieldDef.getDefaultValue());
+    }
 }

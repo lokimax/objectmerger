@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MergeDefinition {
-  private Map<String, FieldDefinition<?>> definitions;
-  private String templateSourceLabel;
+    private Map<String, FieldDefinition<?>> definitions;
+    private String templateSourceLabel;
 
-  public MergeDefinition(Map<String, FieldDefinition<?>> definitions) {
-    this.definitions = definitions;
-  }
+    public MergeDefinition(Map<String, FieldDefinition<?>> definitions) {
+        this.definitions = definitions;
+    }
 }

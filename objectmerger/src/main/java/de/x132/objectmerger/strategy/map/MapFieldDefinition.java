@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class MapFieldDefinition<T> extends FieldDefinition<T> {
-  private String keyStrategy;
-  private List<String> keyTemplateSources;
-  private ItemMergeDefinition itemMergeDefinition;
+    private String keyStrategy;
+    private List<String> keyTemplateSources;
+    private ItemMergeDefinition itemMergeDefinition;
 }

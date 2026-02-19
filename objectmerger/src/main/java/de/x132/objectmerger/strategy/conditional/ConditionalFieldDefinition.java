@@ -17,9 +17,9 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ConditionalFieldDefinition<T> extends FieldDefinition<T>
-    implements ConditionalConfig<T> {
+        implements ConditionalConfig<T> {
 
-  @Builder.Default private List<ConditionCase<T>> cases = new ArrayList<>();
+    @Builder.Default private List<ConditionCase<T>> cases = new ArrayList<>();
 
-  private FieldDefinition<T> defaultStrategy;
+    private FieldDefinition<T> defaultStrategy;
 }

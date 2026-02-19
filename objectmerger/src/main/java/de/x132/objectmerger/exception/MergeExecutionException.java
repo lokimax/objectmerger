@@ -5,11 +5,11 @@ package de.x132.objectmerger.exception;
  * instantiation error).
  */
 public class MergeExecutionException extends ObjectMergerException {
-  public MergeExecutionException(String message) {
-    super(message);
-  }
+    public MergeExecutionException(String message) {
+        super(message);
+    }
 
-  public MergeExecutionException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    public MergeExecutionException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

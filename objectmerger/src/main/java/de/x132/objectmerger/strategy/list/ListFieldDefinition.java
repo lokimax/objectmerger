@@ -16,9 +16,9 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ListFieldDefinition<T> extends FieldDefinition<T> implements ListConfig {
-  private boolean deduplicate;
-  private String identifyBy;
-  private ItemMergeDefinition itemMergeDefinition;
-  private List<String> keyOriginLabels;
-  private boolean requirePresenceInAllKeyOrigins;
+    private boolean deduplicate;
+    private String identifyBy;
+    private ItemMergeDefinition itemMergeDefinition;
+    private List<String> keyOriginLabels;
+    private boolean requirePresenceInAllKeyOrigins;
 }

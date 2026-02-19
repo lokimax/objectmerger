@@ -7,21 +7,21 @@ import java.util.Map;
 
 public class MergeDefinitionConverter {
 
-  private static final Gson gson;
+    private static final Gson gson;
 
-  static {
-    gson =
-        new GsonBuilder()
-            .registerTypeAdapterFactory(new FieldDefinitionTypeAdapterFactory())
-            .create();
-  }
-
-  public static MergeDefinition fromMap(Map<String, Map<String, Object>> definitionMap) {
-    try {
-      String json = gson.toJson(Map.of("definitions", definitionMap));
-      return gson.fromJson(json, MergeDefinition.class);
-    } catch (Exception e) {
-      throw new IllegalArgumentException("Invalid merge definition: " + e.getMessage(), e);
+    static {
+        gson =
+                new GsonBuilder()
+                        .registerTypeAdapterFactory(new FieldDefinitionTypeAdapterFactory())
+                        .create();
     }
-  }
+
+    public static MergeDefinition fromMap(Map<String, Map<String, Object>> definitionMap) {
+        try {
+            String json = gson.toJson(Map.of("definitions", definitionMap));
+            return gson.fromJson(json, MergeDefinition.class);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid merge definition: " + e.getMessage(), e);
+        }
+    }
 }

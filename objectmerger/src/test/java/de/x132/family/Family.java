@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 public class Family {
-  private String familyName;
-  private List<FamilyMember> members;
+    private String familyName;
+    private List<FamilyMember> members;
 }

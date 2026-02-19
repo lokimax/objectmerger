@@ -11,6 +11,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class FieldDefinition<T> implements Defaultable<T> {
-  private String strategy;
-  private T defaultValue;
+    private String strategy;
+    private T defaultValue;
 }
