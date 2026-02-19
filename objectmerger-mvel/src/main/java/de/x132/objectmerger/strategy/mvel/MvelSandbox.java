@@ -8,49 +8,48 @@ import org.mvel2.ParserContext;
 public final class MvelSandbox {
 
     private static final Pattern[] BLOCKED_EXPRESSION_PATTERNS = {
-            Pattern.compile("(?i).*\\bRuntime\\b.*"),
-            Pattern.compile("(?i).*\\bProcessBuilder\\b.*"),
-            Pattern.compile("(?i).*\\bProcess\\b.*"),
-            Pattern.compile("(?i).*\\bSystem\\b.*"),
-            Pattern.compile("(?i).*\\bClassLoader\\b.*"),
-            Pattern.compile("(?i).*\\bClass\\b.*"),
-            Pattern.compile("(?i).*\\bjava\\.lang\\.reflect\\b.*"),
-            Pattern.compile("(?i).*\\bMethod\\b.*"),
-            Pattern.compile("(?i).*\\bField\\b.*"),
-            Pattern.compile("(?i).*\\bConstructor\\b.*"),
-            Pattern.compile("(?i).*\\bjava\\.io\\b.*"),
-            Pattern.compile("(?i).*\\bjava\\.nio\\b.*"),
-            Pattern.compile("(?i).*\\bFile\\b.*"),
-            Pattern.compile("(?i).*\\bFileInputStream\\b.*"),
-            Pattern.compile("(?i).*\\bFileOutputStream\\b.*"),
-            Pattern.compile("(?i).*\\bFileReader\\b.*"),
-            Pattern.compile("(?i).*\\bFileWriter\\b.*"),
-            Pattern.compile("(?i).*\\bjava\\.net\\b.*"),
-            Pattern.compile("(?i).*\\bSocket\\b.*"),
-            Pattern.compile("(?i).*\\bURL\\b.*"),
-            Pattern.compile("(?i).*\\bHttpURLConnection\\b.*"),
-            Pattern.compile("(?i).*\\bScriptEngine\\b.*"),
-            Pattern.compile("(?i).*\\bjavax\\.script\\b.*"),
-            Pattern.compile("(?i).*\\bThread\\b.*"),
-            Pattern.compile("(?i).*\\bThreadGroup\\b.*"),
+        Pattern.compile("(?i).*\\bRuntime\\b.*"),
+        Pattern.compile("(?i).*\\bProcessBuilder\\b.*"),
+        Pattern.compile("(?i).*\\bProcess\\b.*"),
+        Pattern.compile("(?i).*\\bSystem\\b.*"),
+        Pattern.compile("(?i).*\\bClassLoader\\b.*"),
+        Pattern.compile("(?i).*\\bClass\\b.*"),
+        Pattern.compile("(?i).*\\bjava\\.lang\\.reflect\\b.*"),
+        Pattern.compile("(?i).*\\bMethod\\b.*"),
+        Pattern.compile("(?i).*\\bField\\b.*"),
+        Pattern.compile("(?i).*\\bConstructor\\b.*"),
+        Pattern.compile("(?i).*\\bjava\\.io\\b.*"),
+        Pattern.compile("(?i).*\\bjava\\.nio\\b.*"),
+        Pattern.compile("(?i).*\\bFile\\b.*"),
+        Pattern.compile("(?i).*\\bFileInputStream\\b.*"),
+        Pattern.compile("(?i).*\\bFileOutputStream\\b.*"),
+        Pattern.compile("(?i).*\\bFileReader\\b.*"),
+        Pattern.compile("(?i).*\\bFileWriter\\b.*"),
+        Pattern.compile("(?i).*\\bjava\\.net\\b.*"),
+        Pattern.compile("(?i).*\\bSocket\\b.*"),
+        Pattern.compile("(?i).*\\bURL\\b.*"),
+        Pattern.compile("(?i).*\\bHttpURLConnection\\b.*"),
+        Pattern.compile("(?i).*\\bScriptEngine\\b.*"),
+        Pattern.compile("(?i).*\\bjavax\\.script\\b.*"),
+        Pattern.compile("(?i).*\\bThread\\b.*"),
+        Pattern.compile("(?i).*\\bThreadGroup\\b.*"),
     };
 
-    private static final Pattern NEW_OBJECT_CREATION_PATTERN = Pattern
-            .compile("\\bnew\\s+([a-zA-Z_$][a-zA-Z\\d_$]*\\.)*[a-zA-Z_$][a-zA-Z\\d_$]*");
+    private static final Pattern NEW_OBJECT_CREATION_PATTERN =
+            Pattern.compile("\\bnew\\s+([a-zA-Z_$][a-zA-Z\\d_$]*\\.)*[a-zA-Z_$][a-zA-Z\\d_$]*");
 
     private static final Pattern MVEL_TYPE_REFERENCE_PATTERN = Pattern.compile("\\bT\\s*\\(");
 
     private static final String[] BLOCKED_DANGEROUS_CLASSES = {
-            "java.lang.Runtime",
-            "java.lang.Process",
-            "java.lang.Thread",
-            "java.io.",
-            "java.net.",
-            "java.lang.reflect."
+        "java.lang.Runtime",
+        "java.lang.Process",
+        "java.lang.Thread",
+        "java.io.",
+        "java.net.",
+        "java.lang.reflect."
     };
 
-    private MvelSandbox() {
-    }
+    private MvelSandbox() {}
 
     public static ParserContext createSandboxedParserContext() {
         ParserContext parserContext = new ParserContext();
