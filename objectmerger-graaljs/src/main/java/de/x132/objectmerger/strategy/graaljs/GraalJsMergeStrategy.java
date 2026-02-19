@@ -1,0 +1,80 @@
+package de.x132.objectmerger.strategy.graaljs;
+
+import de.x132.objectmerger.LabeledSource;
+import de.x132.objectmerger.strategy.MergeStrategy;
+import de.x132.objectmerger.strategy.config.GraalJsConfig;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
+import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.Engine;
+import org.graalvm.polyglot.HostAccess;
+import org.graalvm.polyglot.Value;
+
+@Slf4j
+public class GraalJsMergeStrategy implements MergeStrategy<Object, GraalJsFieldDefinition> {
+
+    public static final String NAME = "mvel"; // Intentionally named "mvel" to replace it
+
+    private static final Engine ENGINE = Engine.newBuilder().build();
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public Class<GraalJsFieldDefinition> getConfigurationClass() {
+        return GraalJsFieldDefinition.class;
+    }
+
+    @Override
+    public Object merge(
+            List<LabeledSource<?>> sources, GraalJsFieldDefinition fieldDef, String fieldName) {
+        return merge(sources, (GraalJsConfig) fieldDef, fieldName, fieldDef.getDefaultValue());
+    }
+
+    private Object merge(
+            List<LabeledSource<?>> sources,
+            GraalJsConfig fieldDef,
+            String fieldName,
+            Object defaultValue) {
+        if (fieldDef == null
+                || fieldDef.getExpression() == null
+                || fieldDef.getExpression().isEmpty()) {
+            log.warn(
+                    "GraalJS strategy invoked for field '{}' but no expression provided.",
+                    fieldName);
+            return defaultValue;
+        }
+
+        try (Context context =
+                Context.newBuilder("js")
+                        .engine(ENGINE)
+                        .allowHostAccess(HostAccess.ALL)
+                        .allowHostClassLookup(s -> false) // Secure by default
+                        .build()) {
+
+            Map<String, Object> simpleSources = new HashMap<>();
+            for (LabeledSource<?> source : sources) {
+                simpleSources.put(source.getLabel(), source.getSource());
+            }
+
+            Value bindings = context.getBindings("js");
+            bindings.putMember("sources", simpleSources);
+            bindings.putMember("labeledSources", sources);
+
+            Value result = context.eval("js", fieldDef.getExpression());
+
+            return result.as(Object.class);
+
+        } catch (Exception e) {
+            log.error(
+                    "Error executing GraalJS expression for field '{}': {}",
+                    fieldName,
+                    e.getMessage());
+            return defaultValue;
+        }
+    }
+}
