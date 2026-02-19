@@ -171,6 +171,15 @@
                             <importOrder/>
                         </java>
                     </configuration>
+                    <executions>
+                        <execution>
+                            <id>auto-style</id>
+                            <phase>process-sources</phase>
+                            <goals>
+                                <goal>apply</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
