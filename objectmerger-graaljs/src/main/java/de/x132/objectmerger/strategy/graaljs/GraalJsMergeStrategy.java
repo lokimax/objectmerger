@@ -15,7 +15,7 @@ import org.graalvm.polyglot.Value;
 @Slf4j
 public class GraalJsMergeStrategy implements MergeStrategy<Object, GraalJsFieldDefinition> {
 
-    public static final String NAME = "mvel"; // Intentionally named "mvel" to replace it
+    public static final String NAME = "graaljs";
 
     private static final Engine ENGINE = Engine.newBuilder().build();
 

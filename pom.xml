@@ -63,6 +63,16 @@
                 <artifactId>objectmerger</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>de.x132</groupId>
+                <artifactId>objectmerger-graaljs</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.x132</groupId>
+                <artifactId>objectmerger-mvel</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- External dependencies -->
             <dependency>

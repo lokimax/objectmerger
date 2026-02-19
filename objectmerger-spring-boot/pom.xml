@@ -53,7 +53,7 @@
         </dependency>
         <dependency>
             <groupId>de.x132</groupId>
-            <artifactId>objectmerger-mvel</artifactId>
+            <artifactId>objectmerger-graaljs</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
