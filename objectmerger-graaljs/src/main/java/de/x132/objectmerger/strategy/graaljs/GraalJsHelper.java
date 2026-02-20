@@ -5,9 +5,18 @@ import org.graalvm.polyglot.Engine;
 import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.Value;
 
-public class GraalJsHelper {
+/**
+ * Helper class to create secure GraalJS contexts.
+ *
+ * <p>Ensures that potentially dangerous global objects (Packages, java, etc.) are removed to
+ * prevent unauthorized access to the host system.
+ */
+public final class GraalJsHelper {
 
     private static final Engine ENGINE = Engine.newBuilder().build();
+
+    // Private constructor to prevent instantiation
+    private GraalJsHelper() {}
 
     public static Context createSecureContext() {
         Context context =

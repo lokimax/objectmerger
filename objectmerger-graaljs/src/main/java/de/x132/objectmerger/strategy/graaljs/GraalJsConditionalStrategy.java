@@ -16,6 +16,14 @@ import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
 
 @Slf4j
+/**
+ * Conditional MergeStrategy using GraalJS expressions.
+ *
+ * <p>Evaluates JavaScript conditions against source values to determine which sub-strategy should
+ * be applied. Uses a sandboxed GraalJS context via {@link GraalJsHelper}.
+ *
+ * @param <T> the type of the result
+ */
 public class GraalJsConditionalStrategy<T>
         implements MergeStrategy<T, ConditionalFieldDefinition<T>> {
 
