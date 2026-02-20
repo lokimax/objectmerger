@@ -147,27 +147,28 @@ class MergeDefinitionConverterTest {
     }
 
     @Test
-    @DisplayName("Should parse MvelFieldDefinition")
-    void parseMvelFieldDefinition() {
+    @DisplayName("Should parse GraalJsFieldDefinition")
+    void parseGraalJsFieldDefinition() {
         Map<String, Object> fieldMap = new HashMap<>();
-        fieldMap.put("strategy", "mvel");
-        fieldMap.put("expression", "sources['a'] + sources['b']");
+        fieldMap.put("strategy", "graaljs");
+        fieldMap.put("expression", "sources.a + sources.b");
 
         Map<String, Map<String, Object>> input = Map.of("testField", fieldMap);
         MergeDefinition definition = MergeDefinitionConverter.fromMap(input);
 
-        // Use reflection to avoid direct dependency on MVEL module classes in imports
+        // Use reflection to verify class, effectively testing that dynamic loading
+        // works
         FieldDefinition fieldDef = definition.getDefinitions().get("testField");
         try {
-            Class<?> mvelClass =
-                    Class.forName("de.x132.objectmerger.strategy.mvel.MvelFieldDefinition");
-            assertInstanceOf(mvelClass, fieldDef);
+            Class<?> graalClass =
+                    Class.forName("de.x132.objectmerger.strategy.graaljs.GraalJsFieldDefinition");
+            assertInstanceOf(graalClass, fieldDef);
 
-            java.lang.reflect.Method getExpression = mvelClass.getMethod("getExpression");
+            java.lang.reflect.Method getExpression = graalClass.getMethod("getExpression");
             String expression = (String) getExpression.invoke(fieldDef);
-            assertEquals("sources['a'] + sources['b']", expression);
+            assertEquals("sources.a + sources.b", expression);
         } catch (Exception e) {
-            fail("Failed to verify MvelFieldDefinition via reflection: " + e.getMessage());
+            fail("Failed to verify GraalJsFieldDefinition via reflection: " + e.getMessage());
         }
     }
 }

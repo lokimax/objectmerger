@@ -22,6 +22,10 @@
             <artifactId>objectmerger</artifactId>
         </dependency>
         <dependency>
+            <groupId>de.x132</groupId>
+            <artifactId>objectmerger-graaljs</artifactId>
+        </dependency>
+        <dependency>
             <groupId>info.picocli</groupId>
             <artifactId>picocli</artifactId>
         </dependency>

@@ -72,8 +72,10 @@ The project is structured as a multi-module Maven project.
 | Module | Description | Dependency |
 |---|---|---|
 | **objectmerger** | **Core library**. Contains the merge logic and standard strategies. | - |
-| **objectmerger-cli** | *Example*: Command-line interface for file-based JSON merging. | `objectmerger` |
-| **objectmerger-spring-boot** | *Example*: REST API application with Swagger UI. | `objectmerger` |
+| **objectmerger-cli** | *Example*: Command-line interface for file-based JSON merging. | `objectmerger`, `objectmerger-graaljs` or `objectmerger-mvel` |
+| **objectmerger-spring-boot** | *Example*: REST API application with Swagger UI. | `objectmerger`, `objectmerger-graaljs` or `objectmerger-mvel` |
+| **objectmerger-mvel** | **Extension**. MVEL-based scripting and conditional implementations. | `objectmerger`, `mvel2` |
+| **objectmerger-graaljs** | **Extension**. GraalJS-based scripting and conditional implementations. | `objectmerger`, `graalvm` |
 
 ### 5.1 Level 1: Core Library (Whitebox)
 
@@ -131,17 +133,41 @@ POST to `http://localhost:8080/api/v1/merge` with a JSON body containing target 
 
 ## 7. Deployment View
 
-### 7.1 Maven Dependency
-
+### 7.1 Maven Dependency (Core)
 ```xml
 <dependency>
     <groupId>de.x132</groupId>
     <artifactId>objectmerger</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.2.0</version>
 </dependency>
 ```
 
-### 7.2 Build
+### 7.2 Extensions (Select One)
+ObjectMerger offers two scripting extensions. Please choose **one** based on your preferred scripting language.
+
+#### Option A: MVEL Extension (Default / Classic)
+Recommended for users familiar with Java-like syntax and the original behavior.
+```xml
+<dependency>
+    <groupId>de.x132</groupId>
+    <artifactId>objectmerger-mvel</artifactId>
+    <version>0.2.0</version>
+</dependency>
+```
+
+#### Option B: GraalJS Extension (Modern / JavaScript)
+Recommended for users who prefer JavaScript syntax or require modern ECMA script features.
+```xml
+<dependency>
+    <groupId>de.x132</groupId>
+    <artifactId>objectmerger-graaljs</artifactId>
+    <version>0.2.0</version>
+</dependency>
+```
+
+> **Important**: Do not include both extensions simultaneously to avoid conflicts with the `conditional` strategy.
+
+### 7.3 Build
 
 ```bash
 mvn clean install
@@ -163,7 +189,8 @@ This builds all modules. The resulting artifacts are located in `target/` of the
 | **mergeList** | Merges lists by ID. Supports Template/Intersection. | `{"strategy": "mergeList", "identifyBy": "id", "keyOriginLabels": ["A"], "requirePresenceInAllKeyOrigins": true}` |
 | **mergeMap** | Vereinigt Maps (Union oder Template) | `{"strategy": "mergeMap"}` |
 | **nested**| Deep merge of POJOs using nested definition. | `{"strategy": "nested", "nestedDefinition": {...}}` |
-| **mvel** | Execute custom scripts. | `{"strategy": "mvel", "expression": "return 1;"}` |
+| **mvel** | Execute custom MVEL scripts. | `{"strategy": "mvel", "expression": "return 1;"}` |
+| **graaljs** | Execute custom JavaScript scripts. | `{"strategy": "graaljs", "expression": "1 + 1"}` |
 
 ### 8.2 Map Template Logic
 Vereinigt Map-Objekte aus mehreren Quellen.
@@ -197,7 +224,10 @@ Control which items are retained in the merged list.
 }
 ```
 
-### 8.3 MVEL Scripting
+### 8.4 Scripting
+You can choose between **MVEL** and **GraalJS** backends depending on your included dependencies.
+
+#### 8.4.1 MVEL Scripting
 Allows complex logic using [MVEL](http://mvel.documentnode.com/).
 
 **Context Variables:**
@@ -214,8 +244,30 @@ Allows complex logic using [MVEL](http://mvel.documentnode.com/).
 }
 ```
 
-### 8.8 Conditional Strategy (MVEL)
-The `conditional` strategy acts as a wrapper that routes to different strategies based on dynamic conditions evaluated using MVEL.
+#### 8.4.2 JavaScript Scripting (GraalJS)
+Allows complex logic using JavaScript (via GraalVM Polyglot).
+
+**Context Variables:**
+* `sources`: `Map<String, Object>` (Label -> Object) -> Accessible via `sources.get("label")` or `sources["label"]`
+* `labeledSources`: `List<LabeledSource>`
+
+**Example:**
+```json
+{
+  "age": {
+    "strategy": "graaljs",
+    "expression": "var max = 0; for(var key in sources) { var s = sources[key]; if(s.age > max) max = s.age; }; max;"
+  }
+}
+```
+
+### 8.5 Conditional Strategy
+The `conditional` strategy acts as a wrapper that routes to different strategies based on dynamic conditions. The implementation depends on the **chosen extension**:
+
+*   If `objectmerger-mvel` is included -> Uses MVEL syntax.
+*   If `objectmerger-graaljs` is included -> Uses JavaScript syntax.
+
+**Note:** Ensure only **one** extension is active to avoid conflicts.
 
 **Behavior:**
 1.  Evaluates `cases` in order.
@@ -225,6 +277,9 @@ The `conditional` strategy acts as a wrapper that routes to different strategies
 **Context Variables:**
 - `sources`: List of available `LabeledSource` objects.
 - `values`: Map of values for the current field (key = source label).
+
+#### 8.5.1 Conditional (mvel)
+Requires `objectmerger-mvel`. Uses MVEL syntax.
 
 **Example:**
 ```json
@@ -241,7 +296,25 @@ The `conditional` strategy acts as a wrapper that routes to different strategies
 }
 ```
 
-### 8.9 Nested POJO Merging
+#### 8.5.2 Conditional (graaljs)
+Requires `objectmerger-graaljs`. Uses JavaScript syntax.
+
+**Example:**
+```json
+{
+  "field": "status",
+  "strategy": "conditional",
+  "cases": [
+    {
+      "condition": "values.get('master') == 'active'", 
+      "useStrategy": { "strategy": "priority", "priority": {"master": 1} }
+    }
+  ],
+  "defaultStrategy": { "strategy": "majority" }
+}
+```
+
+### 8.6 Nested POJO Merging
 Allows deep merging of nested POJO objects instead of replacing them wholesale. This enables granular control over nested fields.
 
 **Configuration:**
@@ -263,7 +336,7 @@ Allows deep merging of nested POJO objects instead of replacing them wholesale. 
 }
 ```
 
-### 8.10 Synergy: Conditional + Nested
+### 8.7 Synergy: Conditional + Nested
 Combine strategies to validate data before deep merging.
 
 **Example:**
@@ -273,7 +346,7 @@ Combine strategies to validate data before deep merging.
     "strategy": "conditional",
     "cases": [
       {
-        "condition": "values['api'].isValid == true",
+        "condition": "values.get('api') && values.get('api').isValid == true",
         "useStrategy": {
           "strategy": "nested",
           "nestedDefinition": {
@@ -289,7 +362,6 @@ Combine strategies to validate data before deep merging.
   }
 }
 ```
-
 ## 9. Glossary
 
 | Term | Definition |

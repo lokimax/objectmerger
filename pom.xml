@@ -39,6 +39,7 @@
         <module>objectmerger-cli</module>
         <module>objectmerger-spring-boot</module>
         <module>objectmerger-mvel</module>
+        <module>objectmerger-graaljs</module>
     </modules>
 
     <properties>
@@ -60,6 +61,16 @@
             <dependency>
                 <groupId>de.x132</groupId>
                 <artifactId>objectmerger</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.x132</groupId>
+                <artifactId>objectmerger-graaljs</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.x132</groupId>
+                <artifactId>objectmerger-mvel</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

@@ -11,7 +11,9 @@ This document describes the available merge strategies in ObjectMerger. Each sec
 - [Minimum Strategy](#minimum-strategy)
 - [Average Strategy](#average-strategy)
 - [Priority Strategy](#priority-strategy)
-- [Conditional Strategy](#conditional-strategy)
+- [Conditional Strategy (MVEL)](#conditional-strategy-mvel)
+- [Conditional Strategy (GraalJS)](#conditional-strategy-graaljs)
+- [GraalJS Strategy](#graaljs-strategy)
 - [MVEL Strategy](#mvel-strategy)
 - [List Strategy](#list-strategy)
 - [Map Strategy](#map-strategy)
@@ -370,13 +372,13 @@ PriorityFieldDefinition<String> statusDef = PriorityFieldDefinition.<String>buil
 
 ---
 
-### Conditional Strategy
+### Conditional Strategy (MVEL)
 **Strategy Name:** `conditional`  
-**Description:** Evaluates MVEL expressions to decide which sub-strategy to use. Supports `cases` list and a `defaultStrategy`.
+**Description:** Evaluates expressions to decide which sub-strategy to use. This documentation covers usage with the **MVEL Extension** (`objectmerger-mvel`).
 
 **Context Variables:** `sources` (List<LabeledSource>), `values` (Map<SourceLabel, ValueOfCurrentField>).
 
-**Example Scenario:** If age is 18 (adult), prioritize json1 over json2.
+**Example Scenario:** If age is 18 (adult), prioritize `json1` (where value is 'adult').
 
 #### Input Data
 **json1**
@@ -404,19 +406,9 @@ PriorityFieldDefinition<String> statusDef = PriorityFieldDefinition.<String>buil
       "cases": [
         {
           "condition": "values['json1'] == 'adult'",
-          "useStrategy": {
-            "strategy": "priority",
-            "priority": {
-              "json1": 1,
-              "json2": 2
-            }
-          }
+          "useStrategy": { "strategy": "priority", "priority": {"json1": 1} }
         }
-      ],
-      "defaultStrategy": {
-        "strategy": "standard",
-        "defaultValue": "fallback"
-      }
+      ]
     }
   }
 }
@@ -432,16 +424,79 @@ PriorityFieldDefinition<String> statusDef = PriorityFieldDefinition.<String>buil
 #### Java Code Example
 ```java
 ConditionCase<String> adultCase = new ConditionCase<>();
-adultCase.setCondition("values['json1'] == 'adult'");
+adultCase.setCondition("values['json1'] == 'adult'"); // MVEL Syntax
 
 Map<String, Integer> p = new HashMap<>();
 p.put("json1", 1);
-p.put("json2", 2);
 PriorityFieldDefinition<String> priorityDef = PriorityFieldDefinition.<String>builder()
     .priority(p)
     .build();
 
 adultCase.setUseStrategy(priorityDef);
+
+ConditionalFieldDefinition<String> categoryDef = ConditionalFieldDefinition.<String>builder()
+    .defaultValue("unknown")
+    .cases(List.of(adultCase))
+    .build();
+```
+
+---
+
+### Conditional Strategy (GraalJS)
+**Strategy Name:** `conditional`  
+**Description:** Evaluates expressions to decide which sub-strategy to use. This documentation covers usage with the **GraalJS Extension** (`objectmerger-graaljs`).
+
+**Context Variables:** `sources` (List<LabeledSource>), `values` (Map<SourceLabel, ValueOfCurrentField>).
+
+**Example Scenario:** If age is 18 (adult), prioritize `json1` (where value is 'adult').
+
+#### Input Data
+**json1**
+```json
+{
+  "age": 18,
+  "category": "adult"
+}
+```
+**json2**
+```json
+{
+  "age": 18,
+  "category": "minor"
+}
+```
+
+#### Merge Definition
+```json
+{
+  "definitions": {
+    "category": {
+      "strategy": "conditional",
+      "defaultValue": "unknown",
+      "cases": [
+        {
+          "condition": "values.get('json1') == 'adult'",
+          "useStrategy": { "strategy": "priority", "priority": {"json1": 1} }
+        }
+      ]
+    }
+  }
+}
+```
+
+#### Result
+```json
+{
+  "category": "adult"
+}
+```
+
+#### Java Code Example
+```java
+ConditionCase<String> adultCase = new ConditionCase<>();
+adultCase.setCondition("values.get('json1') == 'adult'"); // JS Syntax
+
+// ... (Rest of setup remains the same) ...
 
 ConditionalFieldDefinition<String> categoryDef = ConditionalFieldDefinition.<String>builder()
     .defaultValue("unknown")
@@ -492,6 +547,53 @@ ConditionalFieldDefinition<String> categoryDef = ConditionalFieldDefinition.<Str
 ```java
 MvelFieldDefinition mvelDef = MvelFieldDefinition.builder()
     .expression("sources['json1']['price'] * (1.0 - sources['json1']['discount'])")
+    .defaultValue(0.0)
+    .build();
+```
+
+---
+
+### GraalJS Strategy
+**Strategy Name:** `graaljs`  
+**Description:** Executes a complex JavaScript expression (via GraalVM Polyglot) to calculate the value.
+
+**Context Variables:** `sources` (Map<SourceLabel, SourceObject>).
+
+**Example Scenario:** Calculating a final price by applying a discount rate from the same source.
+
+#### Input Data
+**json1**
+```json
+{
+  "price": 100,
+  "discount": 0.1
+}
+```
+
+#### Merge Definition
+```json
+{
+  "definitions": {
+    "finalPrice": {
+      "strategy": "graaljs",
+      "expression": "sources.get('json1').price * (1.0 - sources.get('json1').discount)",
+      "defaultValue": 0.0
+    }
+  }
+}
+```
+
+#### Result
+```json
+{
+  "finalPrice": 90.0
+}
+```
+
+#### Java Code Example
+```java
+GraalJsFieldDefinition jsDef = GraalJsFieldDefinition.builder()
+    .expression("sources.get('json1').price * (1.0 - sources.get('json1').discount)")
     .defaultValue(0.0)
     .build();
 ```
@@ -613,6 +715,8 @@ itemsDef.setItemMergeDefinition(itemDef);
 #### Java Code Example
 ```java
 MapFieldDefinition<Map<Object, Object>> transDef = MapFieldDefinition.<Map<Object, Object>>builder()
+    .build();
+```
 ---
 
 ### Nested Strategy

@@ -11,5 +11,4 @@ de.x132.objectmerger.strategy.maximum.MaximumValueStrategy
 
 
 de.x132.objectmerger.strategy.nested.NestedMergeStrategy
-de.x132.objectmerger.strategy.mvel.MvelMergeStrategy
-de.x132.objectmerger.strategy.conditional.ConditionalMergeStrategy
+
