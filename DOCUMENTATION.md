@@ -377,10 +377,32 @@ PriorityFieldDefinition<String> statusDef = PriorityFieldDefinition.<String>buil
 
 **Important:** You must include **either** `objectmerger-mvel` **or** `objectmerger-graaljs` in your dependencies, but not both.
 
-**Context Variables:** `sources` (List<LabeledSource>), `values` (Map<SourceLabel, ValueOfCurrentField>).
+---
 
-#### If using MVEL Extension
-Requires `objectmerger-mvel`.
+#### Variant A: Conditional with MVEL Extension
+**Requires:** `objectmerger-mvel` dependency.
+
+**Description:** Uses MVEL syntax to evaluate conditions.
+
+**Example Scenario:** If age is 18 (adult), prioritize `json1` (where value is 'adult').
+
+#### Input Data
+**json1**
+```json
+{
+  "age": 18,
+  "category": "adult"
+}
+```
+**json2**
+```json
+{
+  "age": 18,
+  "category": "minor"
+}
+```
+
+#### Merge Definition
 ```json
 {
   "definitions": {
@@ -398,8 +420,58 @@ Requires `objectmerger-mvel`.
 }
 ```
 
-#### If using GraalJS Extension
-Requires `objectmerger-graaljs`.
+#### Result
+```json
+{
+  "category": "adult"
+}
+```
+
+#### Java Code Example
+```java
+ConditionCase<String> adultCase = new ConditionCase<>();
+adultCase.setCondition("values['json1'] == 'adult'"); // MVEL Syntax
+
+Map<String, Integer> p = new HashMap<>();
+p.put("json1", 1);
+PriorityFieldDefinition<String> priorityDef = PriorityFieldDefinition.<String>builder()
+    .priority(p)
+    .build();
+
+adultCase.setUseStrategy(priorityDef);
+
+ConditionalFieldDefinition<String> categoryDef = ConditionalFieldDefinition.<String>builder()
+    .defaultValue("unknown")
+    .cases(List.of(adultCase))
+    .build();
+```
+
+---
+
+#### Variant B: Conditional with GraalJS Extension
+**Requires:** `objectmerger-graaljs` dependency.
+
+**Description:** Uses JavaScript syntax to evaluate conditions.
+
+**Example Scenario:** If age is 18 (adult), prioritize `json1` (where value is 'adult').
+
+#### Input Data
+**json1**
+```json
+{
+  "age": 18,
+  "category": "adult"
+}
+```
+**json2**
+```json
+{
+  "age": 18,
+  "category": "minor"
+}
+```
+
+#### Merge Definition
 ```json
 {
   "definitions": {
@@ -417,21 +489,19 @@ Requires `objectmerger-graaljs`.
 }
 ```
 
+#### Result
+```json
+{
+  "category": "adult"
+}
+```
+
 #### Java Code Example
-The Java setup is identical, only the condition string syntax varies.
 ```java
 ConditionCase<String> adultCase = new ConditionCase<>();
-// Use MVEL or GraalJS syntax depending on your dependencies
-adultCase.setCondition("values.get('json1') == 'adult'"); 
+adultCase.setCondition("values.get('json1') == 'adult'"); // JS Syntax
 
-Map<String, Integer> p = new HashMap<>();
-p.put("json1", 1);
-p.put("json2", 2);
-PriorityFieldDefinition<String> priorityDef = PriorityFieldDefinition.<String>builder()
-    .priority(p)
-    .build();
-
-adultCase.setUseStrategy(priorityDef);
+// ... (Rest of setup remains the same) ...
 
 ConditionalFieldDefinition<String> categoryDef = ConditionalFieldDefinition.<String>builder()
     .defaultValue("unknown")
