@@ -18,6 +18,11 @@ public final class GraalJsHelper {
     // Private constructor to prevent instantiation
     private GraalJsHelper() {}
 
+    /**
+     * Creates a new secure GraalJS context.
+     *
+     * @return a new secure {@link Context}. The caller is responsible for closing it.
+     */
     public static Context createSecureContext() {
         Context context =
                 Context.newBuilder("js")
