@@ -133,17 +133,41 @@ POST to `http://localhost:8080/api/v1/merge` with a JSON body containing target 
 
 ## 7. Deployment View
 
-### 7.1 Maven Dependency
-
+### 7.1 Maven Dependency (Core)
 ```xml
 <dependency>
     <groupId>de.x132</groupId>
     <artifactId>objectmerger</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.2.0</version>
 </dependency>
 ```
 
-### 7.2 Build
+### 7.2 Extensions (Select One)
+ObjectMerger offers two scripting extensions. Please choose **one** based on your preferred scripting language.
+
+#### Option A: MVEL Extension (Default / Classic)
+Recommended for users familiar with Java-like syntax and the original behavior.
+```xml
+<dependency>
+    <groupId>de.x132</groupId>
+    <artifactId>objectmerger-mvel</artifactId>
+    <version>0.2.0</version>
+</dependency>
+```
+
+#### Option B: GraalJS Extension (Modern / JavaScript)
+Recommended for users who prefer JavaScript syntax or require modern ECMA script features.
+```xml
+<dependency>
+    <groupId>de.x132</groupId>
+    <artifactId>objectmerger-graaljs</artifactId>
+    <version>0.2.0</version>
+</dependency>
+```
+
+> **Important**: Do not include both extensions simultaneously to avoid conflicts with the `conditional` strategy.
+
+### 7.3 Build
 
 ```bash
 mvn clean install
@@ -238,7 +262,12 @@ Allows complex logic using JavaScript (via GraalVM Polyglot).
 ```
 
 ### 8.5 Conditional Strategy
-The `conditional` strategy acts as a wrapper that routes to different strategies based on dynamic conditions. The implementation depends on the active extension (**MVEL** or **GraalJS**).
+The `conditional` strategy acts as a wrapper that routes to different strategies based on dynamic conditions. The implementation depends on the **chosen extension**:
+
+*   If `objectmerger-mvel` is included -> Uses MVEL syntax.
+*   If `objectmerger-graaljs` is included -> Uses JavaScript syntax.
+
+**Note:** Ensure only **one** extension is active to avoid conflicts.
 
 **Behavior:**
 1.  Evaluates `cases` in order.
@@ -249,8 +278,8 @@ The `conditional` strategy acts as a wrapper that routes to different strategies
 - `sources`: List of available `LabeledSource` objects.
 - `values`: Map of values for the current field (key = source label).
 
-#### 8.5.1 Conditional (MVEL)
-Uses MVEL syntax for conditions.
+#### 8.5.1 Conditional (mvel)
+Requires `objectmerger-mvel`. Uses MVEL syntax.
 
 **Example:**
 ```json
@@ -267,8 +296,8 @@ Uses MVEL syntax for conditions.
 }
 ```
 
-#### 8.5.2 Conditional (GraalJS)
-Uses JavaScript syntax for conditions.
+#### 8.5.2 Conditional (graaljs)
+Requires `objectmerger-graaljs`. Uses JavaScript syntax.
 
 **Example:**
 ```json

@@ -373,11 +373,14 @@ PriorityFieldDefinition<String> statusDef = PriorityFieldDefinition.<String>buil
 
 ### Conditional Strategy
 **Strategy Name:** `conditional`  
-**Description:** Evaluates expressions to decide which sub-strategy to use. The syntax depends on the active extension (**MVEL** or **GraalJS**).
+**Description:** Evaluates expressions to decide which sub-strategy to use. The syntax depends on the **active extension** (MVEL or GraalJS).
+
+**Important:** You must include **either** `objectmerger-mvel` **or** `objectmerger-graaljs` in your dependencies, but not both.
 
 **Context Variables:** `sources` (List<LabeledSource>), `values` (Map<SourceLabel, ValueOfCurrentField>).
 
-#### MVEL Syntax Example
+#### If using MVEL Extension
+Requires `objectmerger-mvel`.
 ```json
 {
   "definitions": {
@@ -395,7 +398,8 @@ PriorityFieldDefinition<String> statusDef = PriorityFieldDefinition.<String>buil
 }
 ```
 
-#### GraalJS Syntax Example
+#### If using GraalJS Extension
+Requires `objectmerger-graaljs`.
 ```json
 {
   "definitions": {
@@ -414,11 +418,11 @@ PriorityFieldDefinition<String> statusDef = PriorityFieldDefinition.<String>buil
 ```
 
 #### Java Code Example
+The Java setup is identical, only the condition string syntax varies.
 ```java
 ConditionCase<String> adultCase = new ConditionCase<>();
-// MVEL: "values['json1'] == 'adult'"
-// GraalJS: "values.get('json1') == 'adult'"
-adultCase.setCondition("values['json1'] == 'adult'"); 
+// Use MVEL or GraalJS syntax depending on your dependencies
+adultCase.setCondition("values.get('json1') == 'adult'"); 
 
 Map<String, Integer> p = new HashMap<>();
 p.put("json1", 1);
