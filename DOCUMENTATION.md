@@ -11,7 +11,8 @@ This document describes the available merge strategies in ObjectMerger. Each sec
 - [Minimum Strategy](#minimum-strategy)
 - [Average Strategy](#average-strategy)
 - [Priority Strategy](#priority-strategy)
-- [Conditional Strategy](#conditional-strategy)
+- [Conditional Strategy (MVEL)](#conditional-strategy-mvel)
+- [Conditional Strategy (GraalJS)](#conditional-strategy-graaljs)
 - [GraalJS Strategy](#graaljs-strategy)
 - [MVEL Strategy](#mvel-strategy)
 - [List Strategy](#list-strategy)
@@ -371,18 +372,11 @@ PriorityFieldDefinition<String> statusDef = PriorityFieldDefinition.<String>buil
 
 ---
 
-### Conditional Strategy
+### Conditional Strategy (MVEL)
 **Strategy Name:** `conditional`  
-**Description:** Evaluates expressions to decide which sub-strategy to use. The syntax depends on the **active extension** (MVEL or GraalJS).
+**Description:** Evaluates expressions to decide which sub-strategy to use. This documentation covers usage with the **MVEL Extension** (`objectmerger-mvel`).
 
-**Important:** You must include **either** `objectmerger-mvel` **or** `objectmerger-graaljs` in your dependencies, but not both.
-
----
-
-#### Variant A: Conditional with MVEL Extension
-**Requires:** `objectmerger-mvel` dependency.
-
-**Description:** Uses MVEL syntax to evaluate conditions.
+**Context Variables:** `sources` (List<LabeledSource>), `values` (Map<SourceLabel, ValueOfCurrentField>).
 
 **Example Scenario:** If age is 18 (adult), prioritize `json1` (where value is 'adult').
 
@@ -448,10 +442,11 @@ ConditionalFieldDefinition<String> categoryDef = ConditionalFieldDefinition.<Str
 
 ---
 
-#### Variant B: Conditional with GraalJS Extension
-**Requires:** `objectmerger-graaljs` dependency.
+### Conditional Strategy (GraalJS)
+**Strategy Name:** `conditional`  
+**Description:** Evaluates expressions to decide which sub-strategy to use. This documentation covers usage with the **GraalJS Extension** (`objectmerger-graaljs`).
 
-**Description:** Uses JavaScript syntax to evaluate conditions.
+**Context Variables:** `sources` (List<LabeledSource>), `values` (Map<SourceLabel, ValueOfCurrentField>).
 
 **Example Scenario:** If age is 18 (adult), prioritize `json1` (where value is 'adult').
 
@@ -720,6 +715,8 @@ itemsDef.setItemMergeDefinition(itemDef);
 #### Java Code Example
 ```java
 MapFieldDefinition<Map<Object, Object>> transDef = MapFieldDefinition.<Map<Object, Object>>builder()
+    .build();
+```
 ---
 
 ### Nested Strategy
