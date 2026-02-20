@@ -8,16 +8,12 @@ import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.graalvm.polyglot.Context;
-import org.graalvm.polyglot.Engine;
-import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.Value;
 
 @Slf4j
 public class GraalJsMergeStrategy implements MergeStrategy<Object, GraalJsFieldDefinition> {
 
     public static final String NAME = "graaljs";
-
-    private static final Engine ENGINE = Engine.newBuilder().build();
 
     @Override
     public String getName() {
@@ -49,12 +45,7 @@ public class GraalJsMergeStrategy implements MergeStrategy<Object, GraalJsFieldD
             return defaultValue;
         }
 
-        try (Context context =
-                Context.newBuilder("js")
-                        .engine(ENGINE)
-                        .allowHostAccess(HostAccess.ALL)
-                        .allowHostClassLookup(s -> false) // Secure by default
-                        .build()) {
+        try (Context context = GraalJsHelper.createSecureContext()) {
 
             Map<String, Object> simpleSources = new HashMap<>();
             for (LabeledSource<?> source : sources) {

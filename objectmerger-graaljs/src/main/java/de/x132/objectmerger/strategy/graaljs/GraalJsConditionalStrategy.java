@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.graalvm.polyglot.Context;
-import org.graalvm.polyglot.Engine;
-import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.Value;
 
 @Slf4j
@@ -22,8 +20,6 @@ public class GraalJsConditionalStrategy<T>
         implements MergeStrategy<T, ConditionalFieldDefinition<T>> {
 
     public static final String NAME = "conditional";
-
-    private static final Engine ENGINE = Engine.newBuilder().build();
 
     @Override
     public String getName() {
@@ -55,12 +51,7 @@ public class GraalJsConditionalStrategy<T>
             values.put(s.getLabel(), ObjectMerger.getFieldValue(s.getSource(), fieldName));
         }
 
-        try (Context context =
-                Context.newBuilder("js")
-                        .engine(ENGINE)
-                        .allowHostAccess(HostAccess.ALL)
-                        .allowHostClassLookup(s -> false) // Secure by default
-                        .build()) {
+        try (Context context = GraalJsHelper.createSecureContext()) {
 
             Value bindings = context.getBindings("js");
             bindings.putMember("values", values);
