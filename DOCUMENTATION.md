@@ -12,7 +12,7 @@ This document describes the available merge strategies in ObjectMerger. Each sec
 - [Average Strategy](#average-strategy)
 - [Priority Strategy](#priority-strategy)
 - [Conditional Strategy](#conditional-strategy)
-- [MVEL Strategy](#mvel-strategy)
+- [GraalJS Strategy](#graaljs-strategy)
 - [List Strategy](#list-strategy)
 - [Map Strategy](#map-strategy)
 - [Nested Strategy](#nested-strategy)
@@ -372,7 +372,7 @@ PriorityFieldDefinition<String> statusDef = PriorityFieldDefinition.<String>buil
 
 ### Conditional Strategy
 **Strategy Name:** `conditional`  
-**Description:** Evaluates MVEL expressions to decide which sub-strategy to use. Supports `cases` list and a `defaultStrategy`.
+**Description:** Evaluates JavaScript expressions (via GraalJS) to decide which sub-strategy to use. Supports `cases` list and a `defaultStrategy`.
 
 **Context Variables:** `sources` (List<LabeledSource>), `values` (Map<SourceLabel, ValueOfCurrentField>).
 
@@ -403,7 +403,7 @@ PriorityFieldDefinition<String> statusDef = PriorityFieldDefinition.<String>buil
       "defaultValue": "unknown",
       "cases": [
         {
-          "condition": "values['json1'] == 'adult'",
+          "condition": "values.get('json1') == 'adult'",
           "useStrategy": {
             "strategy": "priority",
             "priority": {
@@ -432,7 +432,7 @@ PriorityFieldDefinition<String> statusDef = PriorityFieldDefinition.<String>buil
 #### Java Code Example
 ```java
 ConditionCase<String> adultCase = new ConditionCase<>();
-adultCase.setCondition("values['json1'] == 'adult'");
+adultCase.setCondition("values.get('json1') == 'adult'");
 
 Map<String, Integer> p = new HashMap<>();
 p.put("json1", 1);
@@ -451,9 +451,9 @@ ConditionalFieldDefinition<String> categoryDef = ConditionalFieldDefinition.<Str
 
 ---
 
-### MVEL Strategy
-**Strategy Name:** `mvel`  
-**Description:** Executes a complex MVEL expression to calculate the value.
+### GraalJS Strategy
+**Strategy Name:** `graaljs`  
+**Description:** Executes a complex JavaScript expression (via GraalVM Polyglot) to calculate the value.
 
 **Context Variables:** `sources` (Map<SourceLabel, SourceObject>).
 
@@ -473,8 +473,8 @@ ConditionalFieldDefinition<String> categoryDef = ConditionalFieldDefinition.<Str
 {
   "definitions": {
     "finalPrice": {
-      "strategy": "mvel",
-      "expression": "sources['json1']['price'] * (1.0 - sources['json1']['discount'])",
+      "strategy": "graaljs",
+      "expression": "sources.get('json1').price * (1.0 - sources.get('json1').discount)",
       "defaultValue": 0.0
     }
   }
@@ -490,8 +490,8 @@ ConditionalFieldDefinition<String> categoryDef = ConditionalFieldDefinition.<Str
 
 #### Java Code Example
 ```java
-MvelFieldDefinition mvelDef = MvelFieldDefinition.builder()
-    .expression("sources['json1']['price'] * (1.0 - sources['json1']['discount'])")
+GraalJsFieldDefinition jsDef = GraalJsFieldDefinition.builder()
+    .expression("sources.get('json1').price * (1.0 - sources.get('json1').discount)")
     .defaultValue(0.0)
     .build();
 ```
