@@ -72,9 +72,10 @@ The project is structured as a multi-module Maven project.
 | Module | Description | Dependency |
 |---|---|---|
 | **objectmerger** | **Core library**. Contains the merge logic and standard strategies. | - |
-| **objectmerger-cli** | *Example*: Command-line interface for file-based JSON merging. | `objectmerger`, `objectmerger-graaljs` |
-| **objectmerger-spring-boot** | *Example*: REST API application with Swagger UI. | `objectmerger`, `objectmerger-graaljs` |
-| **objectmerger-graaljs** | **Extension**. Provides JavaScript-based scripting and conditional implementations. | `objectmerger` |
+| **objectmerger-cli** | *Example*: Command-line interface for file-based JSON merging. | `objectmerger`, `objectmerger-graaljs` or `objectmerger-mvel` |
+| **objectmerger-spring-boot** | *Example*: REST API application with Swagger UI. | `objectmerger`, `objectmerger-graaljs` or `objectmerger-mvel` |
+| **objectmerger-mvel** | **Extension**. MVEL-based scripting and conditional implementations. | `objectmerger`, `mvel2` |
+| **objectmerger-graaljs** | **Extension**. GraalJS-based scripting and conditional implementations. | `objectmerger`, `graalvm` |
 
 ### 5.1 Level 1: Core Library (Whitebox)
 
@@ -164,6 +165,7 @@ This builds all modules. The resulting artifacts are located in `target/` of the
 | **mergeList** | Merges lists by ID. Supports Template/Intersection. | `{"strategy": "mergeList", "identifyBy": "id", "keyOriginLabels": ["A"], "requirePresenceInAllKeyOrigins": true}` |
 | **mergeMap** | Vereinigt Maps (Union oder Template) | `{"strategy": "mergeMap"}` |
 | **nested**| Deep merge of POJOs using nested definition. | `{"strategy": "nested", "nestedDefinition": {...}}` |
+| **mvel** | Execute custom MVEL scripts. | `{"strategy": "mvel", "expression": "return 1;"}` |
 | **graaljs** | Execute custom JavaScript scripts. | `{"strategy": "graaljs", "expression": "1 + 1"}` |
 
 ### 8.2 Map Template Logic
@@ -198,7 +200,27 @@ Control which items are retained in the merged list.
 }
 ```
 
-### 8.4 JavaScript Scripting (GraalJS)
+### 8.4 Scripting
+You can choose between **MVEL** and **GraalJS** backends depending on your included dependencies.
+
+#### 8.4.1 MVEL Scripting
+Allows complex logic using [MVEL](http://mvel.documentnode.com/).
+
+**Context Variables:**
+* `sources`: `Map<String, Object>` (Label -> Object)
+* `labeledSources`: `List<LabeledSource>`
+
+**Example:**
+```json
+{
+  "age": {
+    "strategy": "mvel",
+    "expression": "java.util.Collections.max(sources.values().!=[null].!=[age==null].age)"
+  }
+}
+```
+
+#### 8.4.2 JavaScript Scripting (GraalJS)
 Allows complex logic using JavaScript (via GraalVM Polyglot).
 
 **Context Variables:**
@@ -215,8 +237,8 @@ Allows complex logic using JavaScript (via GraalVM Polyglot).
 }
 ```
 
-### 8.5 Conditional Strategy (GraalJS)
-The `conditional` strategy acts as a wrapper that routes to different strategies based on dynamic conditions evaluated using JavaScript (GraalJS).
+### 8.5 Conditional Strategy
+The `conditional` strategy acts as a wrapper that routes to different strategies based on dynamic conditions. The implementation depends on the active extension (**MVEL** or **GraalJS**).
 
 **Behavior:**
 1.  Evaluates `cases` in order.
@@ -226,6 +248,27 @@ The `conditional` strategy acts as a wrapper that routes to different strategies
 **Context Variables:**
 - `sources`: List of available `LabeledSource` objects.
 - `values`: Map of values for the current field (key = source label).
+
+#### 8.5.1 Conditional (MVEL)
+Uses MVEL syntax for conditions.
+
+**Example:**
+```json
+{
+  "field": "status",
+  "strategy": "conditional",
+  "cases": [
+    {
+      "condition": "values.containsKey('master') && values.get('master') == 'active'", 
+      "useStrategy": { "strategy": "priority", "priority": {"master": 1} }
+    }
+  ],
+  "defaultStrategy": { "strategy": "majority" }
+}
+```
+
+#### 8.5.2 Conditional (GraalJS)
+Uses JavaScript syntax for conditions.
 
 **Example:**
 ```json

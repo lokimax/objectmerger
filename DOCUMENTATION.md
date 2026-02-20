@@ -13,6 +13,7 @@ This document describes the available merge strategies in ObjectMerger. Each sec
 - [Priority Strategy](#priority-strategy)
 - [Conditional Strategy](#conditional-strategy)
 - [GraalJS Strategy](#graaljs-strategy)
+- [MVEL Strategy](#mvel-strategy)
 - [List Strategy](#list-strategy)
 - [Map Strategy](#map-strategy)
 - [Nested Strategy](#nested-strategy)
@@ -372,29 +373,29 @@ PriorityFieldDefinition<String> statusDef = PriorityFieldDefinition.<String>buil
 
 ### Conditional Strategy
 **Strategy Name:** `conditional`  
-**Description:** Evaluates JavaScript expressions (via GraalJS) to decide which sub-strategy to use. Supports `cases` list and a `defaultStrategy`.
+**Description:** Evaluates expressions to decide which sub-strategy to use. The syntax depends on the active extension (**MVEL** or **GraalJS**).
 
 **Context Variables:** `sources` (List<LabeledSource>), `values` (Map<SourceLabel, ValueOfCurrentField>).
 
-**Example Scenario:** If age is 18 (adult), prioritize json1 over json2.
-
-#### Input Data
-**json1**
+#### MVEL Syntax Example
 ```json
 {
-  "age": 18,
-  "category": "adult"
-}
-```
-**json2**
-```json
-{
-  "age": 18,
-  "category": "minor"
+  "definitions": {
+    "category": {
+      "strategy": "conditional",
+      "defaultValue": "unknown",
+      "cases": [
+        {
+          "condition": "values['json1'] == 'adult'",
+          "useStrategy": { "strategy": "priority", "priority": {"json1": 1} }
+        }
+      ]
+    }
+  }
 }
 ```
 
-#### Merge Definition
+#### GraalJS Syntax Example
 ```json
 {
   "definitions": {
@@ -404,35 +405,20 @@ PriorityFieldDefinition<String> statusDef = PriorityFieldDefinition.<String>buil
       "cases": [
         {
           "condition": "values.get('json1') == 'adult'",
-          "useStrategy": {
-            "strategy": "priority",
-            "priority": {
-              "json1": 1,
-              "json2": 2
-            }
-          }
+          "useStrategy": { "strategy": "priority", "priority": {"json1": 1} }
         }
-      ],
-      "defaultStrategy": {
-        "strategy": "standard",
-        "defaultValue": "fallback"
-      }
+      ]
     }
   }
-}
-```
-
-#### Result
-```json
-{
-  "category": "adult"
 }
 ```
 
 #### Java Code Example
 ```java
 ConditionCase<String> adultCase = new ConditionCase<>();
-adultCase.setCondition("values.get('json1') == 'adult'");
+// MVEL: "values['json1'] == 'adult'"
+// GraalJS: "values.get('json1') == 'adult'"
+adultCase.setCondition("values['json1'] == 'adult'"); 
 
 Map<String, Integer> p = new HashMap<>();
 p.put("json1", 1);
@@ -446,6 +432,53 @@ adultCase.setUseStrategy(priorityDef);
 ConditionalFieldDefinition<String> categoryDef = ConditionalFieldDefinition.<String>builder()
     .defaultValue("unknown")
     .cases(List.of(adultCase))
+    .build();
+```
+
+---
+
+### MVEL Strategy
+**Strategy Name:** `mvel`  
+**Description:** Executes a complex MVEL expression to calculate the value.
+
+**Context Variables:** `sources` (Map<SourceLabel, SourceObject>).
+
+**Example Scenario:** Calculating a final price by applying a discount rate from the same source.
+
+#### Input Data
+**json1**
+```json
+{
+  "price": 100,
+  "discount": 0.1
+}
+```
+
+#### Merge Definition
+```json
+{
+  "definitions": {
+    "finalPrice": {
+      "strategy": "mvel",
+      "expression": "sources['json1']['price'] * (1.0 - sources['json1']['discount'])",
+      "defaultValue": 0.0
+    }
+  }
+}
+```
+
+#### Result
+```json
+{
+  "finalPrice": 90.0
+}
+```
+
+#### Java Code Example
+```java
+MvelFieldDefinition mvelDef = MvelFieldDefinition.builder()
+    .expression("sources['json1']['price'] * (1.0 - sources['json1']['discount'])")
+    .defaultValue(0.0)
     .build();
 ```
 
