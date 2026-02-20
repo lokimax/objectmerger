@@ -10,13 +10,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
 
-@Slf4j
 /**
  * MergeStrategy implementation using GraalJS.
  *
  * <p>Securely evaluates JavaScript expressions to merge values from multiple sources. Uses a
  * sandboxed GraalJS context via {@link GraalJsHelper} to prevent unauthorized access.
  */
+@Slf4j
 public class GraalJsMergeStrategy implements MergeStrategy<Object, GraalJsFieldDefinition> {
 
     public static final String NAME = "graaljs";

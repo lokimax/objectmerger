@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
 
-@Slf4j
 /**
  * Conditional MergeStrategy using GraalJS expressions.
  *
@@ -24,6 +23,7 @@ import org.graalvm.polyglot.Value;
  *
  * @param <T> the type of the result
  */
+@Slf4j
 public class GraalJsConditionalStrategy<T>
         implements MergeStrategy<T, ConditionalFieldDefinition<T>> {
 

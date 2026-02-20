@@ -27,8 +27,8 @@ public final class GraalJsHelper {
         Context context =
                 Context.newBuilder("js")
                         .engine(ENGINE)
-                        .allowHostAccess(HostAccess.NONE)
-                        .allowHostClassLookup(s -> false) // Secure by default
+                        .allowHostAccess(HostAccess.ALL)
+                        .allowHostClassLookup(s -> false) // Restricts explici
                         .build();
         sanitize(context);
         return context;
