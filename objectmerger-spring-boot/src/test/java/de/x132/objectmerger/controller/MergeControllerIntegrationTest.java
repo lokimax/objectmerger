@@ -52,10 +52,6 @@ class MergeControllerIntegrationTest {
     @Test
     @DisplayName("Should merge person with priority strategy")
     void testMergeWithPriorityStrategy() throws Exception {
-        // Prepare request
-        MergeRequest request = new MergeRequest();
-        request.setTargetClass("de.x132.objectmerger.model.Person");
-
         // Define merge definition with priority
         Map<String, Map<String, Object>> definition = new LinkedHashMap<>();
         definition.put(
@@ -64,7 +60,6 @@ class MergeControllerIntegrationTest {
         definition.put("age", Map.of("strategy", "maximum"));
         definition.put("email", Map.of("strategy", "priority", "priority", Map.of("database", 1)));
         definition.put("phone", Map.of("strategy", "priority", "priority", Map.of("crm", 1)));
-        request.setDefinition(definition);
 
         // Define sources
         Map<String, Object> dbSource = new LinkedHashMap<>();
@@ -83,7 +78,10 @@ class MergeControllerIntegrationTest {
                 Arrays.asList(
                         new LabeledSourceDTO("database", dbSource),
                         new LabeledSourceDTO("crm", crmSource));
-        request.setSources(sources);
+
+        // Prepare request using record constructor
+        MergeRequest request =
+                new MergeRequest("de.x132.objectmerger.model.Person", definition, sources);
 
         // Execute request
         mockMvc.perform(
@@ -100,15 +98,11 @@ class MergeControllerIntegrationTest {
     @Test
     @DisplayName("Should merge with maximum strategy")
     void testMergeWithMaximumStrategy() throws Exception {
-        MergeRequest request = new MergeRequest();
-        request.setTargetClass("de.x132.objectmerger.model.Person");
-
         Map<String, Map<String, Object>> definition = new LinkedHashMap<>();
         definition.put("name", Map.of("strategy", "priority", "priority", Map.of("source1", 1)));
         definition.put("age", Map.of("strategy", "maximum"));
         definition.put("email", Map.of("strategy", "priority", "priority", Map.of("source1", 1)));
         definition.put("phone", Map.of("strategy", "priority", "priority", Map.of("source1", 1)));
-        request.setDefinition(definition);
 
         Map<String, Object> source1 = new LinkedHashMap<>();
         source1.put("name", "John");
@@ -133,7 +127,9 @@ class MergeControllerIntegrationTest {
                         new LabeledSourceDTO("source1", source1),
                         new LabeledSourceDTO("source2", source2),
                         new LabeledSourceDTO("source3", source3));
-        request.setSources(sources);
+
+        MergeRequest request =
+                new MergeRequest("de.x132.objectmerger.model.Person", definition, sources);
 
         mockMvc.perform(
                         post("/api/v1/merge")
@@ -146,15 +142,11 @@ class MergeControllerIntegrationTest {
     @Test
     @DisplayName("Should merge with minimum strategy")
     void testMergeWithMinimumStrategy() throws Exception {
-        MergeRequest request = new MergeRequest();
-        request.setTargetClass("de.x132.objectmerger.model.Person");
-
         Map<String, Map<String, Object>> definition = new LinkedHashMap<>();
         definition.put("name", Map.of("strategy", "priority", "priority", Map.of("source1", 1)));
         definition.put("age", Map.of("strategy", "minimum"));
         definition.put("email", Map.of("strategy", "priority", "priority", Map.of("source1", 1)));
         definition.put("phone", Map.of("strategy", "priority", "priority", Map.of("source1", 1)));
-        request.setDefinition(definition);
 
         Map<String, Object> source1 = new LinkedHashMap<>();
         source1.put("name", "Person1");
@@ -172,7 +164,9 @@ class MergeControllerIntegrationTest {
                 Arrays.asList(
                         new LabeledSourceDTO("source1", source1),
                         new LabeledSourceDTO("source2", source2));
-        request.setSources(sources);
+
+        MergeRequest request =
+                new MergeRequest("de.x132.objectmerger.model.Person", definition, sources);
 
         mockMvc.perform(
                         post("/api/v1/merge")
@@ -185,15 +179,11 @@ class MergeControllerIntegrationTest {
     @Test
     @DisplayName("Should merge with average strategy")
     void testMergeWithAverageStrategy() throws Exception {
-        MergeRequest request = new MergeRequest();
-        request.setTargetClass("de.x132.objectmerger.model.Person");
-
         Map<String, Map<String, Object>> definition = new LinkedHashMap<>();
         definition.put("name", Map.of("strategy", "priority", "priority", Map.of("source1", 1)));
         definition.put("age", Map.of("strategy", "average"));
         definition.put("email", Map.of("strategy", "priority", "priority", Map.of("source1", 1)));
         definition.put("phone", Map.of("strategy", "priority", "priority", Map.of("source1", 1)));
-        request.setDefinition(definition);
 
         Map<String, Object> source1 = new LinkedHashMap<>();
         source1.put("name", "Person1");
@@ -218,7 +208,9 @@ class MergeControllerIntegrationTest {
                         new LabeledSourceDTO("source1", source1),
                         new LabeledSourceDTO("source2", source2),
                         new LabeledSourceDTO("source3", source3));
-        request.setSources(sources);
+
+        MergeRequest request =
+                new MergeRequest("de.x132.objectmerger.model.Person", definition, sources);
 
         mockMvc.perform(
                         post("/api/v1/merge")
@@ -231,15 +223,11 @@ class MergeControllerIntegrationTest {
     @Test
     @DisplayName("Should merge with sum strategy")
     void testMergeWithSumStrategy() throws Exception {
-        MergeRequest request = new MergeRequest();
-        request.setTargetClass("de.x132.objectmerger.model.Person");
-
         Map<String, Map<String, Object>> definition = new LinkedHashMap<>();
         definition.put("name", Map.of("strategy", "priority", "priority", Map.of("source1", 1)));
         definition.put("age", Map.of("strategy", "sum"));
         definition.put("email", Map.of("strategy", "priority", "priority", Map.of("source1", 1)));
         definition.put("phone", Map.of("strategy", "priority", "priority", Map.of("source1", 1)));
-        request.setDefinition(definition);
 
         Map<String, Object> source1 = new LinkedHashMap<>();
         source1.put("name", "Person1");
@@ -264,7 +252,9 @@ class MergeControllerIntegrationTest {
                         new LabeledSourceDTO("source1", source1),
                         new LabeledSourceDTO("source2", source2),
                         new LabeledSourceDTO("source3", source3));
-        request.setSources(sources);
+
+        MergeRequest request =
+                new MergeRequest("de.x132.objectmerger.model.Person", definition, sources);
 
         mockMvc.perform(
                         post("/api/v1/merge")
@@ -277,19 +267,17 @@ class MergeControllerIntegrationTest {
     @Test
     @DisplayName("Should return 403 when target class is not in allowed packages")
     void testMergeWithBlockedTargetClass() throws Exception {
-        MergeRequest request = new MergeRequest();
-        request.setTargetClass("com.invalid.NonExistentClass");
-
         Map<String, Map<String, Object>> definition = new LinkedHashMap<>();
         definition.put("name", Map.of("strategy", "priority", "priority", Map.of("source1", 1)));
-        request.setDefinition(definition);
 
         Map<String, Object> source = new LinkedHashMap<>();
         source.put("name", "Test");
 
         List<LabeledSourceDTO> sources =
                 Collections.singletonList(new LabeledSourceDTO("source1", source));
-        request.setSources(sources);
+
+        MergeRequest request =
+                new MergeRequest("com.invalid.NonExistentClass", definition, sources);
 
         mockMvc.perform(
                         post("/api/v1/merge")
@@ -302,9 +290,6 @@ class MergeControllerIntegrationTest {
     @Test
     @DisplayName("Should handle null values in sources")
     void testMergeWithNullValues() throws Exception {
-        MergeRequest request = new MergeRequest();
-        request.setTargetClass("de.x132.objectmerger.model.Person");
-
         Map<String, Map<String, Object>> definition = new LinkedHashMap<>();
         definition.put(
                 "name",
@@ -318,7 +303,6 @@ class MergeControllerIntegrationTest {
         definition.put(
                 "phone",
                 Map.of("strategy", "priority", "priority", Map.of("source1", 1, "source2", 2)));
-        request.setDefinition(definition);
 
         // source1 has nulls
         Map<String, Object> source1 = new LinkedHashMap<>();
@@ -338,7 +322,9 @@ class MergeControllerIntegrationTest {
                 Arrays.asList(
                         new LabeledSourceDTO("source1", source1),
                         new LabeledSourceDTO("source2", source2));
-        request.setSources(sources);
+
+        MergeRequest request =
+                new MergeRequest("de.x132.objectmerger.model.Person", definition, sources);
 
         mockMvc.perform(
                         post("/api/v1/merge")
@@ -354,9 +340,6 @@ class MergeControllerIntegrationTest {
     @Test
     @DisplayName("Should merge with multiple sources and complex priority")
     void testMergeWithComplexPriority() throws Exception {
-        MergeRequest request = new MergeRequest();
-        request.setTargetClass("de.x132.objectmerger.model.Person");
-
         Map<String, Map<String, Object>> definition = new LinkedHashMap<>();
         definition.put(
                 "name",
@@ -380,7 +363,6 @@ class MergeControllerIntegrationTest {
                         "priority",
                         "priority",
                         Map.of("crm", 1, "database", 2, "analytics", 3)));
-        request.setDefinition(definition);
 
         Map<String, Object> dbSource = new LinkedHashMap<>();
         dbSource.put("name", "DB Name");
@@ -405,7 +387,9 @@ class MergeControllerIntegrationTest {
                         new LabeledSourceDTO("database", dbSource),
                         new LabeledSourceDTO("crm", crmSource),
                         new LabeledSourceDTO("analytics", analyticsSource));
-        request.setSources(sources);
+
+        MergeRequest request =
+                new MergeRequest("de.x132.objectmerger.model.Person", definition, sources);
 
         mockMvc.perform(
                         post("/api/v1/merge")
