@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.x132.objectmerger.security.ClassLoadingGuard;
+import de.x132.objectmerger.service.ExampleMergeService;
 import de.x132.objectmerger.service.ObjectMergerService;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,8 @@ class MergeControllerTest {
     @Autowired private MockMvc mockMvc;
 
     @MockBean private ObjectMergerService objectMergerService;
+
+    @MockBean private ExampleMergeService exampleMergeService;
 
     @Test
     void testGenerateFromClass() throws Exception {

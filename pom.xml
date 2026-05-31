@@ -40,6 +40,8 @@
         <module>objectmerger-spring-boot</module>
         <module>objectmerger-mvel</module>
         <module>objectmerger-graaljs</module>
+        <module>objectmerger-nashorn</module>
+        <module>benchmark-throwaway</module>
     </modules>
 
     <properties>
@@ -57,6 +59,13 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Nashorn -->
+            <dependency>
+                <groupId>org.openjdk.nashorn</groupId>
+                <artifactId>nashorn-core</artifactId>
+                <version>15.4</version>
+            </dependency>
+
             <!-- Internal modules -->
             <dependency>
                 <groupId>de.x132</groupId>
@@ -71,6 +80,11 @@
             <dependency>
                 <groupId>de.x132</groupId>
                 <artifactId>objectmerger-mvel</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.x132</groupId>
+                <artifactId>objectmerger-nashorn</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
